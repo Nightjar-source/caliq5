@@ -220,39 +220,21 @@ fun FeatureExplanationCard(
     val shape = RoundedCornerShape(28.dp)
     val isRtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
 
-    // Authentic sea-glass translucent gradient from the theme color: pure, transparent, seamless
-    val gradientColors = if (isDark) {
-        if (isRtl) {
-            listOf(
-                primaryColor.copy(alpha = 0.18f),
-                primaryColor.copy(alpha = 0.32f),
-                primaryColor.copy(alpha = 0.48f),
-                primaryColor.copy(alpha = 0.62f)
-            )
-        } else {
-            listOf(
-                primaryColor.copy(alpha = 0.62f),
-                primaryColor.copy(alpha = 0.48f),
-                primaryColor.copy(alpha = 0.32f),
-                primaryColor.copy(alpha = 0.18f)
-            )
-        }
+    // Smooth theme color gradient from 95% down to 10% with 20% transparent glass base
+    val gradientColors = if (isRtl) {
+        listOf(
+            primaryColor.copy(alpha = 0.10f),
+            primaryColor.copy(alpha = 0.35f),
+            primaryColor.copy(alpha = 0.65f),
+            primaryColor.copy(alpha = 0.95f)
+        )
     } else {
-        if (isRtl) {
-            listOf(
-                primaryColor.copy(alpha = 0.12f),
-                primaryColor.copy(alpha = 0.26f),
-                primaryColor.copy(alpha = 0.42f),
-                primaryColor.copy(alpha = 0.58f)
-            )
-        } else {
-            listOf(
-                primaryColor.copy(alpha = 0.58f),
-                primaryColor.copy(alpha = 0.42f),
-                primaryColor.copy(alpha = 0.26f),
-                primaryColor.copy(alpha = 0.12f)
-            )
-        }
+        listOf(
+            primaryColor.copy(alpha = 0.95f),
+            primaryColor.copy(alpha = 0.65f),
+            primaryColor.copy(alpha = 0.35f),
+            primaryColor.copy(alpha = 0.10f)
+        )
     }
 
     // Dynamic contrast-compliant calculation strictly following Material 3 and WCAG 2.1
@@ -311,7 +293,7 @@ fun FeatureExplanationCard(
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
                 .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 5.dp, tintColor = primaryColor, hasSaltMotes = false)
                 .clip(shape)
-                .background(surfaceColor.copy(alpha = if (isDark) 0.55f else 0.70f))
+                .background(surfaceColor.copy(alpha = 0.20f))
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = gradientColors
