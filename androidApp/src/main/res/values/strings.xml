@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">حاسبة الاعفاء والسعي</string>
+    <string name="shortcut_exemption_short">الإعفاء</string>
+    <string name="shortcut_exemption_long">حساب الإعفاء الفردي والعام</string>
+    <string name="shortcut_annual_short">السعي السنوي</string>
+    <string name="shortcut_annual_long">حساب معدل السعي السنوي</string>
+    <string name="shortcut_monthly_short">المعدل الفصلي</string>
+    <string name="shortcut_monthly_long">حساب المعدل الفصلي</string>
+    <string name="shortcut_grades_short">سجل درجاتي</string>
+    <string name="shortcut_grades_long">عرض سجل درجاتي الشامل</string>
+</resources>
