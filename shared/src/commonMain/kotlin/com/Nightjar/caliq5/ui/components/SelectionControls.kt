@@ -796,7 +796,6 @@ fun DeleteConfirmDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -927,7 +926,6 @@ fun CaliqConfirmationDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeDrawing)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,

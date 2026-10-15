@@ -82,7 +82,7 @@ fun MathBackground(
     val textMeasurer = rememberTextMeasurer()
 
     val isHighPerf = com.Nightjar.caliq5.utils.rememberIsHighPerformanceDevice()
-    var masterTime by remember { androidx.compose.runtime.mutableFloatStateOf(0f) }
+    var masterTime by remember { mutableStateOf(0f) }
     
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()

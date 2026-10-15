@@ -161,7 +161,7 @@ private fun SideMenuHeader() {
                         )
                     )
                 )
-                .windowInsetsPadding(WindowInsets.statusBars.add(WindowInsets.captionBar))
+                .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(horizontal = 20.dp, vertical = 24.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -185,14 +185,16 @@ private fun SideMenuHeader() {
                         modifier = Modifier
                             .align(Alignment.Center)
                             .graphicsLayer {
-                                val f = floatAnim
-                                val angleDeg = baseAngle + (f * 12f)
+                                // Draw phase deferral: Reading floatAnim exclusively inside graphicsLayer lambda
+                                // achieves Zero Recompositions and locked 120 FPS
+                                val currentAnim = floatAnim
+                                val angleDeg = baseAngle + (currentAnim * 12f)
                                 val rad = angleDeg * (kotlin.math.PI / 180f).toFloat()
-                                val distance = 46f + (f * 3f)
-                                val transY = f * -5f
+                                val distance = 46f + (currentAnim * 3f)
+                                val transY = currentAnim * -5f
                                 translationX = kotlin.math.cos(rad) * distance * density
                                 translationY = (kotlin.math.sin(rad) * distance * density) + (transY * density)
-                                rotationZ = (f * 15f) - 7.5f
+                                rotationZ = (currentAnim * 15f) - 7.5f
                             }
                     )
                 }

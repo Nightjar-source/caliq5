@@ -35,7 +35,7 @@
             android:supportsPictureInPicture="true"
             android:theme="@style/Theme.Caliq.Splash"
             android:windowSoftInputMode="adjustResize"
-            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|density|uiMode|keyboard|navigation">
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|density|uiMode|keyboard|navigation|layoutDirection">
             
             <layout
                 android:defaultWidth="600dp"
@@ -49,9 +49,6 @@
                 android:value="true" />
             <property
                 android:name="android.window.PROPERTY_ACTIVITY_EMBEDDING_SPLITS_ENABLED"
-                android:value="true" />
-            <property
-                android:name="android.window.PROPERTY_COMPAT_ALLOW_RESIZEABLE_ACTIVITY_OVERRIDES"
                 android:value="true" />
 
             <intent-filter>
@@ -96,20 +93,11 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:exported="false" />
 
+        <!-- Background cleanup service triggered when app is swiped away from Recents (onTaskRemoved) -->
         <service
             android:name=".CaliqCleanupService"
-            android:stopWithTask="false"
-            android:exported="false" />
-
-        <!-- Android 16+ / 2026-2027 AI Agent & Assistant App Functions Service -->
-        <service
-            android:name=".CaliqAppFunctionService"
-            android:exported="true"
-            android:permission="android.permission.BIND_APP_FUNCTION_SERVICE">
-            <intent-filter>
-                <action android:name="android.app.appfunctions.AppFunctionService" />
-            </intent-filter>
-        </service>
+            android:exported="false"
+            android:stopWithTask="false" />
     </application>
 
 </manifest>

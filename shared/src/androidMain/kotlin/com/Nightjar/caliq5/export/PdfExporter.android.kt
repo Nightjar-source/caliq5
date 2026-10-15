@@ -15,7 +15,6 @@ import com.Nightjar.caliq5.CaliqApplication
 import com.Nightjar.caliq5.viewmodel.ResultDisplayState
 import com.Nightjar.caliq5.data.TermMode
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -642,7 +641,6 @@ actual object PdfExporter {
                 saveToPublicDownloads(context, cacheFile, fileNameFinal)
                 showDownloadNotification(context, fileNameFinal, cacheFile)
                 openExternalViewer(context, cacheFile, fileNameFinal)
-                com.Nightjar.caliq5.utils.MemoryManager.scheduleTwoMinuteIdleCleanup(cacheFile)
             } catch (e: Exception) { e.printStackTrace() } finally { document.close() }
         }
     }

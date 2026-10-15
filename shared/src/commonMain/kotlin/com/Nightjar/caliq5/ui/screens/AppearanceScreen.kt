@@ -193,21 +193,27 @@ fun AppearanceScreen(viewModel: AppViewModel) {
                             modifier = Modifier.fillMaxWidth().clipToBounds(),
                             enter = expandVertically(
                                 animationSpec = androidx.compose.animation.core.tween(
-                                    durationMillis = 220,
-                                    easing = androidx.compose.animation.core.FastOutSlowInEasing
+                                    durationMillis = 260,
+                                    easing = androidx.compose.animation.core.CubicBezierEasing(0.0f, 0.0f, 0.2f, 1.0f)
                                 )
-                            ) + fadeIn(animationSpec = androidx.compose.animation.core.tween(160)),
+                            ) + fadeIn(animationSpec = androidx.compose.animation.core.tween(180)) + slideInVertically(
+                                initialOffsetY = { -it / 6 },
+                                animationSpec = androidx.compose.animation.core.tween(260)
+                            ),
                             exit = shrinkVertically(
                                 animationSpec = androidx.compose.animation.core.tween(
-                                    durationMillis = 190,
-                                    easing = androidx.compose.animation.core.FastOutSlowInEasing
+                                    durationMillis = 240,
+                                    easing = androidx.compose.animation.core.CubicBezierEasing(0.25f, 0.1f, 0.25f, 1.0f)
                                 ),
                                 shrinkTowards = Alignment.Top
                             ) + fadeOut(
                                 animationSpec = androidx.compose.animation.core.tween(
-                                    durationMillis = 130,
+                                    durationMillis = 200,
                                     easing = androidx.compose.animation.core.LinearEasing
                                 )
+                            ) + slideOutVertically(
+                                targetOffsetY = { -it / 6 },
+                                animationSpec = androidx.compose.animation.core.tween(240)
                             )
                         ) {
                             Column(
@@ -244,18 +250,18 @@ fun AppearanceScreen(viewModel: AppViewModel) {
                                                 
                                                 val cardScale by androidx.compose.animation.core.animateFloatAsState(
                                                     targetValue = if (isSelected) 1.025f else 1f,
-                                                    animationSpec = androidx.compose.animation.core.tween(
-                                                        durationMillis = 180,
-                                                        easing = androidx.compose.animation.core.FastOutSlowInEasing
+                                                    animationSpec = androidx.compose.animation.core.spring(
+                                                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                                                        stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
                                                     ),
                                                     label = "color_card_scale"
                                                 )
 
                                                 val circleScale by androidx.compose.animation.core.animateFloatAsState(
                                                     targetValue = if (isSelected) 1.10f else 1f,
-                                                    animationSpec = androidx.compose.animation.core.tween(
-                                                        durationMillis = 180,
-                                                        easing = androidx.compose.animation.core.FastOutSlowInEasing
+                                                    animationSpec = androidx.compose.animation.core.spring(
+                                                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                                                        stiffness = androidx.compose.animation.core.Spring.StiffnessLow
                                                     ),
                                                     label = "color_circle_scale"
                                                 )

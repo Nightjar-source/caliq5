@@ -34,15 +34,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import com.Nightjar.caliq5.viewmodel.ResultDisplayState
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -263,7 +258,7 @@ fun AppNavigation(
             }
         }
 
-        val safeTopPadding = WindowInsets.statusBars.add(WindowInsets.captionBar).asPaddingValues().calculateTopPadding()
+        val safeTopPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
         val snackbarVisibleState = remember { androidx.compose.animation.core.MutableTransitionState(false) }
         snackbarVisibleState.targetState = (snackbarMessage != null)
 
@@ -434,7 +429,7 @@ private fun MainContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.statusBars.add(WindowInsets.captionBar))
+                    .windowInsetsPadding(WindowInsets.statusBars)
                     .height(topBarHeight)
                     .padding(horizontal = if (isWideOrLandscape) 10.dp else 14.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -554,7 +549,13 @@ fun CaliqBottomNav(
         BoxWithConstraints(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight(),
+                .fillMaxHeight()
+                .neuralAmbientGlow(
+                    cornerRadius = 32.dp,
+                    elevation = 7.dp,
+                    tintColor = MaterialTheme.colorScheme.primary,
+                    hasSaltMotes = false
+                ),
             contentAlignment = Alignment.Center
         ) {
             val totalWidth = maxWidth
@@ -582,26 +583,28 @@ fun CaliqBottomNav(
                 (tabWidth * lastValidIndex) + (tabWidth - pillWidth) / 2f
             }
 
+            // Authentic liquid spring physics: soft, organic, elastic fluidity like mercury/water
             val animX by animateDpAsState(
                 targetValue = targetX,
-                animationSpec = if (dragOffset != null) {
-                    spring(dampingRatio = 0.85f, stiffness = Spring.StiffnessHigh)
-                } else {
-                    spring(dampingRatio = 0.62f, stiffness = 260f)
-                },
+                animationSpec = spring(
+                    dampingRatio = 0.60f, // Liquid fluid elasticity
+                    stiffness = 220f      // Soft fluid movement following finger seamlessly
+                ),
                 label = "bottom_nav_pill_x"
             )
 
             val animScale by animateFloatAsState(
                 targetValue = if ((localSelectedIndex in 0..3) || dragOffset != null) 1f else 0f,
-                animationSpec = spring(dampingRatio = 0.55f, stiffness = 340f),
+                animationSpec = spring(dampingRatio = 0.60f, stiffness = 260f),
                 label = "bottom_nav_pill_scale"
             )
 
-            val moveDeltaX = (animX.value - targetX.value).let { if (it < 0f) -it else it }
+            // Volume-conserving liquid squash and stretch during lateral velocity
+            val moveDeltaX = kotlin.math.abs(animX.value - targetX.value)
             val maxNormX = tabWidth.value.coerceAtLeast(1f)
-            val stretchRatioX = (moveDeltaX / maxNormX).coerceIn(0f, 1.2f)
-            val stretchFactorX = 1f + (stretchRatioX * 0.38f)
+            val velocityRatio = (moveDeltaX / maxNormX).coerceIn(0f, 1f)
+            val stretchFactorX = 1f + (velocityRatio * 0.22f)
+            val squashFactorY = 1f - (velocityRatio * 0.08f)
 
             val navShape = CircleShape
 
@@ -616,50 +619,92 @@ fun CaliqBottomNav(
                     )
             ) {
                 if ((localSelectedIndex in 0..3) || dragOffset != null) {
+                    val pillShape = RoundedCornerShape(24.dp)
+                    val liquidDropletBg = if (isDark) {
+                        Color(
+                            red = MaterialTheme.colorScheme.surface.red * 0.35f + themePrimary.red * 0.65f,
+                            green = MaterialTheme.colorScheme.surface.green * 0.35f + themePrimary.green * 0.65f,
+                            blue = MaterialTheme.colorScheme.surface.blue * 0.35f + themePrimary.blue * 0.65f,
+                            alpha = 0.42f
+                        )
+                    } else {
+                        Color.White.copy(alpha = 0.68f)
+                    }
+
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .offset(x = animX)
                             .size(width = pillWidth, height = innerPillHeight)
                             .graphicsLayer {
-                                scaleX = stretchFactorX.coerceIn(1f, 1.42f)
-                                scaleY = (1f - ((stretchFactorX - 1f) * 0.65f)).coerceIn(0.72f, 1f)
+                                scaleX = stretchFactorX.coerceIn(1f, 1.25f)
+                                scaleY = squashFactorY.coerceIn(0.90f, 1f)
                                 alpha = animScale.coerceIn(0f, 1f)
                                 clip = false
                             }
-                            .drawBehind {
-                                val rPx = size.height / 2f
-                                // 1. Liquid droplet body with subtle theme-tinted organic liquid surface
-                                val liquidBody = if (isDark) {
+                            .background(
+                                color = liquidDropletBg,
+                                shape = pillShape
+                            )
+                            .drawWithCache {
+                                val rPx = 24.dp.toPx()
+                                val w = size.width
+                                val h = size.height
+
+                                // 1. Meniscus crest highlight & translucent internal refraction
+                                val meniscusSheen = if (isDark) {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.12f),
-                                        0.40f to themePrimary.copy(alpha = 0.26f),
-                                        1.0f to themePrimary.copy(alpha = 0.38f)
+                                        0.0f to Color.White.copy(alpha = 0.34f),
+                                        0.35f to themePrimary.copy(alpha = 0.20f),
+                                        0.70f to Color.Transparent,
+                                        1.0f to themePrimary.copy(alpha = 0.30f)
                                     )
                                 } else {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.65f),
-                                        0.45f to themePrimary.copy(alpha = 0.16f),
+                                        0.0f to Color.White.copy(alpha = 0.68f),
+                                        0.35f to Color.White.copy(alpha = 0.28f),
+                                        0.70f to Color.Transparent,
                                         1.0f to themePrimary.copy(alpha = 0.24f)
                                     )
                                 }
-                                drawRoundRect(
-                                    brush = liquidBody,
-                                    size = size,
-                                    cornerRadius = CornerRadius(rPx, rPx)
+
+                                // 2. Central liquid lens volume
+                                val liquidLens = Brush.radialGradient(
+                                    colors = listOf(
+                                        Color.White.copy(alpha = if (isDark) 0.20f else 0.34f),
+                                        Color.Transparent
+                                    ),
+                                    center = Offset(w * 0.5f, h * 0.40f),
+                                    radius = kotlin.math.max(w, h) * 0.65f
                                 )
 
-                                // 2. Delicate fluid surface tension rim
-                                val rimBrush = Brush.verticalGradient(
-                                    0.0f to (if (isDark) Color.White.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.45f)),
-                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.28f else 0.22f)
+                                // 3. Liquid surface tension micro border
+                                val surfaceTensionBorder = Brush.verticalGradient(
+                                    0.0f to Color.White.copy(alpha = if (isDark) 0.40f else 0.55f),
+                                    0.60f to themePrimary.copy(alpha = if (isDark) 0.15f else 0.20f),
+                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.30f else 0.35f)
                                 )
-                                drawRoundRect(
-                                    brush = rimBrush,
-                                    size = size,
-                                    cornerRadius = CornerRadius(rPx, rPx),
-                                    style = Stroke(width = 1.dp.toPx())
-                                )
+                                val borderStroke = Stroke(width = 0.8.dp.toPx())
+
+                                onDrawWithContent {
+                                    drawContent()
+                                    drawRoundRect(
+                                        brush = meniscusSheen,
+                                        size = size,
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx)
+                                    )
+                                    drawRoundRect(
+                                        brush = liquidLens,
+                                        size = size,
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx)
+                                    )
+                                    drawRoundRect(
+                                        brush = surfaceTensionBorder,
+                                        size = size,
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx),
+                                        style = borderStroke
+                                    )
+                                }
                             }
                     )
                 }
@@ -717,6 +762,12 @@ fun CaliqBottomNav(
         Box(
             modifier = Modifier
                 .size(barHeight)
+                .neuralAmbientGlow(
+                    cornerRadius = 20.dp,
+                    elevation = 7.dp,
+                    tintColor = MaterialTheme.colorScheme.primary,
+                    hasSaltMotes = false
+                )
                 .frostedOrganicCapsule(
                     shape = fabShape,
                     cornerRadius = 20.dp,
@@ -836,7 +887,13 @@ fun CaliqNavigationRail(
         BoxWithConstraints(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .neuralAmbientGlow(
+                    cornerRadius = 32.dp,
+                    elevation = 7.dp,
+                    tintColor = MaterialTheme.colorScheme.primary,
+                    hasSaltMotes = false
+                ),
             contentAlignment = Alignment.Center
         ) {
             val totalHeight = maxHeight
@@ -861,24 +918,25 @@ fun CaliqNavigationRail(
 
             val animY by animateDpAsState(
                 targetValue = targetY,
-                animationSpec = if (dragOffset != null) {
-                    spring(dampingRatio = 0.85f, stiffness = Spring.StiffnessHigh)
-                } else {
-                    spring(dampingRatio = 0.62f, stiffness = 260f)
-                },
+                animationSpec = spring(
+                    dampingRatio = 0.60f, // Liquid fluid elasticity
+                    stiffness = 220f      // Soft fluid movement following finger seamlessly
+                ),
                 label = "rail_pill_y"
             )
 
             val animScale by animateFloatAsState(
                 targetValue = if ((localSelectedIndex in 0..3) || dragOffset != null) 1f else 0f,
-                animationSpec = spring(dampingRatio = 0.55f, stiffness = 340f),
+                animationSpec = spring(dampingRatio = 0.60f, stiffness = 260f),
                 label = "rail_pill_scale"
             )
 
-            val moveDeltaY = (animY.value - targetY.value).let { if (it < 0f) -it else it }
+            // Volume-conserving liquid squash and stretch during vertical velocity
+            val moveDeltaY = kotlin.math.abs(animY.value - targetY.value)
             val maxNormY = tabHeight.value.coerceAtLeast(1f)
-            val stretchRatioY = (moveDeltaY / maxNormY).coerceIn(0f, 1.2f)
-            val stretchFactorY = 1f + (stretchRatioY * 0.38f)
+            val velocityRatioY = (moveDeltaY / maxNormY).coerceIn(0f, 1f)
+            val stretchFactorY = 1f + (velocityRatioY * 0.22f)
+            val squashFactorX = 1f - (velocityRatioY * 0.08f)
 
             val railShape = RoundedCornerShape(32.dp)
 
@@ -893,50 +951,92 @@ fun CaliqNavigationRail(
                     )
             ) {
                 if ((localSelectedIndex in 0..3) || dragOffset != null) {
+                    val pillShape = RoundedCornerShape(22.dp)
+                    val liquidDropletBg = if (isDark) {
+                        Color(
+                            red = MaterialTheme.colorScheme.surface.red * 0.35f + themePrimary.red * 0.65f,
+                            green = MaterialTheme.colorScheme.surface.green * 0.35f + themePrimary.green * 0.65f,
+                            blue = MaterialTheme.colorScheme.surface.blue * 0.35f + themePrimary.green * 0.65f,
+                            alpha = 0.42f
+                        )
+                    } else {
+                        Color.White.copy(alpha = 0.68f)
+                    }
+
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .offset(y = animY)
                             .size(width = pillWidth, height = pillHeight)
                             .graphicsLayer {
-                                scaleX = (1f - ((stretchFactorY - 1f) * 0.65f)).coerceIn(0.72f, 1f)
-                                scaleY = stretchFactorY.coerceIn(1f, 1.42f)
+                                scaleX = squashFactorX.coerceIn(0.90f, 1f)
+                                scaleY = stretchFactorY.coerceIn(1f, 1.25f)
                                 alpha = animScale.coerceIn(0f, 1f)
                                 clip = false
                             }
-                            .drawBehind {
-                                val rPx = size.width / 2f
-                                // 1. Liquid droplet body with subtle theme-tinted organic liquid surface
-                                val liquidBody = if (isDark) {
+                            .background(
+                                color = liquidDropletBg,
+                                shape = pillShape
+                            )
+                            .drawWithCache {
+                                val rPx = 22.dp.toPx()
+                                val w = size.width
+                                val h = size.height
+
+                                // 1. Meniscus crest highlight & translucent internal refraction
+                                val meniscusSheen = if (isDark) {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.12f),
-                                        0.40f to themePrimary.copy(alpha = 0.26f),
-                                        1.0f to themePrimary.copy(alpha = 0.38f)
+                                        0.0f to Color.White.copy(alpha = 0.34f),
+                                        0.35f to themePrimary.copy(alpha = 0.20f),
+                                        0.70f to Color.Transparent,
+                                        1.0f to themePrimary.copy(alpha = 0.30f)
                                     )
                                 } else {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.65f),
-                                        0.45f to themePrimary.copy(alpha = 0.16f),
+                                        0.0f to Color.White.copy(alpha = 0.68f),
+                                        0.35f to Color.White.copy(alpha = 0.28f),
+                                        0.70f to Color.Transparent,
                                         1.0f to themePrimary.copy(alpha = 0.24f)
                                     )
                                 }
-                                drawRoundRect(
-                                    brush = liquidBody,
-                                    size = size,
-                                    cornerRadius = CornerRadius(rPx, rPx)
+
+                                // 2. Central liquid lens volume
+                                val liquidLens = Brush.radialGradient(
+                                    colors = listOf(
+                                        Color.White.copy(alpha = if (isDark) 0.20f else 0.34f),
+                                        Color.Transparent
+                                    ),
+                                    center = Offset(w * 0.5f, h * 0.40f),
+                                    radius = kotlin.math.max(w, h) * 0.65f
                                 )
 
-                                // 2. Delicate fluid surface tension rim
-                                val rimBrush = Brush.verticalGradient(
-                                    0.0f to (if (isDark) Color.White.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.45f)),
-                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.28f else 0.22f)
+                                // 3. Liquid surface tension micro border
+                                val surfaceTensionBorder = Brush.verticalGradient(
+                                    0.0f to Color.White.copy(alpha = if (isDark) 0.40f else 0.55f),
+                                    0.60f to themePrimary.copy(alpha = if (isDark) 0.15f else 0.20f),
+                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.30f else 0.35f)
                                 )
-                                drawRoundRect(
-                                    brush = rimBrush,
-                                    size = size,
-                                    cornerRadius = CornerRadius(rPx, rPx),
-                                    style = Stroke(width = 1.dp.toPx())
-                                )
+                                val borderStroke = Stroke(width = 0.8.dp.toPx())
+
+                                onDrawWithContent {
+                                    drawContent()
+                                    drawRoundRect(
+                                        brush = meniscusSheen,
+                                        size = size,
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx)
+                                    )
+                                    drawRoundRect(
+                                        brush = liquidLens,
+                                        size = size,
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx)
+                                    )
+                                    drawRoundRect(
+                                        brush = surfaceTensionBorder,
+                                        size = size,
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx),
+                                        style = borderStroke
+                                    )
+                                }
                             }
                     )
                 }
@@ -994,6 +1094,12 @@ fun CaliqNavigationRail(
         Box(
             modifier = Modifier
                 .size(railWidth)
+                .neuralAmbientGlow(
+                    cornerRadius = 20.dp,
+                    elevation = 7.dp,
+                    tintColor = MaterialTheme.colorScheme.primary,
+                    hasSaltMotes = false
+                )
                 .frostedOrganicCapsule(
                     shape = fabShape,
                     cornerRadius = 20.dp,

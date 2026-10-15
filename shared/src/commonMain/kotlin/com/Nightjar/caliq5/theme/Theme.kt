@@ -106,18 +106,18 @@ fun Color.contrastingTextColor(
 fun Color.contrastingShadow(alpha: Float = 0.50f): androidx.compose.ui.graphics.Shadow {
     val isLight = (0.2126f * red + 0.7152f * green + 0.0722f * blue) > 0.5f
     return if (isLight) {
-        // نص أبيض ناصع فوق خلفية دافئة/داكنة/متدرجة: ظل أسود خفيف ناعم يبرز الأحرف بدقة متناهية
+        // نص أبيض ناصع فوق خلفية دافئة/داكنة/متدرجة: ظل أسود عميق ناعم يبرز الأحرف بدقة متناهية
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = (alpha * 0.90f).coerceIn(0.28f, 0.55f)),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
-            blurRadius = 3.0f
+            color = Color.Black.copy(alpha = (alpha * 1.15f).coerceIn(0.40f, 0.70f)),
+            offset = androidx.compose.ui.geometry.Offset(0f, 2.5f),
+            blurRadius = 6.0f
         )
     } else {
-        // نص داكن فوق خلفية فاتحة/متدرجة: ظل أبيض خفيف ناعم يبرز النص دون أن يكون الظل فاقعاً
+        // نص داكن فوق خلفية فاتحة/متدرجة: هالة ضوئية بيضاء واقية تحمي حواف النص من الاندماج
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = (alpha * 0.85f).coerceIn(0.25f, 0.48f)),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.0f),
-            blurRadius = 2.0f
+            color = Color.White.copy(alpha = 0.65f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
+            blurRadius = 4.5f
         )
     }
 }

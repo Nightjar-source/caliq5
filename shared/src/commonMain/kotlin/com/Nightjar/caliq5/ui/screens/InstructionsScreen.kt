@@ -165,15 +165,21 @@ private fun ExpandableInstructionCard(
 
     val arrowAngle by androidx.compose.animation.core.animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
-        animationSpec = androidx.compose.animation.core.tween(240, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.65f, stiffness = 450f),
         label = "instr_arrow_angle"
+    )
+    val arrowScale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (expanded) 1.15f else 1.0f,
+        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.65f, stiffness = 450f),
+        label = "instr_arrow_scale"
     )
 
     val shape = RoundedCornerShape(16.dp)
 
     Surface(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            ,
         shape = shape,
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {
@@ -202,6 +208,8 @@ private fun ExpandableInstructionCard(
                     contentDescription = null,
                     modifier = Modifier.graphicsLayer {
                         rotationZ = arrowAngle
+                        scaleX = arrowScale
+                        scaleY = arrowScale
                     },
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -210,12 +218,18 @@ private fun ExpandableInstructionCard(
             AnimatedVisibility(
                 visible = expanded,
                 enter = expandVertically(
-                    animationSpec = androidx.compose.animation.core.tween(260, easing = androidx.compose.animation.core.FastOutSlowInEasing)
-                ) + fadeIn(animationSpec = androidx.compose.animation.core.tween(200)),
+                    animationSpec = androidx.compose.animation.core.spring(
+                        dampingRatio = 0.82f,
+                        stiffness = 420f
+                    )
+                ) + fadeIn(animationSpec = androidx.compose.animation.core.tween(160)),
                 exit = shrinkVertically(
-                    animationSpec = androidx.compose.animation.core.tween(200, easing = androidx.compose.animation.core.FastOutLinearInEasing),
+                    animationSpec = androidx.compose.animation.core.spring(
+                        dampingRatio = 0.85f,
+                        stiffness = 480f
+                    ),
                     shrinkTowards = Alignment.Top
-                ) + fadeOut(animationSpec = androidx.compose.animation.core.tween(150))
+                ) + fadeOut(animationSpec = androidx.compose.animation.core.tween(120))
             ) {
                 Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {

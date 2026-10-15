@@ -220,56 +220,83 @@ fun FeatureExplanationCard(
     val shape = RoundedCornerShape(28.dp)
     val isRtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
 
+    // Authentic sea-glass translucent gradient from the theme color: pure, transparent, seamless
     val gradientColors = if (isDark) {
         if (isRtl) {
             listOf(
-                primaryColor.copy(alpha = 0.28f),
-                primaryColor.copy(alpha = 0.55f),
-                primaryColor.copy(alpha = 0.82f),
-                primaryColor.copy(alpha = 0.95f)
+                primaryColor.copy(alpha = 0.18f),
+                primaryColor.copy(alpha = 0.32f),
+                primaryColor.copy(alpha = 0.48f),
+                primaryColor.copy(alpha = 0.62f)
             )
         } else {
             listOf(
-                primaryColor.copy(alpha = 0.95f),
-                primaryColor.copy(alpha = 0.82f),
-                primaryColor.copy(alpha = 0.55f),
-                primaryColor.copy(alpha = 0.28f)
+                primaryColor.copy(alpha = 0.62f),
+                primaryColor.copy(alpha = 0.48f),
+                primaryColor.copy(alpha = 0.32f),
+                primaryColor.copy(alpha = 0.18f)
             )
         }
     } else {
-        // In Light Mode: Preserve rich theme color so it never washes out or fades into white frost
         if (isRtl) {
             listOf(
-                primaryColor.copy(alpha = 0.82f),
-                primaryColor.copy(alpha = 0.90f),
-                primaryColor.copy(alpha = 0.96f),
-                primaryColor
+                primaryColor.copy(alpha = 0.12f),
+                primaryColor.copy(alpha = 0.26f),
+                primaryColor.copy(alpha = 0.42f),
+                primaryColor.copy(alpha = 0.58f)
             )
         } else {
             listOf(
-                primaryColor,
-                primaryColor.copy(alpha = 0.96f),
-                primaryColor.copy(alpha = 0.90f),
-                primaryColor.copy(alpha = 0.82f)
+                primaryColor.copy(alpha = 0.58f),
+                primaryColor.copy(alpha = 0.42f),
+                primaryColor.copy(alpha = 0.26f),
+                primaryColor.copy(alpha = 0.12f)
             )
         }
     }
 
     // Dynamic contrast-compliant calculation strictly following Material 3 and WCAG 2.1
+    // In Dark mode: crisp white text with protective subtle black shadow.
+    // In Light mode: deep slate text with protective subtle white halo shadow.
     val cardTextColor = if (isDark) {
         Color.White
     } else {
-        primaryColor.contrastingTextColor(
-            darkText = Color(0xFF0F172A),
-            lightText = Color.White
-        )
+        Color(0xFF0F172A)
     }
     val cardTitleColor = if (isDark) {
         Color.White
     } else {
-        cardTextColor
+        primaryColor
     }
-    val cardTextShadow = cardTextColor.contrastingShadow(alpha = if (isDark) 0.65f else 0.55f)
+
+    // Subtle complementary text shadow: opposite to font color to enhance crispness without clutter
+    val cardTextShadow = if (cardTextColor == Color.White) {
+        androidx.compose.ui.graphics.Shadow(
+            color = Color.Black.copy(alpha = 0.40f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
+            blurRadius = 4.0f
+        )
+    } else {
+        androidx.compose.ui.graphics.Shadow(
+            color = Color.White.copy(alpha = 0.60f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
+            blurRadius = 3.5f
+        )
+    }
+
+    val cardTitleShadow = if (cardTitleColor == Color.White) {
+        androidx.compose.ui.graphics.Shadow(
+            color = Color.Black.copy(alpha = 0.40f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
+            blurRadius = 4.0f
+        )
+    } else {
+        androidx.compose.ui.graphics.Shadow(
+            color = Color.White.copy(alpha = 0.60f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
+            blurRadius = 3.5f
+        )
+    }
 
     Box(
         modifier = modifier
@@ -282,8 +309,9 @@ fun FeatureExplanationCard(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
+                .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 5.dp, tintColor = primaryColor, hasSaltMotes = false)
                 .clip(shape)
-                .background(surfaceColor)
+                .background(surfaceColor.copy(alpha = if (isDark) 0.55f else 0.70f))
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = gradientColors
@@ -300,7 +328,7 @@ fun FeatureExplanationCard(
                 Surface(
                     shape = RoundedCornerShape(14.dp),
                     color = if (isDark) MaterialTheme.colorScheme.surface.copy(alpha = 0.90f) else MaterialTheme.colorScheme.surface,
-                    shadowElevation = 2.dp,
+                    shadowElevation = 0.dp,
                     modifier = Modifier.size(44.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -323,7 +351,7 @@ fun FeatureExplanationCard(
                             title,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleMedium.copy(
-                                shadow = cardTextShadow
+                                shadow = cardTitleShadow
                             ),
                             color = cardTitleColor,
                             textAlign = TextAlign.Justify
@@ -391,7 +419,7 @@ fun MainGradeBox(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
-                .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 8.dp, tintColor = gradientColors?.firstOrNull() ?: primaryColor, hasSaltMotes = true)
+                .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 6.dp, tintColor = gradientColors?.firstOrNull() ?: primaryColor, hasSaltMotes = false)
                 .clip(boxShape)
                 .background(
                     brush = Brush.linearGradient(
@@ -400,7 +428,19 @@ fun MainGradeBox(
                 )
                 .expressive3DCurvature(cornerRadius = 28.dp, shape = boxShape, tintColor = gradientColors?.firstOrNull() ?: primaryColor)
         ) {
-                val cardTextShadow = dynamicTextColor.contrastingShadow(alpha = if (isDark) 0.60f else 0.45f)
+                val cardTextShadow = if (dynamicTextColor == Color.White) {
+                    androidx.compose.ui.graphics.Shadow(
+                        color = Color.Black.copy(alpha = if (isDark) 0.50f else 0.40f),
+                        offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
+                        blurRadius = 4.0f
+                    )
+                } else {
+                    androidx.compose.ui.graphics.Shadow(
+                        color = Color.White.copy(alpha = 0.60f),
+                        offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
+                        blurRadius = 3.5f
+                    )
+                }
                 Column(
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 26.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -474,7 +514,19 @@ fun Term2GradeBox(
         darkText = Color(0xFF0F172A),
         lightText = Color.White
     )
-    val cardTextShadow = dynamicTextColor.contrastingShadow(alpha = if (isDark) 0.60f else 0.45f)
+    val cardTextShadow = if (dynamicTextColor == Color.White) {
+        androidx.compose.ui.graphics.Shadow(
+            color = Color.Black.copy(alpha = if (isDark) 0.50f else 0.40f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
+            blurRadius = 4.0f
+        )
+    } else {
+        androidx.compose.ui.graphics.Shadow(
+            color = Color.White.copy(alpha = 0.60f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
+            blurRadius = 3.5f
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -487,7 +539,7 @@ fun Term2GradeBox(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
-                .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 8.dp, tintColor = actualGradient.firstOrNull() ?: primaryColor, hasSaltMotes = true)
+                .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 6.dp, tintColor = actualGradient.firstOrNull() ?: primaryColor, hasSaltMotes = false)
                 .clip(boxShape)
                 .background(
                     brush = Brush.linearGradient(actualGradient)

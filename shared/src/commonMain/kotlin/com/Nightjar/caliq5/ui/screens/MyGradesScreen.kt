@@ -222,7 +222,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                 state = listGridState,
                 columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 260.dp),
                 modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                contentPadding = PaddingValues(top = WindowInsets.statusBars.add(WindowInsets.captionBar).asPaddingValues().calculateTopPadding() + 65.dp, bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
+                contentPadding = PaddingValues(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp, bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -391,7 +391,7 @@ fun StudentEditView(
     val subjectsMap = subjectsList.associate { it.name to it.record }
     
     val coroutineScope = rememberCoroutineScope()
-    val classList = ClassData.classNames + "صف آخر (مخصص)"
+    val classList = remember { ClassData.classNames + "صف آخر (مخصص)" }
     var expandedClassSelect by remember { mutableStateOf(false) }
 
     fun clearPersistentDraft() {
@@ -582,7 +582,7 @@ fun StudentEditView(
             state = editGridState,
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 260.dp),
             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(top = WindowInsets.statusBars.add(WindowInsets.captionBar).asPaddingValues().calculateTopPadding() + 65.dp, bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
+            contentPadding = PaddingValues(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp, bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -696,7 +696,7 @@ Box(modifier = Modifier.fillMaxWidth()) {
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = null,
-                                modifier = Modifier.rotate(arrowAngle).size(26.dp),
+                                modifier = Modifier.graphicsLayer { rotationZ = arrowAngle }.size(26.dp),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -705,17 +705,17 @@ Box(modifier = Modifier.fillMaxWidth()) {
                         androidx.compose.animation.AnimatedVisibility(
                             visible = expandedClassSelect,
                             enter = androidx.compose.animation.expandVertically(
-                                animationSpec = androidx.compose.animation.core.tween(
-                                    durationMillis = 220,
-                                    easing = androidx.compose.animation.core.FastOutSlowInEasing
+                                animationSpec = androidx.compose.animation.core.spring(
+                                    dampingRatio = 0.85f,
+                                    stiffness = 450f
                                 )
                             ) + androidx.compose.animation.fadeIn(
                                 animationSpec = androidx.compose.animation.core.tween(150)
                             ),
                             exit = androidx.compose.animation.shrinkVertically(
-                                animationSpec = androidx.compose.animation.core.tween(
-                                    durationMillis = 190,
-                                    easing = androidx.compose.animation.core.FastOutSlowInEasing
+                                animationSpec = androidx.compose.animation.core.spring(
+                                    dampingRatio = 0.90f,
+                                    stiffness = 500f
                                 )
                             ) + androidx.compose.animation.fadeOut(
                                 animationSpec = androidx.compose.animation.core.tween(120)

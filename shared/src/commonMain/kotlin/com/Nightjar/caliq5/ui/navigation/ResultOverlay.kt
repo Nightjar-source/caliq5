@@ -73,7 +73,7 @@ fun ResultOverlay(
                         .navigationBarsPadding()
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 16.dp)
-                        .padding(top = WindowInsets.statusBars.add(WindowInsets.captionBar).asPaddingValues().calculateTopPadding() + 65.dp) 
+                        .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp) 
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         when (content) {
@@ -108,7 +108,7 @@ fun ResultOverlay(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .windowInsetsPadding(WindowInsets.statusBars.add(WindowInsets.captionBar))
+                            .statusBarsPadding()
                             .padding(horizontal = 16.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {

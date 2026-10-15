@@ -31,9 +31,6 @@ class MainActivity : ComponentActivity() {
         window.statusBarColor = android.graphics.Color.TRANSPARENT
         window.navigationBarColor = android.graphics.Color.TRANSPARENT
         super.onCreate(savedInstanceState)
-        try {
-            startService(android.content.Intent(this, CaliqCleanupService::class.java))
-        } catch (_: Throwable) {}
         
         if (savedInstanceState != null) {
             val savedUri = savedInstanceState.getString("savedDeepLinkUri")
@@ -41,6 +38,10 @@ class MainActivity : ComponentActivity() {
         } else {
             deepLinkUri.value = intent.data?.toString()
         }
+
+        try {
+            startService(android.content.Intent(this, CaliqCleanupService::class.java))
+        } catch (_: Throwable) {}
 
         setContent {
             androidx.compose.runtime.LaunchedEffect(Unit) {
@@ -149,13 +150,6 @@ class MainActivity : ComponentActivity() {
                 // App is in background and system is under memory pressure - prune stale cache & temporary files
                 com.Nightjar.caliq5.utils.MemoryManager.deepPurgeMemory(this)
             }
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (isFinishing) {
-            com.Nightjar.caliq5.utils.MemoryManager.deepPurgeMemory(this)
         }
     }
 

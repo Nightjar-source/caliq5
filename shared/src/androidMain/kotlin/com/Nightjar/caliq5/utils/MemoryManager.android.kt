@@ -2,51 +2,11 @@ package com.Nightjar.caliq5.utils
 
 import android.app.ActivityManager
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
+import android.os.Build
 import com.Nightjar.caliq5.CaliqApplication
-import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 
 actual object MemoryManager {
     private val context: Context get() = CaliqApplication.appContext
-    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
-    private val pendingCleanupTasks = ConcurrentHashMap<String, Runnable>()
-
-    /**
-     * Schedules a lightweight 2-minute idle timer for a cached file.
-     * If the user accesses/opens the file again within 2 minutes, the timer resets.
-     * When 2 minutes elapse without further access, the file is safely deleted from cache.
-     * Uses zero background threads and consumes zero CPU/RAM while idle.
-     */
-    fun scheduleTwoMinuteIdleCleanup(file: File) {
-        val path = file.absolutePath
-        pendingCleanupTasks.remove(path)?.let { existingRunnable ->
-            mainHandler.removeCallbacks(existingRunnable)
-        }
-
-        val cleanupRunnable = Runnable {
-            pendingCleanupTasks.remove(path)
-            try {
-                if (file.exists() && file.isFile) {
-                    file.delete()
-                }
-            } catch (_: Throwable) {}
-        }
-
-        pendingCleanupTasks[path] = cleanupRunnable
-        mainHandler.postDelayed(cleanupRunnable, 120_000L)
-    }
-
-    /**
-     * Cancels any pending idle cleanup for a specific file.
-     */
-    fun cancelTwoMinuteIdleCleanup(file: File) {
-        val path = file.absolutePath
-        pendingCleanupTasks.remove(path)?.let { existingRunnable ->
-            mainHandler.removeCallbacks(existingRunnable)
-        }
-    }
 
     /**
      * February 2027 Android Memory Guidelines:
@@ -59,10 +19,14 @@ actual object MemoryManager {
             val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
             val isLowRam = activityManager?.isLowRamDevice == true
 
+            // On older and low-RAM devices (<= 3.2GB RAM), invoke System.gc() when backgrounded
+            // to reclaim memory held by Compose layouts and transient graphics buffers immediately.
             if (isLowRam || isDeviceLowRam()) {
                 System.gc()
             }
-        } catch (_: Throwable) {}
+        } catch (e: Throwable) {
+            // Safe guard against platform differences
+        }
     }
 
     fun trimMemoryOnBackground(ctx: Context) {
@@ -70,36 +34,29 @@ actual object MemoryManager {
     }
 
     /**
-     * Purges transient cache files (.tmp, generated temporary PDFs, font caches)
+     * Purges transient cache files (.tmp, generated temporary PDFs, image caches)
      * completely without ever touching permanent user data (databases, DataStore, filesDir).
-     * Cancels all pending timers and frees memory immediately upon app exit or swipe-out.
+     * Prevents cache bloat when user exits or navigates away.
      */
     actual fun deepPurgeMemory() {
         try {
-            pendingCleanupTasks.values.forEach { runnable ->
-                mainHandler.removeCallbacks(runnable)
-            }
-            pendingCleanupTasks.clear()
-
             val cache = context.cacheDir
             cache?.listFiles()?.forEach { file ->
-                try {
-                    if (file.isFile) {
-                        file.delete()
-                    } else if (file.isDirectory && file.name.startsWith("temp", ignoreCase = true)) {
-                        file.deleteRecursively()
-                    }
-                } catch (_: Throwable) {}
+                if (file.isFile) {
+                    file.delete()
+                } else if (file.isDirectory && file.name.startsWith("temp", ignoreCase = true)) {
+                    file.deleteRecursively()
+                }
             }
             context.externalCacheDir?.listFiles()?.forEach { file ->
-                try {
-                    if (file.isFile) {
-                        file.delete()
-                    }
-                } catch (_: Throwable) {}
+                if (file.isFile) {
+                    file.delete()
+                }
             }
             System.gc()
-        } catch (_: Throwable) {}
+        } catch (e: Throwable) {
+            // Ignore errors during cache cleanup
+        }
     }
 
     fun deepPurgeMemory(ctx: Context) {
@@ -113,7 +70,7 @@ actual object MemoryManager {
             activityManager.getMemoryInfo(memoryInfo)
             val totalRamGb = memoryInfo.totalMem / (1024.0 * 1024.0 * 1024.0)
             totalRamGb <= 3.2
-        } catch (_: Throwable) {
+        } catch (e: Throwable) {
             false
         }
     }
