@@ -31,11 +31,18 @@ jobs:
         run: chmod +x gradlew
 
       - name: Restore Signing Credentials from Secrets
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > androidApp/Nightjar.keystore
-          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> local.properties
-          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> local.properties
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > androidApp/Nightjar.keystore
+            echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> local.properties
+            echo "KEY_PASSWORD=$KEY_PASSWORD" >> local.properties
+          else
+            echo "::warning::KEYSTORE_BASE64 secret is not set!"
+          fi
 
       - name: Build Release APK
         run: ./gradlew :androidApp:assembleRelease --no-daemon --stacktrace
@@ -46,6 +53,13 @@ jobs:
           APK_PATH=$(find androidApp/build/outputs/apk/release/ -name "*.apk" | head -n 1)
           echo "Found APK at: $APK_PATH"
           echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        if: steps.find_apk.outputs.apk_path != ''
+        with:
+          name: caliq5-release-apk
+          path: ${{ steps.find_apk.outputs.apk_path }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
