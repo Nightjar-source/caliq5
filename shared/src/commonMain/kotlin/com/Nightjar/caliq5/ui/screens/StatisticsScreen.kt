@@ -171,7 +171,7 @@ fun StatisticsScreen(viewModel: AppViewModel) {
                                             .fillMaxWidth()
                                             .expressive3DCurvature(
                                                 cornerRadius = 18.dp,
-                                                hasInnerGlow = isPendingDeletion
+                                                tintColor = if (isPendingDeletion) MaterialTheme.colorScheme.error else null
                                             ),
                                         shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
                                         color = if (isPendingDeletion) {
@@ -256,3 +256,5 @@ fun StatisticsScreen(viewModel: AppViewModel) {
         }
     }
 }
+}
+
