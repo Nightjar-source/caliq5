@@ -30,6 +30,13 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Restore Signing Credentials from Secrets
+        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > androidApp/Nightjar.keystore
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> local.properties
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> local.properties
+
       - name: Build Release APK
         run: ./gradlew :androidApp:assembleRelease --no-daemon --stacktrace
 
