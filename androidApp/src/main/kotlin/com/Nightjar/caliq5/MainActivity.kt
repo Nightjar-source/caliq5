@@ -95,24 +95,6 @@ class MainActivity : ComponentActivity() {
         outState.putString("savedDeepLinkUri", deepLinkUri.value)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isFinishing) {
-            try {
-                com.Nightjar.caliq5.utils.MemoryManager.deepPurgeMemory()
-            } catch (_: Throwable) {}
-        }
-    }
-
-    override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
-        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
-            try {
-                com.Nightjar.caliq5.utils.MemoryManager.trimMemoryOnBackground()
-            } catch (_: Throwable) {}
-        }
-    }
-
     /**
      * AI Agent & Digital Assistant Semantic Knowledge Provider (Android Assist API / Gemini Nano).
      * Provides structured Schema.org JSON-LD and canonical deep links to digital assistants
