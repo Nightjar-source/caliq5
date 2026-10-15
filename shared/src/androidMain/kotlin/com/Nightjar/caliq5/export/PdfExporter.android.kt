@@ -642,6 +642,7 @@ actual object PdfExporter {
                 saveToPublicDownloads(context, cacheFile, fileNameFinal)
                 showDownloadNotification(context, fileNameFinal, cacheFile)
                 openExternalViewer(context, cacheFile, fileNameFinal)
+                com.Nightjar.caliq5.utils.MemoryManager.scheduleTwoMinuteIdleCleanup(cacheFile)
             } catch (e: Exception) { e.printStackTrace() } finally { document.close() }
         }
     }

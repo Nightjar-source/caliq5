@@ -220,25 +220,42 @@ fun FeatureExplanationCard(
     val shape = RoundedCornerShape(28.dp)
     val isRtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
 
-    val gradientColors = if (isRtl) {
-        listOf(
-            primaryColor.copy(alpha = 0.15f),
-            primaryColor.copy(alpha = 0.38f),
-            primaryColor.copy(alpha = 0.68f),
-            primaryColor.copy(alpha = 0.90f)
-        )
+    val gradientColors = if (isDark) {
+        if (isRtl) {
+            listOf(
+                primaryColor.copy(alpha = 0.28f),
+                primaryColor.copy(alpha = 0.55f),
+                primaryColor.copy(alpha = 0.82f),
+                primaryColor.copy(alpha = 0.95f)
+            )
+        } else {
+            listOf(
+                primaryColor.copy(alpha = 0.95f),
+                primaryColor.copy(alpha = 0.82f),
+                primaryColor.copy(alpha = 0.55f),
+                primaryColor.copy(alpha = 0.28f)
+            )
+        }
     } else {
-        listOf(
-            primaryColor.copy(alpha = 0.90f),
-            primaryColor.copy(alpha = 0.68f),
-            primaryColor.copy(alpha = 0.38f),
-            primaryColor.copy(alpha = 0.15f)
-        )
+        // In Light Mode: Preserve rich theme color so it never washes out or fades into white frost
+        if (isRtl) {
+            listOf(
+                primaryColor.copy(alpha = 0.82f),
+                primaryColor.copy(alpha = 0.90f),
+                primaryColor.copy(alpha = 0.96f),
+                primaryColor
+            )
+        } else {
+            listOf(
+                primaryColor,
+                primaryColor.copy(alpha = 0.96f),
+                primaryColor.copy(alpha = 0.90f),
+                primaryColor.copy(alpha = 0.82f)
+            )
+        }
     }
 
     // Dynamic contrast-compliant calculation strictly following Material 3 and WCAG 2.1
-    // Dark mode: crisp white text with deep protective shadow.
-    // Light mode: deep slate text with bright white protective halo shadow.
     val cardTextColor = if (isDark) {
         Color.White
     } else {
@@ -250,9 +267,9 @@ fun FeatureExplanationCard(
     val cardTitleColor = if (isDark) {
         Color.White
     } else {
-        primaryColor
+        cardTextColor
     }
-    val cardTextShadow = cardTextColor.contrastingShadow(alpha = if (isDark) 0.60f else 0.50f)
+    val cardTextShadow = cardTextColor.contrastingShadow(alpha = if (isDark) 0.65f else 0.55f)
 
     Box(
         modifier = modifier
@@ -265,9 +282,8 @@ fun FeatureExplanationCard(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
-                .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 5.dp, tintColor = primaryColor, hasSaltMotes = true)
                 .clip(shape)
-                .background(surfaceColor.copy(alpha = 0.80f))
+                .background(surfaceColor)
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = gradientColors

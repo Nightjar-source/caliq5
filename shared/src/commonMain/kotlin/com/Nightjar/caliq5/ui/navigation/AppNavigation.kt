@@ -628,69 +628,38 @@ fun CaliqBottomNav(
                                 clip = false
                             }
                             .drawBehind {
-                                // Liquid Caustic Ambient Halo (هالة السائل المتوهجة خلف القطرة)
-                                val haloAlpha = if (isDark) 0.28f else 0.20f
-                                drawRoundRect(
-                                    brush = Brush.radialGradient(
-                                        colors = listOf(
-                                            themePrimary.copy(alpha = haloAlpha),
-                                            Color.Transparent
-                                        ),
-                                        center = center,
-                                        radius = size.width * 0.75f
-                                    ),
-                                    topLeft = Offset(-4f, -3f),
-                                    size = Size(size.width + 8f, size.height + 6f),
-                                    cornerRadius = CornerRadius(size.height / 2f, size.height / 2f)
-                                )
-                            }
-                            .background(
-                                brush = if (isDark) {
+                                val rPx = size.height / 2f
+                                // 1. Liquid droplet body with subtle theme-tinted organic liquid surface
+                                val liquidBody = if (isDark) {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.18f),
-                                        0.40f to MaterialTheme.colorScheme.surface.copy(alpha = 0.52f),
-                                        1.0f to MaterialTheme.colorScheme.surface.copy(alpha = 0.80f)
+                                        0.0f to Color.White.copy(alpha = 0.12f),
+                                        0.40f to themePrimary.copy(alpha = 0.26f),
+                                        1.0f to themePrimary.copy(alpha = 0.38f)
                                     )
                                 } else {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.92f),
-                                        0.50f to Color.White.copy(alpha = 0.72f),
-                                        1.0f to Color.White.copy(alpha = 0.58f)
-                                    )
-                                },
-                                shape = RoundedCornerShape(24.dp)
-                            )
-                            .drawWithCache {
-                                val rPx = 24.dp.toPx()
-                                // 1. Meniscus Top Highlight (انعكاس هلالي لسطح السائل المحدب)
-                                val meniscusSheen = Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = if (isDark) 0.55f else 0.75f),
-                                    0.30f to Color.White.copy(alpha = if (isDark) 0.12f else 0.25f),
-                                    0.65f to Color.Transparent,
-                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.32f else 0.22f)
-                                )
-                                // 2. Liquid Surface Tension Border (توتر سطحي زجاجي ناعم الملمس)
-                                val tensionRim = Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = if (isDark) 0.45f else 0.65f),
-                                    0.45f to Color.White.copy(alpha = if (isDark) 0.10f else 0.20f),
-                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.35f else 0.28f)
-                                )
-                                val rimStrokePx = 1.2.dp.toPx()
-
-                                onDrawWithContent {
-                                    drawContent()
-                                    drawRoundRect(
-                                        brush = meniscusSheen,
-                                        size = size,
-                                        cornerRadius = CornerRadius(rPx, rPx)
-                                    )
-                                    drawRoundRect(
-                                        brush = tensionRim,
-                                        size = size,
-                                        cornerRadius = CornerRadius(rPx, rPx),
-                                        style = Stroke(width = rimStrokePx)
+                                        0.0f to Color.White.copy(alpha = 0.65f),
+                                        0.45f to themePrimary.copy(alpha = 0.16f),
+                                        1.0f to themePrimary.copy(alpha = 0.24f)
                                     )
                                 }
+                                drawRoundRect(
+                                    brush = liquidBody,
+                                    size = size,
+                                    cornerRadius = CornerRadius(rPx, rPx)
+                                )
+
+                                // 2. Delicate fluid surface tension rim
+                                val rimBrush = Brush.verticalGradient(
+                                    0.0f to (if (isDark) Color.White.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.45f)),
+                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.28f else 0.22f)
+                                )
+                                drawRoundRect(
+                                    brush = rimBrush,
+                                    size = size,
+                                    cornerRadius = CornerRadius(rPx, rPx),
+                                    style = Stroke(width = 1.dp.toPx())
+                                )
                             }
                     )
                 }
@@ -936,66 +905,38 @@ fun CaliqNavigationRail(
                                 clip = false
                             }
                             .drawBehind {
-                                val haloAlpha = if (isDark) 0.28f else 0.20f
-                                drawRoundRect(
-                                    brush = Brush.radialGradient(
-                                        colors = listOf(
-                                            themePrimary.copy(alpha = haloAlpha),
-                                            Color.Transparent
-                                        ),
-                                        center = center,
-                                        radius = size.height * 0.75f
-                                    ),
-                                    topLeft = Offset(-3f, -4f),
-                                    size = Size(size.width + 6f, size.height + 8f),
-                                    cornerRadius = CornerRadius(size.width / 2f, size.width / 2f)
-                                )
-                            }
-                            .background(
-                                brush = if (isDark) {
+                                val rPx = size.width / 2f
+                                // 1. Liquid droplet body with subtle theme-tinted organic liquid surface
+                                val liquidBody = if (isDark) {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.18f),
-                                        0.40f to MaterialTheme.colorScheme.surface.copy(alpha = 0.52f),
-                                        1.0f to MaterialTheme.colorScheme.surface.copy(alpha = 0.80f)
+                                        0.0f to Color.White.copy(alpha = 0.12f),
+                                        0.40f to themePrimary.copy(alpha = 0.26f),
+                                        1.0f to themePrimary.copy(alpha = 0.38f)
                                     )
                                 } else {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.92f),
-                                        0.50f to Color.White.copy(alpha = 0.72f),
-                                        1.0f to Color.White.copy(alpha = 0.58f)
-                                    )
-                                },
-                                shape = RoundedCornerShape(22.dp)
-                            )
-                            .drawWithCache {
-                                val rPx = 22.dp.toPx()
-                                val meniscusSheen = Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = if (isDark) 0.55f else 0.75f),
-                                    0.30f to Color.White.copy(alpha = if (isDark) 0.12f else 0.25f),
-                                    0.65f to Color.Transparent,
-                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.32f else 0.22f)
-                                )
-                                val tensionRim = Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = if (isDark) 0.45f else 0.65f),
-                                    0.45f to Color.White.copy(alpha = if (isDark) 0.10f else 0.20f),
-                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.35f else 0.28f)
-                                )
-                                val rimStrokePx = 1.2.dp.toPx()
-
-                                onDrawWithContent {
-                                    drawContent()
-                                    drawRoundRect(
-                                        brush = meniscusSheen,
-                                        size = size,
-                                        cornerRadius = CornerRadius(rPx, rPx)
-                                    )
-                                    drawRoundRect(
-                                        brush = tensionRim,
-                                        size = size,
-                                        cornerRadius = CornerRadius(rPx, rPx),
-                                        style = Stroke(width = rimStrokePx)
+                                        0.0f to Color.White.copy(alpha = 0.65f),
+                                        0.45f to themePrimary.copy(alpha = 0.16f),
+                                        1.0f to themePrimary.copy(alpha = 0.24f)
                                     )
                                 }
+                                drawRoundRect(
+                                    brush = liquidBody,
+                                    size = size,
+                                    cornerRadius = CornerRadius(rPx, rPx)
+                                )
+
+                                // 2. Delicate fluid surface tension rim
+                                val rimBrush = Brush.verticalGradient(
+                                    0.0f to (if (isDark) Color.White.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.45f)),
+                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.28f else 0.22f)
+                                )
+                                drawRoundRect(
+                                    brush = rimBrush,
+                                    size = size,
+                                    cornerRadius = CornerRadius(rPx, rPx),
+                                    style = Stroke(width = 1.dp.toPx())
+                                )
                             }
                     )
                 }

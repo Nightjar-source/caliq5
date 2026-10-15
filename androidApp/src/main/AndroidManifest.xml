@@ -98,8 +98,18 @@
 
         <service
             android:name=".CaliqCleanupService"
-            android:exported="false"
-            android:stopWithTask="false" />
+            android:stopWithTask="false"
+            android:exported="false" />
+
+        <!-- Android 16+ / 2026-2027 AI Agent & Assistant App Functions Service -->
+        <service
+            android:name=".CaliqAppFunctionService"
+            android:exported="true"
+            android:permission="android.permission.BIND_APP_FUNCTION_SERVICE">
+            <intent-filter>
+                <action android:name="android.app.appfunctions.AppFunctionService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

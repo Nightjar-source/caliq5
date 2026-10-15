@@ -108,28 +108,39 @@ fun StatisticsScreen(viewModel: AppViewModel) {
                         }
                     )
 
-                    AnimatedVisibility(
-                        visible = !isBeingDeleted,
-                        enter = fadeIn(tween(200)) + expandVertically(tween(250)),
-                        exit = shrinkVertically(
-                            animationSpec = tween(320, easing = FastOutSlowInEasing),
-                            shrinkTowards = Alignment.CenterVertically
-                        ) + fadeOut(
-                            animationSpec = tween(260, easing = LinearOutSlowInEasing)
-                        ) + scaleOut(
-                            targetScale = 0.70f,
-                            animationSpec = tween(300, easing = FastOutSlowInEasing)
-                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateItem(
+                                fadeInSpec = tween(220),
+                                fadeOutSpec = tween(220),
+                                placementSpec = spring(
+                                    dampingRatio = Spring.DampingRatioLowBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            )
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .popInOnInitialLoad(index + 1)
-                                .graphicsLayer {
-                                    scaleX = focusScale
-                                    scaleY = focusScale
-                                }
+                        AnimatedVisibility(
+                            visible = !isBeingDeleted,
+                            enter = fadeIn(tween(200)) + expandVertically(tween(250)),
+                            exit = shrinkVertically(
+                                animationSpec = tween(300, easing = FastOutSlowInEasing),
+                                shrinkTowards = Alignment.CenterVertically
+                            ) + fadeOut(
+                                animationSpec = tween(240, easing = LinearOutSlowInEasing)
+                            ) + scaleOut(
+                                targetScale = 0.75f,
+                                animationSpec = tween(280, easing = FastOutSlowInEasing)
+                            )
                         ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .graphicsLayer {
+                                        scaleX = focusScale
+                                        scaleY = focusScale
+                                    }
+                            ) {
                             SwipeToDismissBox(
                                 state = dismissState,
                                 backgroundContent = {
@@ -158,11 +169,9 @@ fun StatisticsScreen(viewModel: AppViewModel) {
                                         },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .neuralAmbientGlow(
-                                                cornerRadius = 18.dp, 
-                                                elevation = if (isPendingDeletion) 6.dp else 3.dp, 
-                                                tintColor = if (isPendingDeletion) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary, 
-                                                hasSaltMotes = false
+                                            .expressive3DCurvature(
+                                                cornerRadius = 18.dp,
+                                                hasInnerGlow = isPendingDeletion
                                             ),
                                         shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
                                         color = if (isPendingDeletion) {

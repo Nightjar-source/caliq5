@@ -705,17 +705,17 @@ Box(modifier = Modifier.fillMaxWidth()) {
                         androidx.compose.animation.AnimatedVisibility(
                             visible = expandedClassSelect,
                             enter = androidx.compose.animation.expandVertically(
-                                animationSpec = androidx.compose.animation.core.spring(
-                                    dampingRatio = 0.85f,
-                                    stiffness = 450f
+                                animationSpec = androidx.compose.animation.core.tween(
+                                    durationMillis = 220,
+                                    easing = androidx.compose.animation.core.FastOutSlowInEasing
                                 )
                             ) + androidx.compose.animation.fadeIn(
                                 animationSpec = androidx.compose.animation.core.tween(150)
                             ),
                             exit = androidx.compose.animation.shrinkVertically(
-                                animationSpec = androidx.compose.animation.core.spring(
-                                    dampingRatio = 0.90f,
-                                    stiffness = 500f
+                                animationSpec = androidx.compose.animation.core.tween(
+                                    durationMillis = 190,
+                                    easing = androidx.compose.animation.core.FastOutSlowInEasing
                                 )
                             ) + androidx.compose.animation.fadeOut(
                                 animationSpec = androidx.compose.animation.core.tween(120)

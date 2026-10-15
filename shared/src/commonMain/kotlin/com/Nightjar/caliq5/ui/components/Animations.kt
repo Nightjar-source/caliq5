@@ -116,26 +116,29 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
  * Replays smoothly on every navigation with an elegant, moist (Fluid) spring motion.
  */
 fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
-    var isLoaded by remember { mutableStateOf(false) }
+    val isHighPerf = com.Nightjar.caliq5.utils.rememberIsHighPerformanceDevice()
+    if (!isHighPerf) return@composed this
+
+    var isLoaded by remember { mutableStateOf(index == 0) }
     LaunchedEffect(Unit) {
         if (index > 0) {
-            kotlinx.coroutines.delay((index.coerceAtMost(10) * 32L))
+            kotlinx.coroutines.delay((index.coerceAtMost(6) * 20L))
+            isLoaded = true
         }
-        isLoaded = true
     }
     val animProgress by animateFloatAsState(
         targetValue = if (isLoaded) 1f else 0f,
         animationSpec = spring(
-            dampingRatio = 0.76f, // رطب وسلس Fluid
+            dampingRatio = 0.82f,
             stiffness = Spring.StiffnessMediumLow
         ),
         label = "fluidSlide_$index"
     )
     this.graphicsLayer {
         this.alpha = animProgress.coerceIn(0f, 1f)
-        this.translationY = (1f - animProgress) * 26.dp.toPx()
-        this.scaleX = 0.95f + 0.05f * animProgress
-        this.scaleY = 0.95f + 0.05f * animProgress
+        this.translationY = (1f - animProgress) * 18.dp.toPx()
+        this.scaleX = 0.96f + 0.04f * animProgress
+        this.scaleY = 0.96f + 0.04f * animProgress
         this.clip = false
     }
 }
@@ -552,74 +555,10 @@ fun Modifier.neuralExpressiveShadow(
  */
 fun Modifier.neuralAmbientGlow(
     cornerRadius: androidx.compose.ui.unit.Dp = 28.dp,
-    elevation: androidx.compose.ui.unit.Dp = 5.dp,
+    elevation: androidx.compose.ui.unit.Dp = 0.dp,
     tintColor: androidx.compose.ui.graphics.Color? = null,
-    hasSaltMotes: Boolean = true
-): Modifier = composed {
-    val isDark = isAppInDarkTheme()
-    val themeColor = tintColor ?: MaterialTheme.colorScheme.primary
-
-    val shape = RoundedCornerShape(cornerRadius)
-
-    val baseMod = this.drawBehind {
-        val cornerRadiusPx = cornerRadius.toPx()
-        val spreadPx = elevation.toPx().coerceIn(4f, 16f)
-        val w = size.width
-        val h = size.height
-        if (w <= 0f || h <= 0f) return@drawBehind
-
-        // 1. Soft Ambient Volumetric Glow that tilts in 3D seamlessly with the card without casting any 2D black shadow over it
-        val haloAlpha = if (isDark) 0.22f else 0.14f
-        drawRoundRect(
-            brush = Brush.radialGradient(
-                colors = listOf(
-                    themeColor.copy(alpha = haloAlpha),
-                    themeColor.copy(alpha = haloAlpha * 0.40f),
-                    Color.Transparent
-                ),
-                center = Offset(w * 0.5f, h * 0.52f),
-                radius = kotlin.math.max(w * 0.52f, h * 1.5f) + spreadPx
-            ),
-            topLeft = Offset(-spreadPx * 0.6f, -spreadPx * 0.4f),
-            size = androidx.compose.ui.geometry.Size(w + spreadPx * 1.2f, h + spreadPx * 1.0f),
-            cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadiusPx + spreadPx * 0.5f, cornerRadiusPx + spreadPx * 0.5f)
-        )
-    }
-
-    if (!hasSaltMotes) {
-        return@composed baseMod
-    }
-
-    baseMod.drawBehind {
-        val cornerRadiusPx = cornerRadius.toPx()
-        val spreadPx = elevation.toPx().coerceIn(3f, 16f)
-        val w = size.width
-        val h = size.height
-        if (w <= 0f || h <= 0f) return@drawBehind
-
-        val cr = cornerRadiusPx.coerceAtMost(minOf(w, h) / 2f)
-
-        // Organic floating salt motes (حبيبات الملح العضوية الرقيقة المحيطة بكارتات الشرح والمعدل 360 درجة بوضوح لوني أعلى)
-        val moteCount = 28
-        val moteAlpha = if (isDark) 0.52f else 0.38f
-        for (idx in 0 until moteCount) {
-            val angle = (idx.toFloat() / moteCount) * (2f * kotlin.math.PI.toFloat())
-            val cosA = kotlin.math.cos(angle)
-            val sinA = kotlin.math.sin(angle)
-            val dist = spreadPx * (0.25f + 0.65f * ((idx * 7) % 11) / 10f)
-            val px = if (cosA >= 0) w - cr + cosA * (cr + dist) else cr + cosA * (cr + dist)
-            val py = if (sinA >= 0) h - cr + sinA * (cr + dist) else cr + sinA * (cr + dist)
-            val pRadius = 1.0f + 0.8f * ((idx * 3) % 5) / 4f
-            val pAlpha = (moteAlpha * (0.80f + 0.20f * ((idx * 5) % 7) / 6f)).coerceIn(0.25f, 0.65f)
-
-            drawCircle(
-                color = themeColor.copy(alpha = pAlpha),
-                radius = pRadius,
-                center = androidx.compose.ui.geometry.Offset(px, py)
-            )
-        }
-    }
-}
+    hasSaltMotes: Boolean = false
+): Modifier = this
 
 /**
  * Longitudinal Sheen (اللمحة الطولية الخفيفة 10%):
@@ -637,7 +576,7 @@ fun Modifier.longitudinalSheen(
         .clip(effectiveShape)
         .drawWithCache {
             val radiusPx = cornerRadius.toPx()
-            val sheenColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
+            val sheenColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.04f)
             val sheenBrush = Brush.verticalGradient(
                 0.0f to sheenColor,
                 (if (isDark) 0.18f else 0.22f) to Color.Transparent,
@@ -656,10 +595,10 @@ fun Modifier.longitudinalSheen(
 }
 
 /**
- * 3D Convex Curvature (التحدب والاعوجاج ثلاثي الأبعاد المحدب من الزوايا والحدود دون حواف حادة):
- * - Creates an authentic convex volume with organic curvature bulging naturally from the corners into the element.
- * - Symmetrical and inverted between Light and Dark mode applying genuine sea glass depth without harsh borders.
- * - In both modes: downward light projection (إخراج الضوء إلى الأسفل) with prominent lateral curvature.
+ * 3D Convex Curvature (التحدب والاعوجاج ثلاثي الأبعاد المحدب العضوي الناعم كالصورة المرجعية):
+ * - Creates an authentic convex volume with organic curvature using the element's OWN theme color (Tone-on-tone).
+ * - ZERO harsh white specular rays, ZERO snowy frost lines washing out the theme color in light mode.
+ * - ZERO bottom drop shadows. Pure convex surface volume.
  */
 fun Modifier.expressive3DCurvature(
     cornerRadius: androidx.compose.ui.unit.Dp = 24.dp,
@@ -677,115 +616,56 @@ fun Modifier.expressive3DCurvature(
             val w = size.width
             val h = size.height
 
-            // 1. Dual-Corner Specular Rays strictly localized at the corner arcs
-            val cornerRadiusLimit = (radiusPx * 1.85f).coerceAtMost(kotlin.math.min(w, h) * 0.45f)
-
-            val primaryRayAlpha = if (isDark) 0.22f else 0.22f
-            val oppositeRayAlpha = if (isDark) 0.15f else 0.15f
-
-            // زوايا متعاكسة هندسياً تنعكس قطرياً 180 درجة بين الوضعين المظلم والفاتح
-            val primaryOrigin = if (isDark) Offset(w, 0f) else Offset(0f, 0f)
-            val oppositeOrigin = if (isDark) Offset(0f, h) else Offset(w, h)
-
-            // Specular corner sheen: blends themeColor naturally to enrich the base gradient
-            val primaryCornerRay = Brush.radialGradient(
-                colors = listOf(
-                    (if (isDark) Color.White.copy(alpha = primaryRayAlpha * 0.90f) else Color.White.copy(alpha = primaryRayAlpha * 1.10f)),
-                    themeColor.copy(alpha = primaryRayAlpha * 0.55f),
-                    Color.Transparent
-                ),
-                center = primaryOrigin,
-                radius = cornerRadiusLimit
-            )
-
-            val oppositeCornerRay = Brush.radialGradient(
-                colors = listOf(
-                    themeColor.copy(alpha = oppositeRayAlpha),
-                    (if (isDark) Color.White.copy(alpha = oppositeRayAlpha * 0.65f) else themeColor.copy(alpha = oppositeRayAlpha * 0.45f)),
-                    Color.Transparent
-                ),
-                center = oppositeOrigin,
-                radius = cornerRadiusLimit * 0.90f
-            )
-
-            // 2. 4-Border Natural Convex Volume Curvature:
-            val topSheen = Brush.verticalGradient(
-                0.0f to (if (isDark) Color.White.copy(alpha = 0.20f) else Color.White.copy(alpha = 0.22f)),
-                0.20f to Color.Transparent,
-                1.0f to Color.Transparent
-            )
-            // في كلا الوضعين: إخراج الضوء إلى الأسفل وإبراز الحجم ثلاثي الأبعاد
-            val bottomDepth = if (isDark) {
+            // 1. Organic Tone-on-tone Volume: Soft central bulge with richer tone at bottom & perimeter
+            val volumeBrush = if (isDark) {
                 Brush.verticalGradient(
-                    0.0f to Color.Transparent,
-                    0.72f to Color.Transparent,
-                    1.0f to themeColor.copy(alpha = 0.18f)
+                    0.0f to Color.White.copy(alpha = 0.08f),
+                    0.45f to Color.Transparent,
+                    1.0f to Color.Black.copy(alpha = 0.20f)
                 )
             } else {
+                // In Light mode: NEVER wash out with flat white. Use gentle depth gradient from same theme tone!
                 Brush.verticalGradient(
-                    0.0f to Color.Transparent,
-                    0.72f to Color.Transparent,
-                    1.0f to Color.White.copy(alpha = 0.25f)
+                    0.0f to Color.White.copy(alpha = 0.06f),
+                    0.40f to Color.Transparent,
+                    1.0f to themeColor.copy(alpha = 0.10f)
                 )
             }
-            // اعوجاج جانبي متناسق يبرز قوسي الكبسولة بدون حواف صلبة
-            val horizontalCurvature = if (isDark) {
-                Brush.horizontalGradient(
-                    0.0f to Color.White.copy(alpha = 0.14f),
-                    0.12f to Color.Transparent,
-                    0.88f to Color.Transparent,
-                    1.0f to themeColor.copy(alpha = 0.14f)
-                )
-            } else {
-                Brush.horizontalGradient(
-                    0.0f to Color.White.copy(alpha = 0.16f),
-                    0.12f to Color.Transparent,
-                    0.88f to Color.Transparent,
-                    1.0f to Color.White.copy(alpha = 0.16f)
-                )
-            }
+
+            // 2. Soft perimeter bezel that contours the pill corners seamlessly
+            val perimeterCurvature = Brush.radialGradient(
+                colors = listOf(
+                    Color.Transparent,
+                    (if (isDark) Color.Black.copy(alpha = 0.16f) else themeColor.copy(alpha = 0.07f))
+                ),
+                center = Offset(w * 0.5f, h * 0.5f),
+                radius = kotlin.math.max(w, h) * 0.70f
+            )
 
             onDrawWithContent {
-                // 1. رسم طبقات التحدب ثلاثي الأبعاد المضيء على السطح والتدرج
-                drawRoundRect(
-                    brush = primaryCornerRay,
-                    size = size,
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(radiusPx, radiusPx)
-                )
-                drawRoundRect(
-                    brush = oppositeCornerRay,
-                    size = size,
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(radiusPx, radiusPx)
-                )
-                drawRoundRect(
-                    brush = topSheen,
-                    size = size,
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(radiusPx, radiusPx)
-                )
-                drawRoundRect(
-                    brush = bottomDepth,
-                    size = size,
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(radiusPx, radiusPx)
-                )
-                drawRoundRect(
-                    brush = horizontalCurvature,
-                    size = size,
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(radiusPx, radiusPx)
-                )
-
-                // 2. رسم محتوى الكارت والنصوص فوق التأثيرات لتبقى واضحة وناصعة 100%
+                // 1. رسم محتوى الكارت والنصوص أولاً
                 drawContent()
+
+                // 2. رسم التحدب الحجمي العضوي الناعم فوق السطح ليعطي إحساس المجسم المحدب دون طمس النص وبدون أي ظلال خارجية
+                drawRoundRect(
+                    brush = volumeBrush,
+                    size = size,
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(radiusPx, radiusPx)
+                )
+                drawRoundRect(
+                    brush = perimeterCurvature,
+                    size = size,
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(radiusPx, radiusPx)
+                )
             }
         }
 }
 
 /**
- * Frosted Organic Capsule (تصميم الكبسولة الزجاجية العضوية بنسيج ملحي ناعم وتحدب ثلاثي الأبعاد):
- * - 25% translucent frosted glass surface tinted dynamically with theme color.
- * - Fine stippled / granular salt-mote tactile texture distributed evenly across the capsule.
- * - Gentle 3D convex volume with top specular crest highlight and bottom soft radiance.
- * - Zero heavy drop shadows (بدون ظلال التي في الصور).
- * - Fully adaptive across all themes in Light and Dark modes.
+ * Frosted Organic Capsule (تصميم الكبسولة الزجاجية العضوية شبه الشفافة Sea Glass):
+ * - Translucent frosted sea glass base tinted with theme color.
+ * - Isolated and simplified gracefully on low-end devices.
+ * - Zero heavy bottom drop shadows.
  */
 fun Modifier.frostedOrganicCapsule(
     shape: Shape = CircleShape,
@@ -793,24 +673,36 @@ fun Modifier.frostedOrganicCapsule(
     tintColor: Color? = null,
     alpha: Float = 0.25f
 ): Modifier = composed {
+    val isHighPerf = com.Nightjar.caliq5.utils.rememberIsHighPerformanceDevice()
     val isDark = isAppInDarkTheme()
     val themeColor = tintColor ?: MaterialTheme.colorScheme.primary
     val surfaceColor = MaterialTheme.colorScheme.surface
 
-    // 25% translucent frosted base tinted naturally with theme and surface (مطابق للصور مع شفافية 25%)
+    if (!isHighPerf) {
+        return@composed this
+            .clip(shape)
+            .background(if (isDark) surfaceColor.copy(alpha = 0.90f) else surfaceColor.copy(alpha = 0.95f))
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.35f else 0.45f),
+                shape
+            )
+    }
+
+    // Semi-transparent frosted Sea Glass base tinted naturally with theme and surface
     val capsuleBg = if (isDark) {
         Color(
-            red = surfaceColor.red * 0.55f + themeColor.red * 0.45f,
-            green = surfaceColor.green * 0.55f + themeColor.green * 0.45f,
-            blue = surfaceColor.blue * 0.55f + themeColor.blue * 0.45f,
-            alpha = alpha
+            red = surfaceColor.red * 0.60f + themeColor.red * 0.40f,
+            green = surfaceColor.green * 0.60f + themeColor.green * 0.40f,
+            blue = surfaceColor.blue * 0.60f + themeColor.blue * 0.40f,
+            alpha = alpha.coerceIn(0.20f, 0.45f)
         )
     } else {
         Color(
-            red = surfaceColor.red * 0.35f + themeColor.red * 0.65f,
-            green = surfaceColor.green * 0.35f + themeColor.green * 0.65f,
-            blue = surfaceColor.blue * 0.35f + themeColor.blue * 0.65f,
-            alpha = alpha
+            red = surfaceColor.red * 0.45f + themeColor.red * 0.55f,
+            green = surfaceColor.green * 0.45f + themeColor.green * 0.55f,
+            blue = surfaceColor.blue * 0.45f + themeColor.blue * 0.55f,
+            alpha = alpha.coerceIn(0.18f, 0.35f)
         )
     }
 
@@ -821,148 +713,37 @@ fun Modifier.frostedOrganicCapsule(
             val w = size.width
             val h = size.height
             val radiusPx = cornerRadius.toPx().coerceAtMost(minOf(w, h) / 2f)
-            val isHorizontal = w >= h
 
-            // 1. التحدب ثلاثي الأبعاد والضوء الحجمي الناعم (Soft 3D Convex Volume Gradient)
+            // Smooth Sea Glass 3D volume gradient without harsh highlights
             val convexVolumeBrush = Brush.verticalGradient(
-                0.0f to (if (isDark) Color.White.copy(alpha = 0.16f) else Color.White.copy(alpha = 0.24f)),
-                0.32f to (if (isDark) themeColor.copy(alpha = 0.07f) else Color.White.copy(alpha = 0.08f)),
-                0.75f to Color.Transparent,
-                1.0f to (if (isDark) themeColor.copy(alpha = 0.12f) else themeColor.copy(alpha = 0.14f))
+                0.0f to (if (isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.12f)),
+                0.35f to Color.Transparent,
+                1.0f to (if (isDark) Color.Black.copy(alpha = 0.15f) else themeColor.copy(alpha = 0.08f))
             )
 
-            // 2. القوسان الجانبيان وحواف الكبسولة الناعمة (Cap Specular Highlights)
-            val cap1Brush = if (isHorizontal) {
-                Brush.radialGradient(
-                    colors = listOf(
-                        (if (isDark) Color.White.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.18f)),
-                        Color.Transparent
-                    ),
-                    center = Offset(h * 0.5f, h * 0.5f),
-                    radius = h * 0.85f
-                )
-            } else {
-                Brush.radialGradient(
-                    colors = listOf(
-                        (if (isDark) Color.White.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.18f)),
-                        Color.Transparent
-                    ),
-                    center = Offset(w * 0.5f, w * 0.5f),
-                    radius = w * 0.85f
-                )
-            }
-
-            val cap2Brush = if (isHorizontal) {
-                Brush.radialGradient(
-                    colors = listOf(
-                        (if (isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.16f)),
-                        Color.Transparent
-                    ),
-                    center = Offset(w - h * 0.5f, h * 0.5f),
-                    radius = h * 0.85f
-                )
-            } else {
-                Brush.radialGradient(
-                    colors = listOf(
-                        (if (isDark) themeColor.copy(alpha = 0.12f) else themeColor.copy(alpha = 0.16f)),
-                        Color.Transparent
-                    ),
-                    center = Offset(w * 0.5f, h - w * 0.5f),
-                    radius = w * 0.85f
-                )
-            }
-
-            // 3. النسيج الحبيبي الملحي الناعم المنتشر على جسم الكبسولة (Stippled Frosted Salt Texture)
-            val grainCount = 140
-            var seed = 42L
-            fun nextFloat(): Float {
-                seed = (seed * 1664525L + 1013904223L) and 0xFFFFFFFFL
-                return (seed.toFloat() / 0xFFFFFFFFL.toFloat()).coerceIn(0f, 1f)
-            }
-
-            val grainPoints = ArrayList<Triple<Offset, Float, Color>>(grainCount)
-            for (i in 0 until grainCount) {
-                val rx = nextFloat()
-                val ry = nextFloat()
-                val px = 6f + rx * (w - 12f)
-                val py = 5f + ry * (h - 10f)
-
-                val inBounds = if (isHorizontal) {
-                    val centerY = h / 2f
-                    val leftCenter = Offset(radiusPx, centerY)
-                    val rightCenter = Offset(w - radiusPx, centerY)
-                    when {
-                        px < radiusPx -> (px - leftCenter.x) * (px - leftCenter.x) + (py - leftCenter.y) * (py - leftCenter.y) <= radiusPx * radiusPx
-                        px > w - radiusPx -> (px - rightCenter.x) * (px - rightCenter.x) + (py - rightCenter.y) * (py - rightCenter.y) <= radiusPx * radiusPx
-                        else -> py in 2f..(h - 2f)
-                    }
-                } else {
-                    val centerX = w / 2f
-                    val topCenter = Offset(centerX, radiusPx)
-                    val bottomCenter = Offset(centerX, h - radiusPx)
-                    when {
-                        py < radiusPx -> (px - topCenter.x) * (px - topCenter.x) + (py - topCenter.y) * (py - topCenter.y) <= radiusPx * radiusPx
-                        py > h - radiusPx -> (px - bottomCenter.x) * (px - bottomCenter.x) + (py - bottomCenter.y) * (py - bottomCenter.y) <= radiusPx * radiusPx
-                        else -> px in 2f..(w - 2f)
-                    }
-                }
-
-                if (inBounds) {
-                    val dotRadius = 0.65f + nextFloat() * 0.75f
-                    val isLight = nextFloat() > 0.40f
-                    val alphaGrain = if (isLight) {
-                        (if (isDark) 0.24f else 0.32f) + nextFloat() * 0.12f
-                    } else {
-                        (if (isDark) 0.18f else 0.24f) + nextFloat() * 0.10f
-                    }
-                    val col = if (isLight) Color.White.copy(alpha = alphaGrain) else themeColor.copy(alpha = alphaGrain)
-                    grainPoints.add(Triple(Offset(px, py), dotRadius, col))
-                }
-            }
-
-            // 4. إطار زجاجي دقيق جداً (Micro Frost Border) لتعريف حافة الكبسولة بدون أي ظلال خارجية
+            // Micro Bevel Rim for delicate Sea Glass edge definition
             val borderSheen = Brush.verticalGradient(
-                0.0f to (if (isDark) Color.White.copy(alpha = 0.24f) else Color.White.copy(alpha = 0.35f)),
-                0.55f to (if (isDark) themeColor.copy(alpha = 0.10f) else themeColor.copy(alpha = 0.14f)),
-                1.0f to (if (isDark) themeColor.copy(alpha = 0.16f) else Color.White.copy(alpha = 0.22f))
+                0.0f to (if (isDark) Color.White.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.22f)),
+                0.60f to themeColor.copy(alpha = if (isDark) 0.06f else 0.08f),
+                1.0f to themeColor.copy(alpha = if (isDark) 0.14f else 0.12f)
             )
 
             onDrawWithContent {
-                // 1. رسم التحدب الحجمي للكبسولة
+                // 1. Draw convex volume
                 drawRoundRect(
                     brush = convexVolumeBrush,
                     size = size,
                     cornerRadius = CornerRadius(radiusPx, radiusPx)
                 )
-                // 2. إبراز قوسي الكبسولة
-                drawRoundRect(
-                    brush = cap1Brush,
-                    size = size,
-                    cornerRadius = CornerRadius(radiusPx, radiusPx)
-                )
-                drawRoundRect(
-                    brush = cap2Brush,
-                    size = size,
-                    cornerRadius = CornerRadius(radiusPx, radiusPx)
-                )
-                // 3. رسم النسيج الحبيبي الملحي العضوي على السطح
-                for (grain in grainPoints) {
-                    drawCircle(
-                        color = grain.third,
-                        radius = grain.second,
-                        center = grain.first
-                    )
-                }
-                // 4. رسم الإطار الزجاجي فائق الرقة
+                // 2. Draw content (icons, text)
+                drawContent()
+                // 3. Draw fine Sea Glass perimeter
                 drawRoundRect(
                     brush = borderSheen,
                     size = size,
                     cornerRadius = CornerRadius(radiusPx, radiusPx),
-                    style = Stroke(width = 0.8f)
+                    style = Stroke(width = 1.dp.toPx())
                 )
-
-                // 5. رسم محتوى الشريط (الأيقونات ومؤشر الاختيار) بنقاء تام
-                drawContent()
             }
         }
 }
