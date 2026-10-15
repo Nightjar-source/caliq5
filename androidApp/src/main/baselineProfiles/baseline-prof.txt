@@ -1,0 +1,8 @@
+Lcom/Nightjar/caliq5/**;
+HSPLcom/Nightjar/caliq5/**;->**(**)**
+Lcaliq5/shared/generated/**;
+HSPLcaliq5/shared/generated/**;->**(**)**
+Landroidx/compose/animation/**;
+HSPLandroidx/compose/animation/**;->**(**)**
+Landroidx/compose/foundation/**;
+HSPLandroidx/compose/foundation/**;->**(**)**

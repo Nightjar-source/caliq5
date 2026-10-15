@@ -1,0 +1,450 @@
+package com.caliq.export
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.graphics.*
+import android.graphics.pdf.PdfDocument
+import android.os.Build
+import android.os.Environment
+import androidx.core.app.NotificationCompat
+import androidx.core.content.FileProvider
+import com.caliq.CaliqApplication
+import com.caliq.viewmodel.ResultDisplayState
+import com.caliq.data.TermMode
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.math.ceil
+import kotlin.math.floor
+
+actual object PdfExporter {
+    actual suspend fun export(result: ResultDisplayState) {
+        withContext(Dispatchers.IO) {
+            val context = CaliqApplication.appContext
+            val docTitle = when (result) {
+                is ResultDisplayState.ExemptionResult -> "نتيجة الإعفاء العام والفردي"
+                is ResultDisplayState.AnnualResult -> "نتيجة السعي السنوي لمادة ${result.data.subjectName}"
+                is ResultDisplayState.MonthlyResult -> "نتيجة المعدل الفصلي لمادة ${result.data.subjectName}"
+                is ResultDisplayState.Term2Result -> "درجة الفصل الثاني المطلوبة"
+                is ResultDisplayState.StudentProfileResult -> "سجل الدرجات الشامل"
+            }
+            val fileName = when (result) {
+                is ResultDisplayState.StudentProfileResult -> {
+                    "تطبيق الاعفاء والسعي - درجات ${result.student.name}.pdf"
+                }
+                else -> {
+                    "تطبيق الاعفاء والسعي - ${result.title}.pdf"
+                }
+            }
+
+            val fontBytes = try {
+                caliq5.shared.generated.resources.Res.readBytes("font/reemkufi_bold.ttf")
+            } catch (e: Exception) { null }
+            
+            val customTypeface = fontBytes?.let { bytes ->
+                try {
+                    val tempFile = File.createTempFile("reemkufi_bold", "ttf", context.cacheDir)
+                    tempFile.deleteOnExit()
+                    FileOutputStream(tempFile).use { it.write(bytes) }
+                    Typeface.createFromFile(tempFile)
+                } catch (e: Exception) { null }
+            }
+            
+            val defaultTypeface = Typeface.DEFAULT
+
+            val document = PdfDocument()
+            val pageWidth = 595
+            val pageHeight = 842
+            val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
+            
+            var currentPage = document.startPage(pageInfo)
+            var canvas = currentPage.canvas
+            var pageNumber = 1
+
+            fun drawPageFooter(c: Canvas, num: Int) {
+                val footerY = pageHeight - 60f
+                val dashedPaint = Paint().apply {
+                    color = Color.parseColor("#79747E")
+                    strokeWidth = 1f
+                    pathEffect = DashPathEffect(floatArrayOf(5f, 5f), 0f)
+                }
+                c.drawLine(30f, footerY, pageWidth - 30f, footerY, dashedPaint)
+                drawText(c, "تم الإنشاء بواسطة: تطبيق حاسبة الاعفاء والسعي 2026", pageWidth - 30f, footerY + 25f, 9f, Color.BLACK, true, Paint.Align.RIGHT, defaultTypeface)
+                val sdf = SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale("en"))
+                val dateStr = sdf.format(Date()).replace("AM", "صباحاً").replace("PM", "مساءً")
+                val pageStr = if (num == 1) "" else " | صفحة $num"
+                drawText(c, "تاريخ الطباعة: $dateStr$pageStr", 30f, footerY + 25f, 9f, Color.BLACK, false, Paint.Align.LEFT, defaultTypeface)
+            }
+
+            fun startNewPage() {
+                drawPageFooter(canvas, pageNumber)
+                document.finishPage(currentPage)
+                pageNumber++
+                currentPage = document.startPage(pageInfo)
+                canvas = currentPage.canvas
+                canvas.drawColor(Color.WHITE)
+                drawText(canvas, "تطبيق الاعفاء والسعي - تابع لـ $docTitle", pageWidth - 30f, 40f, 10f, Color.GRAY, false, Paint.Align.RIGHT, defaultTypeface)
+                canvas.drawLine(30f, 55f, pageWidth - 30f, 55f, Paint().apply { color = Color.parseColor("#EADDFF"); strokeWidth = 1f })
+            }
+
+            val primaryColor = Color.parseColor("#6750A4")
+            val containerColor = Color.parseColor("#F3EDF7")
+            val tableRowColor = Color.parseColor("#FAFAFA")
+
+            // Draw App Icon
+            val appIconId = context.resources.getIdentifier("ic_launcher", "mipmap", context.packageName)
+            if (appIconId != 0) {
+                val bitmap = BitmapFactory.decodeResource(context.resources, appIconId)
+                if (bitmap != null) {
+                    val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 45, 45, true)
+                    canvas.drawBitmap(scaledBitmap, pageWidth - 65f, 40f, null)
+                }
+            }
+            
+            // Header
+            drawText(canvas, "حاسبة الاعفاء والسعي لطلاب العراق", pageWidth / 2f, 65f, 22f, primaryColor, true, Paint.Align.CENTER, customTypeface)
+            drawText(canvas, "م/ $docTitle", pageWidth / 2f, 95f, 14f, Color.parseColor("#625B71"), false, Paint.Align.CENTER, defaultTypeface)
+            
+            // Elegant separator
+            val gradPaint = Paint().apply {
+                shader = LinearGradient(30f, 120f, pageWidth - 30f, 120f, intArrayOf(Color.TRANSPARENT, primaryColor, Color.TRANSPARENT), null, Shader.TileMode.CLAMP)
+                strokeWidth = 2f
+            }
+            canvas.drawLine(30f, 120f, pageWidth - 30f, 120f, gradPaint)
+
+            var y = 160f
+
+            fun drawBeautifulResultBox(c: Canvas, y: Float, label: String, grade: String, subLabel: String): Float {
+                val tempPaint = Paint().apply { textSize = 12f; typeface = defaultTypeface }
+                val textWidth = tempPaint.measureText(subLabel) + 40f
+                val boxWidth = maxOf(220f, textWidth)
+                val boxHeight = 110f
+                val boxX = (pageWidth - boxWidth) / 2f
+                
+                c.drawRoundRect(boxX, y, boxX + boxWidth, y + boxHeight, 24f, 24f, Paint().apply { color = Color.parseColor("#FDFDFD") })
+                c.drawRoundRect(boxX, y, boxX + boxWidth, y + boxHeight, 24f, 24f, Paint().apply { color = primaryColor; style = Paint.Style.STROKE; strokeWidth = 2f })
+                
+                drawText(c, label, pageWidth / 2f, y + 35f, 16f, primaryColor, true, Paint.Align.CENTER, defaultTypeface)
+                drawText(c, grade, pageWidth / 2f, y + 75f, 32f, primaryColor, true, Paint.Align.CENTER, defaultTypeface)
+                drawText(c, subLabel, pageWidth / 2f, y + 95f, 12f, Color.parseColor("#625B71"), false, Paint.Align.CENTER, defaultTypeface)
+                
+                return y + boxHeight + 30f
+            }
+
+            when (result) {
+                is ResultDisplayState.ExemptionResult -> {
+                    val d = result.data
+                    y = drawBeautifulResultBox(canvas, y, "السعي العام", "${"%.2f".format(d.finalAverage)}%", d.exemptionStatus.primary)
+
+                    y = drawCard(canvas, pageWidth, y, "ضوابط الإعفاء المعتمدة", listOf(
+                        "• الإعفاء العام: معدل الطالب 85% أو أكثر، مع درجة سعي لا تقل عن 75% في كل مادة.",
+                        "• الإعفاء الفردي: درجة السعي السنوي للمادة 90% أو أكثر."
+                    ), primaryColor, defaultTypeface)
+
+                    if (d.individualExemptions.isNotEmpty()) {
+                        y = drawCard(canvas, pageWidth, y, "المواد المشمولة بالإعفاء الفردي (90% فما فوق)", 
+                            d.individualExemptions.map { "• ${it.name}: ${it.grade?.let { g -> "%.1f".format(g) } ?: ""}%" }, 
+                            primaryColor, defaultTypeface)
+                    }
+
+                    y = drawSectionHeader(canvas, pageWidth, y, "تفاصيل درجات السعي السنوي", defaultTypeface)
+                    for (g in d.grades) {
+                        if (y > pageHeight - 100f) { startNewPage(); y = 80f }
+                        val gradeStr = g.grade?.let { "${if (it == it.toLong().toDouble()) it.toLong() else "%.2f".format(it)}%" } ?: "لا تشملني"
+                        y = drawRow(canvas, pageWidth, y, g.name, gradeStr, defaultTypeface)
+                    }
+                }
+                is ResultDisplayState.AnnualResult -> {
+                    val d = result.data
+                    y = drawBeautifulResultBox(canvas, y, "السعي السنوي", "${"%.2f".format(d.realAverage)}%", "المعدل المقرب: ${d.finalAverage}%")
+
+                    val floorVal = kotlin.math.floor(d.realAverage)
+                    val roundingMsg = if (d.finalAverage > floorVal) {
+                        "🎉 تهانينا! تم جبر السعي السنوي للأعلى إلى ${d.finalAverage}% لأن الكسر العشري كان 0.6 أو أكثر."
+                    } else {
+                        "السعي السنوي النهائي هو ${d.finalAverage}%. لم يتم جبره للأعلى لأن الكسر العشري أقل من 0.6."
+                    }
+                    y = drawCard(canvas, pageWidth, y, "النتيجة النهائية بعد الجبر", listOf(roundingMsg), primaryColor, defaultTypeface)
+
+                    y = drawSectionHeader(canvas, pageWidth, y, "تفاصيل الفصول والامتحانات", defaultTypeface)
+                    d.grades.forEach { g ->
+                        if (y > pageHeight - 100f) { startNewPage(); y = 80f }
+                        y = drawRow(canvas, pageWidth, y, g.name, "${g.grade}%", defaultTypeface)
+                    }
+                }
+                is ResultDisplayState.MonthlyResult -> {
+                    val d = result.data
+                    y = drawBeautifulResultBox(canvas, y, "المعدل الفصلي", "${"%.2f".format(d.realAverage)}%", "المعدل المقرب: ${d.finalAverage}%")
+
+                    val floorVal = kotlin.math.floor(d.realAverage)
+                    val roundingMsg = if (d.finalAverage > floorVal) {
+                        "🎉 تهانينا! تم جبر المعدل الفصلي للأعلى إلى ${d.finalAverage}% لأن الكسر العشري كان 0.6 أو أكثر."
+                    } else {
+                        "المعدل النهائي هو ${d.finalAverage}%. لم يتم جبره للأعلى لأن الكسر العشري أقل من 0.6."
+                    }
+                    y = drawCard(canvas, pageWidth, y, "النتيجة النهائية بعد الجبر", listOf(roundingMsg), primaryColor, defaultTypeface)
+
+                    y = drawSectionHeader(canvas, pageWidth, y, "درجات الأشهر", defaultTypeface)
+                    d.grades.forEach { g ->
+                        if (y > pageHeight - 100f) { startNewPage(); y = 80f }
+                        y = drawRow(canvas, pageWidth, y, g.name, "${g.grade}%", defaultTypeface)
+                    }
+                }
+                is ResultDisplayState.Term2Result -> {
+                    val d = result.data
+                    val term1 = d.grades.find { it.name == "الفصل الأول" }?.grade ?: 0.0
+                    val mid = d.grades.find { it.name == "نصف السنة" }?.grade ?: 0.0
+
+                    val req75 = if (d.requiredFor75 < 0) 0.0 else d.requiredFor75
+                    val msg75 = when {
+                        d.requiredFor75 <= 0 -> "محسوم!"
+                        d.requiredFor75 <= 100 -> "ممكن تحقيقه"
+                        else -> "مستحيل تحقيقه"
+                    }
+
+                    y = drawBeautifulResultBox(canvas, y, "لإعفاء عام (75%)", "${"%.1f".format(req75)}%", msg75)
+
+                    val req90 = if (d.requiredFor90 < 0) 0.0 else d.requiredFor90
+                    val msg90 = when {
+                        d.requiredFor90 <= 0 -> "محسوم!"
+                        d.requiredFor90 <= 100 -> "ممكن تحقيقه"
+                        else -> "مستحيل تحقيقه"
+                    }
+                    
+                    y = drawBeautifulResultBox(canvas, y, "لإعفاء فردي (90%)", "${"%.1f".format(req90)}%", msg90)
+
+                    val lines75 = mutableListOf("الدرجة المطلوبة: ${"%.1f".format(req75)}%")
+                    if (result.is75Expanded) {
+                        lines75.add("شرح المعادلة: لتحقيق سعي 75%، يجب أن يكون مجموع درجات الفصول 225.")
+                        lines75.add("المعادلة: 225 - ${term1.toInt()} (ف1) - ${mid.toInt()} (نصف سنة) = ${"%.1f".format(d.requiredFor75)}")
+                    }
+                    y = drawCard(canvas, pageWidth, y, "تفاصيل الإعفاء العام", lines75, primaryColor, defaultTypeface)
+
+                    y = drawSectionHeader(canvas, pageWidth, y, "درجات الفصول السابقة", defaultTypeface)
+                    d.grades.forEach { g ->
+                        if (y > pageHeight - 100f) { startNewPage(); y = 80f }
+                        y = drawRow(canvas, pageWidth, y, g.name, "${g.grade}%", defaultTypeface)
+                    }
+                }
+                is ResultDisplayState.StudentProfileResult -> {
+                    val s = result.student
+                    drawText(canvas, "اسم الطالب: ${s.name}", pageWidth - 30f, y, 16f, primaryColor, true, Paint.Align.RIGHT, defaultTypeface)
+                    y += 30f
+                    drawText(canvas, "الصف الدراسي: ${s.className}", pageWidth - 30f, y, 14f, Color.GRAY, false, Paint.Align.RIGHT, defaultTypeface)
+                    y += 40f
+                    
+                    val cols = listOf("المادة", "ف1", "نصف", "ف2", "السعي", "النهائي", "المحصلة")
+                    val colWidths = listOf(110f, 60f, 60f, 60f, 60f, 70f, 75f)
+                    
+                    var totalSaei = 0.0
+                    var countSaei = 0
+                    var hasBelow75 = false
+                    for (r in s.subjects.values) {
+                        val t1Val = if (r.t1Mode == TermMode.TERM) r.t1Val.toDoubleOrNull() else {
+                            val gr = r.t1Months.mapNotNull { it.toDoubleOrNull() }
+                            if (gr.isNotEmpty()) gr.average() else null
+                        }
+                        val midVal = r.midVal.toDoubleOrNull()
+                        val t2Val = if (r.t2Mode == TermMode.TERM) r.t2Val.toDoubleOrNull() else {
+                            val gr = r.t2Months.mapNotNull { it.toDoubleOrNull() }
+                            if (gr.isNotEmpty()) gr.average() else null
+                        }
+                        
+                        if (t1Val != null && midVal != null && t2Val != null) {
+                            val saeiRaw = (t1Val + midVal + t2Val) / 3.0
+                            val rounded = floor(saeiRaw).let { f -> 
+                                val dec = saeiRaw - f
+                                when {
+                                    dec >= 0.6 -> ceil(saeiRaw)
+                                    saeiRaw >= 74.6 && saeiRaw < 75.0 -> 75.0
+                                    saeiRaw >= 89.6 && saeiRaw < 90.0 -> 90.0
+                                    else -> f
+                                }
+                            }
+                            totalSaei += rounded
+                            countSaei++
+                            if (rounded < 75.0) hasBelow75 = true
+                        }
+                    }
+                    val isGenExempt = countSaei > 0 && (totalSaei / countSaei) >= 85.0 && !hasBelow75
+
+                    val genExemptStatus = if (isGenExempt) "معفى عام 🎉" else "غير معفى عام"
+                    val overallAverageStr = if (countSaei > 0) "${"%.2f".format(totalSaei / countSaei)}%" else "---"
+                    y = drawCard(canvas, pageWidth, y, "حالة الإعفاء العام والسعي للطالب", listOf(
+                        "معدل السعي السنوي العام: $overallAverageStr",
+                        "حالة الإعفاء العام: $genExemptStatus"
+                    ), primaryColor, defaultTypeface)
+
+                    drawTableHeader(canvas, pageWidth, y, cols, colWidths, containerColor, defaultTypeface)
+                    y += 30f
+
+                    for (entry in s.subjects) {
+                        val subName = entry.key
+                        val subRecord = entry.value
+                        if (y > pageHeight - 100f) {
+                            startNewPage()
+                            y = 80f
+                            drawTableHeader(canvas, pageWidth, y, cols, colWidths, containerColor, defaultTypeface)
+                            y += 30f
+                        }
+                        val t1Val = if (subRecord.t1Mode == TermMode.TERM) subRecord.t1Val.toDoubleOrNull() else {
+                            val gr = subRecord.t1Months.mapNotNull { it.toDoubleOrNull() }
+                            if (gr.isNotEmpty()) gr.average() else null
+                        }
+                        val midVal = subRecord.midVal.toDoubleOrNull()
+                        val t2Val = if (subRecord.t2Mode == TermMode.TERM) subRecord.t2Val.toDoubleOrNull() else {
+                            val gr = subRecord.t2Months.mapNotNull { it.toDoubleOrNull() }
+                            if (gr.isNotEmpty()) gr.average() else null
+                        }
+                        val saeiRaw = if (t1Val != null && midVal != null && t2Val != null) (t1Val + midVal + t2Val) / 3.0 else null
+                        val saeiRounded = saeiRaw?.let { num ->
+                            val fl = floor(num)
+                            val dec = num - fl
+                            when {
+                                dec >= 0.6 -> ceil(num)
+                                num >= 74.6 && num < 75.0 -> 75.0
+                                num >= 89.6 && num < 90.0 -> 90.0
+                                else -> fl
+                            }
+                        }
+                        val isIndivExempt = saeiRounded != null && saeiRounded >= 90.0
+                        val isExempt = saeiRounded != null && (isIndivExempt || isGenExempt)
+                        val t1Str = if (subRecord.t1Mode == TermMode.TERM) subRecord.t1Val else t1Val?.toInt()?.toString() ?: ""
+                        val t2Str = if (subRecord.t2Mode == TermMode.TERM) subRecord.t2Val else t2Val?.toInt()?.toString() ?: ""
+                        val saeiStr = saeiRounded?.toInt()?.toString() ?: "---"
+                        val finalStr = if (isExempt) "معفى" else subRecord.finalVal
+                        val resStr = if (isExempt) saeiStr else {
+                            val fin = subRecord.finalVal.toDoubleOrNull()
+                            if (fin != null && saeiRounded != null) Math.round((saeiRounded + fin) / 2.0).toInt().toString() else "---"
+                        }
+                        val vals = listOf(t1Str, subRecord.midVal, t2Str, saeiStr, finalStr, resStr)
+                        y = drawTableRow(canvas, pageWidth, y, subName, vals, colWidths, if (isExempt) Color.parseColor("#E8F5E9") else tableRowColor, defaultTypeface)
+                    }
+                }
+            }
+
+            drawPageFooter(canvas, pageNumber)
+            document.finishPage(currentPage)
+
+            val fileNameFinal = fileName.replace("/", "-").replace(":", "-")
+            val cacheFile = File(context.cacheDir, fileNameFinal)
+            try {
+                document.writeTo(FileOutputStream(cacheFile))
+                saveToPublicDownloads(context, cacheFile, fileNameFinal)
+                showDownloadNotification(context, fileNameFinal, cacheFile)
+            } catch (e: Exception) { e.printStackTrace() } finally { document.close() }
+        }
+    }
+
+    private fun saveToPublicDownloads(context: Context, sourceFile: File, fileName: String) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val contentValues = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                    put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                    put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                }
+                val uri = context.contentResolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                uri?.let {
+                    context.contentResolver.openOutputStream(it)?.use { out ->
+                        sourceFile.inputStream().use { input -> input.copyTo(out) }
+                    }
+                }
+            } else {
+                val targetFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
+                sourceFile.inputStream().use { input ->
+                    FileOutputStream(targetFile).use { out -> input.copyTo(out) }
+                }
+            }
+        } catch (e: Exception) { e.printStackTrace() }
+    }
+
+    private fun drawTableHeader(canvas: Canvas, pageWidth: Int, y: Float, cols: List<String>, widths: List<Float>, color: Int, typeface: Typeface?) {
+        val paint = Paint().apply { this.color = color; style = Paint.Style.FILL }
+        canvas.drawRoundRect(30f, y - 20f, pageWidth - 30f, y + 15f, 8f, 8f, paint)
+        var x = pageWidth - 35f
+        for(i in cols.indices) {
+            drawText(canvas, cols[i], x - widths[i]/2, y + 2f, 11f, Color.parseColor("#21005D"), true, Paint.Align.CENTER, typeface)
+            x -= widths[i]
+        }
+    }
+
+    private fun drawTableRow(canvas: Canvas, pageWidth: Int, y: Float, name: String, vals: List<String>, widths: List<Float>, color: Int, typeface: Typeface?): Float {
+        val paint = Paint().apply { this.color = color; style = Paint.Style.FILL }
+        canvas.drawRoundRect(30f, y - 15f, pageWidth - 30f, y + 15f, 8f, 8f, paint)
+        var x = pageWidth - 35f
+        drawText(canvas, name, x - 5f, y + 3f, 10f, Color.BLACK, true, Paint.Align.RIGHT, typeface)
+        x -= widths[0]
+        for(i in vals.indices) {
+            drawText(canvas, vals[i], x - widths[i+1]/2, y + 3f, 10f, Color.BLACK, false, Paint.Align.CENTER, typeface)
+            x -= widths[i+1]
+        }
+        return y + 35f
+    }
+
+    private fun drawCard(canvas: Canvas, pageWidth: Int, y: Float, title: String, lines: List<String>, color: Int, typeface: Typeface?): Float {
+        val height = 40f + (lines.size * 25f)
+        canvas.drawRoundRect(30f, y, pageWidth - 30f, y + height, 16f, 16f, Paint().apply { this.color = Color.parseColor("#FDFDFD") })
+        canvas.drawRoundRect(30f, y, pageWidth - 30f, y + height, 16f, 16f, Paint().apply { this.color = Color.parseColor("#CAC4D0"); style = Paint.Style.STROKE; strokeWidth = 1.5f })
+        drawText(canvas, title, pageWidth - 45f, y + 25f, 14f, color, true, Paint.Align.RIGHT, typeface)
+        var ly = y + 55f
+        for(line in lines) {
+            drawText(canvas, line, pageWidth - 45f, ly, 11f, Color.DKGRAY, false, Paint.Align.RIGHT, typeface)
+            ly += 22f
+        }
+        return y + height + 25f
+    }
+
+    private fun drawSectionHeader(canvas: Canvas, pageWidth: Int, y: Float, text: String, typeface: Typeface?): Float {
+        drawText(canvas, text, pageWidth - 30f, y, 14f, Color.parseColor("#6750A4"), true, Paint.Align.RIGHT, typeface)
+        canvas.drawLine(30f, y + 10f, pageWidth - 30f, y + 10f, Paint().apply { color = Color.parseColor("#EADDFF"); strokeWidth = 2f })
+        return y + 35f
+    }
+
+    private fun drawRow(canvas: Canvas, pageWidth: Int, y: Float, label: String, value: String, typeface: Typeface?): Float {
+        drawText(canvas, label, pageWidth - 40f, y, 11f, Color.BLACK, false, Paint.Align.RIGHT, typeface)
+        drawText(canvas, value, 40f, y, 11f, Color.parseColor("#6750A4"), true, Paint.Align.LEFT, typeface)
+        canvas.drawLine(30f, y + 12f, pageWidth - 30f, y + 12f, Paint().apply { color = Color.parseColor("#EEEEEE"); strokeWidth = 1f; pathEffect = DashPathEffect(floatArrayOf(10f, 10f), 0f) })
+        return y + 28f
+    }
+
+    private fun showDownloadNotification(context: Context, fileName: String, file: File) {
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+        }
+        val channelId = "caliq_pdf"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            nm.createNotificationChannel(NotificationChannel(channelId, "PDF Downloads", NotificationManager.IMPORTANCE_HIGH))
+        }
+        val uri = FileProvider.getUriForFile(context, "com.caliq.fileprovider", file)
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/pdf")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        val pi = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(context.applicationInfo.icon)
+            .setContentTitle("تم حفظ ملف PDF بنجاح ✓")
+            .setContentText("انقر لفتح: $fileName")
+            .setAutoCancel(true)
+            .setContentIntent(pi)
+            .build()
+        nm.notify(1, notification)
+    }
+
+    private fun drawText(canvas: Canvas, text: String, x: Float, y: Float, size: Float, color: Int, bold: Boolean = false, align: Paint.Align = Paint.Align.RIGHT, customTypeface: Typeface? = null) {
+        val p = Paint().apply {
+            this.color = color; this.textSize = size; this.textAlign = align; this.isAntiAlias = true
+            if (customTypeface != null) { typeface = customTypeface } 
+            else if (bold) { typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD) }
+        }
+        canvas.drawText(text, x, y, p)
+    }
+}

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Digital Assistant & AI Agent Capabilities (Google Assistant / Gemini / Bixby) -->
+    <capability android:name="actions.intent.OPEN_APP_FEATURE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.Nightjar.caliq5"
+            android:targetClass="com.Nightjar.caliq5.MainActivity"
+            android:data="caliq://exemption">
+            <parameter
+                android:name="feature"
+                android:key="feature" />
+        </intent>
+    </capability>
+
+    <!-- Exemption Calculator Shortcut -->
+    <shortcut
+        android:shortcutId="shortcut_exemption"
+        android:enabled="true"
+        android:icon="@drawable/ic_widget_school"
+        android:shortcutShortLabel="@string/shortcut_exemption_short"
+        android:shortcutLongLabel="@string/shortcut_exemption_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.Nightjar.caliq5"
+            android:targetClass="com.Nightjar.caliq5.MainActivity"
+            android:data="caliq://exemption" />
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE" />
+    </shortcut>
+
+    <!-- Student Grades Record Shortcut -->
+    <shortcut
+        android:shortcutId="shortcut_grades"
+        android:enabled="true"
+        android:icon="@drawable/ic_widget_grades"
+        android:shortcutShortLabel="@string/shortcut_grades_short"
+        android:shortcutLongLabel="@string/shortcut_grades_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.Nightjar.caliq5"
+            android:targetClass="com.Nightjar.caliq5.MainActivity"
+            android:data="caliq://grades" />
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE" />
+    </shortcut>
+
+    <!-- Annual Average Shortcut -->
+    <shortcut
+        android:shortcutId="shortcut_annual"
+        android:enabled="true"
+        android:icon="@drawable/ic_widget_functions"
+        android:shortcutShortLabel="@string/shortcut_annual_short"
+        android:shortcutLongLabel="@string/shortcut_annual_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.Nightjar.caliq5"
+            android:targetClass="com.Nightjar.caliq5.MainActivity"
+            android:data="caliq://annual" />
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE" />
+    </shortcut>
+
+    <!-- Monthly / Term Average Shortcut -->
+    <shortcut
+        android:shortcutId="shortcut_monthly"
+        android:enabled="true"
+        android:icon="@drawable/ic_widget_calendar"
+        android:shortcutShortLabel="@string/shortcut_monthly_short"
+        android:shortcutLongLabel="@string/shortcut_monthly_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.Nightjar.caliq5"
+            android:targetClass="com.Nightjar.caliq5.MainActivity"
+            android:data="caliq://monthly" />
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE" />
+    </shortcut>
+
+</shortcuts>
