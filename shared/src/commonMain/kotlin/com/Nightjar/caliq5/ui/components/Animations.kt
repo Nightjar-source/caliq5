@@ -639,10 +639,6 @@ fun Modifier.longitudinalSheen(
  * - Zero harsh white specular lines, zero solid borders, zero external drop shadows. Pure sea-glass volumetric depth.
  */
 fun Modifier.expressive3DCurvature(
-    cornerRadius: androidx.compose.ui.unit.Dp = 24.dp,
-    shape: androidx.compose.ui.graphics.Shape? = null,
-    tintColor: androidx.compose.ui.graphics.Color? = null
-fun Modifier.expressive3DCurvature(
     cornerRadius: Dp = 28.dp,
     shape: Shape? = null,
     tintColor: Color? = null

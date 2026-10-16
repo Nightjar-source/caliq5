@@ -534,6 +534,7 @@ fun CaliqBottomNav(
 
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val themePrimary = MaterialTheme.colorScheme.primary
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
     val barHeight = 54.dp
     val squircleSize = 48.dp
 
@@ -630,7 +631,7 @@ fun CaliqBottomNav(
                                 val liquidBody = if (isDark) {
                                     Brush.verticalGradient(
                                         0.0f to Color.White.copy(alpha = 0.25f),
-                                        0.35f to MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
+                                        0.35f to surfaceVariant.copy(alpha = 0.60f),
                                         1.0f to themePrimary.copy(alpha = 0.30f)
                                     )
                                 } else {
@@ -725,7 +726,7 @@ fun CaliqBottomNav(
                             val liquidBody = if (isDark) {
                                 Brush.verticalGradient(
                                     0.0f to Color.White.copy(alpha = 0.25f),
-                                    0.35f to MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
+                                    0.35f to surfaceVariant.copy(alpha = 0.60f),
                                     1.0f to themePrimary.copy(alpha = 0.30f)
                                 )
                             } else {
@@ -823,6 +824,7 @@ fun CaliqNavigationRail(
 
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val themePrimary = MaterialTheme.colorScheme.primary
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
     val railWidth = 64.dp
 
     Column(
@@ -913,7 +915,7 @@ fun CaliqNavigationRail(
                                 val liquidBody = if (isDark) {
                                     Brush.verticalGradient(
                                         0.0f to Color.White.copy(alpha = 0.25f),
-                                        0.35f to MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
+                                        0.35f to surfaceVariant.copy(alpha = 0.60f),
                                         1.0f to themePrimary.copy(alpha = 0.30f)
                                     )
                                 } else {
@@ -1009,7 +1011,7 @@ fun CaliqNavigationRail(
                             val liquidBody = if (isDark) {
                                 Brush.verticalGradient(
                                     0.0f to Color.White.copy(alpha = 0.25f),
-                                    0.35f to MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
+                                    0.35f to surfaceVariant.copy(alpha = 0.60f),
                                     1.0f to themePrimary.copy(alpha = 0.30f)
                                 )
                             } else {

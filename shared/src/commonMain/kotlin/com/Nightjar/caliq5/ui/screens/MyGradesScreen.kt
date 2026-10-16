@@ -593,6 +593,8 @@ fun StudentEditView(
         if (isCustomClass) emptyList() else com.Nightjar.caliq5.data.ClassData.getSubjects(selectedClassName).map { it.name }
     }
 
+    val editGridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+
     val topSafeInset = WindowInsets.statusBars
         .union(WindowInsets.captionBar)
         .union(WindowInsets.displayCutout)
