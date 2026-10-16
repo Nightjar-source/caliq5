@@ -1,6 +1,8 @@
 package com.Nightjar.caliq5.ui.screens
 
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.collect
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -423,7 +425,7 @@ fun StudentEditView(
             val listSnapshot = subjectsList.toList()
             Triple(name, selectedClassName, listSnapshot.hashCode())
         }
-        .kotlinx.coroutines.flow.debounce(400)
+        .debounce(400)
         .collect {
             if (student == null) {
                 hasUnsavedChanges = name.isNotEmpty() || selectedClassName.isNotEmpty() || subjectsList.isNotEmpty()
