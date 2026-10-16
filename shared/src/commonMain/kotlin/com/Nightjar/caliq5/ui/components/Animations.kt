@@ -654,28 +654,36 @@ fun Modifier.expressive3DCurvature(
             val w = size.width
             val h = size.height
 
-            // 1. Sea Stone Convex Volume: Top soft highlight crest fading naturally without any bottom dark band
-            val volumeBrush = if (isDark) {
-                Brush.verticalGradient(
-                    0.0f to Color.White.copy(alpha = 0.26f),
-                    0.28f to themeColor.copy(alpha = 0.08f),
-                    0.70f to Color.Transparent,
-                    1.0f to Color.Transparent
+            // 1. Sea Stone Convex Volume: Top specular crest highlight derived purely from the theme color itself (من جنس اللون نفسه)
+            val crestColor = if (isDark) {
+                Color(
+                    red = (themeColor.red * 0.55f + 0.45f).coerceIn(0f, 1f),
+                    green = (themeColor.green * 0.55f + 0.45f).coerceIn(0f, 1f),
+                    blue = (themeColor.blue * 0.55f + 0.45f).coerceIn(0f, 1f),
+                    alpha = 0.35f
                 )
             } else {
-                Brush.verticalGradient(
-                    0.0f to Color.White.copy(alpha = 0.44f),
-                    0.30f to Color.White.copy(alpha = 0.14f),
-                    0.70f to Color.Transparent,
-                    1.0f to Color.Transparent
+                Color(
+                    red = (themeColor.red * 0.35f + 0.65f).coerceIn(0f, 1f),
+                    green = (themeColor.green * 0.35f + 0.65f).coerceIn(0f, 1f),
+                    blue = (themeColor.blue * 0.35f + 0.65f).coerceIn(0f, 1f),
+                    alpha = 0.45f
                 )
             }
+            val midCurveColor = themeColor.copy(alpha = if (isDark) 0.16f else 0.18f)
 
-            // 2. Soft perimeter contouring embracing the organic curved pebble crest
+            val volumeBrush = Brush.verticalGradient(
+                0.0f to crestColor,
+                0.28f to midCurveColor,
+                0.65f to Color.Transparent,
+                1.0f to Color.Transparent
+            )
+
+            // 2. Soft perimeter contouring embracing the organic curved pebble crest from theme color
             val perimeterCurvature = Brush.radialGradient(
                 colors = listOf(
                     Color.Transparent,
-                    (if (isDark) Color.White.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.10f))
+                    themeColor.copy(alpha = if (isDark) 0.10f else 0.14f)
                 ),
                 center = Offset(w * 0.5f, h * 0.35f),
                 radius = kotlin.math.max(w, h) * 0.65f

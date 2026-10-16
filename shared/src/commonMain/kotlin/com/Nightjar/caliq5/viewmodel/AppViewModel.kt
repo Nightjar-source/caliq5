@@ -66,12 +66,17 @@ data class SnackbarMessage(
 data class MonthlyGrade(val id: Int, val grade: String)
 
 class AppViewModel : ViewModel() {
+    private var isInitialized = false
+
     /**
      * الفصل الذكي بين "القتل في الخلفية" (Process Death) و "الإغلاق الكامل" (Cold Start):
      * - إذا كان isProcessDeath == true: يستعيد فوراً نفس الشاشة ونفس مكدس التنقل والبيانات.
      * - إذا كان isProcessDeath == false: يمسح حالات التنقل السابقة ويفتح نظيفاً على الشاشة الرئيسية (EXEMPTION_SELECT).
+     * - محمي ضد إعادة التهيئة عند تدوير الشاشة (Orientation Change).
      */
     fun initLaunchState(isProcessDeath: Boolean) {
+        if (isInitialized) return
+        isInitialized = true
         viewModelScope.launch {
             if (isProcessDeath) {
                 val savedScreenName = DataRepository.loadPreference("last_active_screen")

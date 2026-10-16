@@ -196,17 +196,17 @@ fun AppearanceScreen(viewModel: AppViewModel) {
                             modifier = Modifier.fillMaxWidth().clipToBounds(),
                             enter = expandVertically(
                                 animationSpec = androidx.compose.animation.core.spring(
-                                    dampingRatio = 0.82f,
-                                    stiffness = 420f
+                                    dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                                    stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
                                 )
-                            ) + fadeIn(animationSpec = androidx.compose.animation.core.tween(160)),
+                            ) + fadeIn(animationSpec = androidx.compose.animation.core.tween(180)),
                             exit = shrinkVertically(
                                 animationSpec = androidx.compose.animation.core.spring(
-                                    dampingRatio = 0.85f,
-                                    stiffness = 480f
+                                    dampingRatio = androidx.compose.animation.core.Spring.DampingRatioNoBouncy,
+                                    stiffness = androidx.compose.animation.core.Spring.StiffnessMedium
                                 ),
                                 shrinkTowards = Alignment.Top
-                            ) + fadeOut(animationSpec = androidx.compose.animation.core.tween(120))
+                            ) + fadeOut(animationSpec = androidx.compose.animation.core.tween(130))
                         ) {
                             Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
                                 Column(

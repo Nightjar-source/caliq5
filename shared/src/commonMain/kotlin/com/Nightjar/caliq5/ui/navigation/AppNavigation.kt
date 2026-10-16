@@ -429,8 +429,8 @@ private fun MainContent(
                             .union(WindowInsets.captionBar)
                             .union(WindowInsets.displayCutout)
                     )
-                    .defaultMinSize(minHeight = if (isWideOrLandscape) 46.dp else 52.dp)
-                    .padding(horizontal = if (isWideOrLandscape) 10.dp else 14.dp),
+                    .defaultMinSize(minHeight = if (isWideOrLandscape) 48.dp else 54.dp)
+                    .padding(horizontal = if (isWideOrLandscape) 12.dp else 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val editingStudentMode by viewModel.editingStudentMode.collectAsState()
@@ -444,13 +444,13 @@ private fun MainContent(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(
                             onClick = { viewModel.handleTopBarBack() },
-                            modifier = Modifier.size(40.dp).clip(CircleShape)
+                            modifier = Modifier.size(44.dp).clip(CircleShape)
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "رجوع",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                         Spacer(Modifier.width(4.dp))

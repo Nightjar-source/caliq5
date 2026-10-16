@@ -214,30 +214,31 @@ fun FeatureExplanationCard(
     val shape = RoundedCornerShape(28.dp)
     val isRtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
 
-    // Smooth theme color gradient from 95% down to 32% (in light mode) to preserve theme body and prevent washed-out white
+    // Smooth theme color gradient from 95% down to 10%
     val gradientColors = if (isRtl) {
         listOf(
-            primaryColor.copy(alpha = if (isDark) 0.15f else 0.32f),
-            primaryColor.copy(alpha = if (isDark) 0.40f else 0.55f),
-            primaryColor.copy(alpha = if (isDark) 0.70f else 0.78f),
+            primaryColor.copy(alpha = if (isDark) 0.15f else 0.10f),
+            primaryColor.copy(alpha = if (isDark) 0.38f else 0.45f),
+            primaryColor.copy(alpha = if (isDark) 0.68f else 0.75f),
             primaryColor.copy(alpha = 0.95f)
         )
     } else {
         listOf(
             primaryColor.copy(alpha = 0.95f),
-            primaryColor.copy(alpha = if (isDark) 0.70f else 0.78f),
-            primaryColor.copy(alpha = if (isDark) 0.40f else 0.55f),
-            primaryColor.copy(alpha = if (isDark) 0.15f else 0.32f)
+            primaryColor.copy(alpha = if (isDark) 0.68f else 0.75f),
+            primaryColor.copy(alpha = if (isDark) 0.38f else 0.45f),
+            primaryColor.copy(alpha = if (isDark) 0.15f else 0.10f)
         )
     }
 
+    // Dynamic contrast determination based on actual composite background
     val effectiveBgColor = if (isDark) {
         primaryColor.copy(alpha = 0.65f)
     } else {
         Color(
-            red = primaryColor.red * 0.55f + surfaceColor.red * 0.45f,
-            green = primaryColor.green * 0.55f + surfaceColor.green * 0.45f,
-            blue = primaryColor.blue * 0.55f + surfaceColor.blue * 0.45f
+            red = primaryColor.red * 0.35f + surfaceColor.red * 0.65f,
+            green = primaryColor.green * 0.35f + surfaceColor.green * 0.65f,
+            blue = primaryColor.blue * 0.35f + surfaceColor.blue * 0.65f
         )
     }
     val cardTextColor = effectiveBgColor.contrastingTextColor(
@@ -246,32 +247,32 @@ fun FeatureExplanationCard(
     )
     val cardTitleColor = if (cardTextColor == Color.White) Color.White else Color(0xFF0F172A)
 
-    // Dynamic contrast-adaptive shadow scaling strictly inverted from text color (Black for White text, White for Dark text)
+    // Dynamic contrast-adaptive shadow: High-contrast inversion to ensure maximum clarity on 10% translucent side
     val cardTextShadow = if (cardTextColor == Color.White) {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = if (isDark) 0.75f else 0.88f),
-            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.5f),
-            blurRadius = 3.5f
+            color = Color.Black.copy(alpha = if (isDark) 0.80f else 0.92f),
+            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.8f),
+            blurRadius = 4.0f
         )
     } else {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = if (isDark) 0.80f else 0.95f),
-            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.2f),
-            blurRadius = 3.0f
+            color = Color.White.copy(alpha = if (isDark) 0.85f else 0.98f),
+            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.5f),
+            blurRadius = 3.5f
         )
     }
 
     val cardTitleShadow = if (cardTitleColor == Color.White) {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = if (isDark) 0.75f else 0.88f),
-            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.5f),
-            blurRadius = 3.5f
+            color = Color.Black.copy(alpha = if (isDark) 0.80f else 0.92f),
+            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.8f),
+            blurRadius = 4.0f
         )
     } else {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = if (isDark) 0.80f else 0.95f),
-            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.2f),
-            blurRadius = 3.0f
+            color = Color.White.copy(alpha = if (isDark) 0.85f else 0.98f),
+            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.5f),
+            blurRadius = 3.5f
         )
     }
 
