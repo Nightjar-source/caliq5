@@ -139,52 +139,55 @@ fun AppearanceScreen(viewModel: AppViewModel) {
                     color = MaterialTheme.colorScheme.surface,
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "ألوان التطبيق",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        )
-
-                        Row(
+                    Column {
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable { viewModel.updateSettings(settings.copy(useMaterialYou = !settings.useMaterialYou)) },
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = "ألوان النظام الديناميكية (Material You)",
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                            Text(
+                                text = "ألوان التطبيق",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary
                                 )
-                                Text(
-                                    text = "تطبيق ألوان متناسقة مع خلفية جهازك",
-                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                )
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Icon(
-                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                    contentDescription = "تبديل القائمة",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.graphicsLayer {
-                                        rotationZ = paletteArrowAngle
-                                        scaleX = paletteArrowScale
-                                        scaleY = paletteArrowScale
-                                    }
-                                )
-                                Switch(
-                                    checked = settings.useMaterialYou,
-                                    onCheckedChange = { viewModel.updateSettings(settings.copy(useMaterialYou = it)) }
-                                )
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .clickable { viewModel.updateSettings(settings.copy(useMaterialYou = !settings.useMaterialYou)) },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "ألوان النظام الديناميكية (Material You)",
+                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
+                                    )
+                                    Text(
+                                        text = "تطبيق ألوان متناسقة مع خلفية جهازك",
+                                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    )
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Icon(
+                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "تبديل القائمة",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.graphicsLayer {
+                                            rotationZ = paletteArrowAngle
+                                            scaleX = paletteArrowScale
+                                            scaleY = paletteArrowScale
+                                        }
+                                    )
+                                    Switch(
+                                        checked = settings.useMaterialYou,
+                                        onCheckedChange = { viewModel.updateSettings(settings.copy(useMaterialYou = it)) }
+                                    )
+                                }
                             }
                         }
 
@@ -205,14 +208,15 @@ fun AppearanceScreen(viewModel: AppViewModel) {
                                 shrinkTowards = Alignment.Top
                             ) + fadeOut(animationSpec = androidx.compose.animation.core.tween(120))
                         ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth().clipToBounds(),
-                                verticalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Text(
-                                    text = "اختر لونك المفضل (12 لوناً متناسقاً):",
-                                    style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                )
+                            Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().clipToBounds(),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    Text(
+                                        text = "اختر لونك المفضل (12 لوناً متناسقاً):",
+                                        style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    )
                                 
                                 Column(
                                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -332,6 +336,7 @@ fun AppearanceScreen(viewModel: AppViewModel) {
             }
         }
     }
+}
 }
 
 @Composable

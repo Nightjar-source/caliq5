@@ -419,16 +419,7 @@ private fun MainContent(
                     .padding(start = topBarStartPadding, end = topBarEndPadding),
             shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f),
-            shadowElevation = 0.dp,
-            border = BorderStroke(
-                1.dp,
-                androidx.compose.ui.graphics.Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Transparent, // Removed the white line at the top edge of the screen!
-                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
-                    )
-                )
-            )
+            shadowElevation = 0.dp
         ) {
             Row(
                 modifier = Modifier
@@ -438,7 +429,7 @@ private fun MainContent(
                             .union(WindowInsets.captionBar)
                             .union(WindowInsets.displayCutout)
                     )
-                    .height(topBarHeight)
+                    .defaultMinSize(minHeight = if (isWideOrLandscape) 46.dp else 52.dp)
                     .padding(horizontal = if (isWideOrLandscape) 10.dp else 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -453,13 +444,13 @@ private fun MainContent(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(
                             onClick = { viewModel.handleTopBarBack() },
-                            modifier = Modifier.size(if (isWideOrLandscape) 32.dp else 36.dp).clip(CircleShape)
+                            modifier = Modifier.size(40.dp).clip(CircleShape)
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "رجوع",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(if (isWideOrLandscape) 18.dp else 20.dp)
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                         Spacer(Modifier.width(4.dp))
@@ -557,13 +548,7 @@ fun CaliqBottomNav(
         BoxWithConstraints(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight()
-                .neuralAmbientGlow(
-                    cornerRadius = 32.dp,
-                    elevation = 7.dp,
-                    tintColor = MaterialTheme.colorScheme.primary,
-                    hasSaltMotes = false
-                ),
+                .fillMaxHeight(),
             contentAlignment = Alignment.Center
         ) {
             val totalWidth = maxWidth
@@ -623,7 +608,7 @@ fun CaliqBottomNav(
                         shape = navShape,
                         cornerRadius = 32.dp,
                         tintColor = MaterialTheme.colorScheme.primary,
-                        alpha = 0.25f
+                        alpha = 0.50f
                     )
             ) {
                 if ((localSelectedIndex in 0..3) || dragOffset != null) {
@@ -643,33 +628,21 @@ fun CaliqBottomNav(
                                 // 1. Liquid droplet body with subtle theme-tinted organic liquid surface
                                 val liquidBody = if (isDark) {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.12f),
-                                        0.40f to themePrimary.copy(alpha = 0.26f),
-                                        1.0f to themePrimary.copy(alpha = 0.38f)
+                                        0.0f to Color.White.copy(alpha = 0.20f),
+                                        0.40f to themePrimary.copy(alpha = 0.35f),
+                                        1.0f to themePrimary.copy(alpha = 0.52f)
                                     )
                                 } else {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.65f),
-                                        0.45f to themePrimary.copy(alpha = 0.16f),
-                                        1.0f to themePrimary.copy(alpha = 0.24f)
+                                        0.0f to Color.White.copy(alpha = 0.72f),
+                                        0.45f to themePrimary.copy(alpha = 0.26f),
+                                        1.0f to themePrimary.copy(alpha = 0.42f)
                                     )
                                 }
                                 drawRoundRect(
                                     brush = liquidBody,
                                     size = size,
                                     cornerRadius = CornerRadius(rPx, rPx)
-                                )
-
-                                // 2. Delicate fluid surface tension rim
-                                val rimBrush = Brush.verticalGradient(
-                                    0.0f to (if (isDark) Color.White.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.45f)),
-                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.28f else 0.22f)
-                                )
-                                drawRoundRect(
-                                    brush = rimBrush,
-                                    size = size,
-                                    cornerRadius = CornerRadius(rPx, rPx),
-                                    style = Stroke(width = 1.dp.toPx())
                                 )
                             }
                     )
@@ -728,17 +701,11 @@ fun CaliqBottomNav(
         Box(
             modifier = Modifier
                 .size(barHeight)
-                .neuralAmbientGlow(
-                    cornerRadius = 20.dp,
-                    elevation = 7.dp,
-                    tintColor = MaterialTheme.colorScheme.primary,
-                    hasSaltMotes = false
-                )
                 .frostedOrganicCapsule(
                     shape = fabShape,
                     cornerRadius = 20.dp,
                     tintColor = MaterialTheme.colorScheme.primary,
-                    alpha = 0.25f
+                    alpha = 0.50f
                 )
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -756,31 +723,21 @@ fun CaliqBottomNav(
                             val rPx = 15.dp.toPx()
                             val liquidBody = if (isDark) {
                                 Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.14f),
-                                    0.40f to themePrimary.copy(alpha = 0.28f),
-                                    1.0f to themePrimary.copy(alpha = 0.40f)
+                                    0.0f to Color.White.copy(alpha = 0.20f),
+                                    0.40f to themePrimary.copy(alpha = 0.35f),
+                                    1.0f to themePrimary.copy(alpha = 0.52f)
                                 )
                             } else {
                                 Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.70f),
-                                    0.45f to themePrimary.copy(alpha = 0.18f),
-                                    1.0f to themePrimary.copy(alpha = 0.28f)
+                                    0.0f to Color.White.copy(alpha = 0.72f),
+                                    0.45f to themePrimary.copy(alpha = 0.26f),
+                                    1.0f to themePrimary.copy(alpha = 0.42f)
                                 )
                             }
                             drawRoundRect(
                                 brush = liquidBody,
                                 size = size,
                                 cornerRadius = CornerRadius(rPx, rPx)
-                            )
-                            val rimBrush = Brush.verticalGradient(
-                                0.0f to (if (isDark) Color.White.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.50f)),
-                                1.0f to themePrimary.copy(alpha = if (isDark) 0.30f else 0.24f)
-                            )
-                            drawRoundRect(
-                                brush = rimBrush,
-                                size = size,
-                                cornerRadius = CornerRadius(rPx, rPx),
-                                style = Stroke(width = 1.dp.toPx())
                             )
                         }
                 )
@@ -880,13 +837,7 @@ fun CaliqNavigationRail(
         BoxWithConstraints(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth()
-                .neuralAmbientGlow(
-                    cornerRadius = 32.dp,
-                    elevation = 7.dp,
-                    tintColor = MaterialTheme.colorScheme.primary,
-                    hasSaltMotes = false
-                ),
+                .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             val totalHeight = maxHeight
@@ -940,7 +891,7 @@ fun CaliqNavigationRail(
                         shape = railShape,
                         cornerRadius = 32.dp,
                         tintColor = MaterialTheme.colorScheme.primary,
-                        alpha = 0.25f
+                        alpha = 0.50f
                     )
             ) {
                 if ((localSelectedIndex in 0..3) || dragOffset != null) {
@@ -960,33 +911,21 @@ fun CaliqNavigationRail(
                                 // 1. Liquid droplet body with subtle theme-tinted organic liquid surface
                                 val liquidBody = if (isDark) {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.12f),
-                                        0.40f to themePrimary.copy(alpha = 0.26f),
-                                        1.0f to themePrimary.copy(alpha = 0.38f)
+                                        0.0f to Color.White.copy(alpha = 0.20f),
+                                        0.40f to themePrimary.copy(alpha = 0.35f),
+                                        1.0f to themePrimary.copy(alpha = 0.52f)
                                     )
                                 } else {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.65f),
-                                        0.45f to themePrimary.copy(alpha = 0.16f),
-                                        1.0f to themePrimary.copy(alpha = 0.24f)
+                                        0.0f to Color.White.copy(alpha = 0.72f),
+                                        0.45f to themePrimary.copy(alpha = 0.26f),
+                                        1.0f to themePrimary.copy(alpha = 0.42f)
                                     )
                                 }
                                 drawRoundRect(
                                     brush = liquidBody,
                                     size = size,
                                     cornerRadius = CornerRadius(rPx, rPx)
-                                )
-
-                                // 2. Delicate fluid surface tension rim
-                                val rimBrush = Brush.verticalGradient(
-                                    0.0f to (if (isDark) Color.White.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.45f)),
-                                    1.0f to themePrimary.copy(alpha = if (isDark) 0.28f else 0.22f)
-                                )
-                                drawRoundRect(
-                                    brush = rimBrush,
-                                    size = size,
-                                    cornerRadius = CornerRadius(rPx, rPx),
-                                    style = Stroke(width = 1.dp.toPx())
                                 )
                             }
                     )
@@ -1045,17 +984,11 @@ fun CaliqNavigationRail(
         Box(
             modifier = Modifier
                 .size(railWidth)
-                .neuralAmbientGlow(
-                    cornerRadius = 20.dp,
-                    elevation = 7.dp,
-                    tintColor = MaterialTheme.colorScheme.primary,
-                    hasSaltMotes = false
-                )
                 .frostedOrganicCapsule(
                     shape = fabShape,
                     cornerRadius = 20.dp,
                     tintColor = MaterialTheme.colorScheme.primary,
-                    alpha = 0.25f
+                    alpha = 0.50f
                 )
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -1073,31 +1006,21 @@ fun CaliqNavigationRail(
                             val rPx = 15.dp.toPx()
                             val liquidBody = if (isDark) {
                                 Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.14f),
-                                    0.40f to themePrimary.copy(alpha = 0.28f),
-                                    1.0f to themePrimary.copy(alpha = 0.40f)
+                                    0.0f to Color.White.copy(alpha = 0.20f),
+                                    0.40f to themePrimary.copy(alpha = 0.35f),
+                                    1.0f to themePrimary.copy(alpha = 0.52f)
                                 )
                             } else {
                                 Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.70f),
-                                    0.45f to themePrimary.copy(alpha = 0.18f),
-                                    1.0f to themePrimary.copy(alpha = 0.28f)
+                                    0.0f to Color.White.copy(alpha = 0.72f),
+                                    0.45f to themePrimary.copy(alpha = 0.26f),
+                                    1.0f to themePrimary.copy(alpha = 0.42f)
                                 )
                             }
                             drawRoundRect(
                                 brush = liquidBody,
                                 size = size,
                                 cornerRadius = CornerRadius(rPx, rPx)
-                            )
-                            val rimBrush = Brush.verticalGradient(
-                                0.0f to (if (isDark) Color.White.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.50f)),
-                                1.0f to themePrimary.copy(alpha = if (isDark) 0.30f else 0.24f)
-                            )
-                            drawRoundRect(
-                                brush = rimBrush,
-                                size = size,
-                                cornerRadius = CornerRadius(rPx, rPx),
-                                style = Stroke(width = 1.dp.toPx())
                             )
                         }
                 )

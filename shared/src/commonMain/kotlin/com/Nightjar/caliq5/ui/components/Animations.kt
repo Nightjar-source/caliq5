@@ -654,31 +654,31 @@ fun Modifier.expressive3DCurvature(
             val w = size.width
             val h = size.height
 
-            // 1. Sea Stone Convex Volume: Top soft highlight crest fading into subtle lower theme-toned depth
+            // 1. Sea Stone Convex Volume: Top soft highlight crest fading naturally without any bottom dark band
             val volumeBrush = if (isDark) {
                 Brush.verticalGradient(
-                    0.0f to Color.White.copy(alpha = 0.28f),
-                    0.25f to themeColor.copy(alpha = 0.08f),
-                    0.60f to Color.Transparent,
-                    1.0f to themeColor.copy(alpha = 0.26f)
+                    0.0f to Color.White.copy(alpha = 0.26f),
+                    0.28f to themeColor.copy(alpha = 0.08f),
+                    0.70f to Color.Transparent,
+                    1.0f to Color.Transparent
                 )
             } else {
                 Brush.verticalGradient(
-                    0.0f to Color.White.copy(alpha = 0.45f),
-                    0.28f to Color.White.copy(alpha = 0.12f),
-                    0.60f to Color.Transparent,
-                    1.0f to themeColor.copy(alpha = 0.22f)
+                    0.0f to Color.White.copy(alpha = 0.44f),
+                    0.30f to Color.White.copy(alpha = 0.14f),
+                    0.70f to Color.Transparent,
+                    1.0f to Color.Transparent
                 )
             }
 
-            // 2. Soft perimeter contouring that embraces the rounded pebble edges
+            // 2. Soft perimeter contouring embracing the organic curved pebble crest
             val perimeterCurvature = Brush.radialGradient(
                 colors = listOf(
                     Color.Transparent,
-                    (if (isDark) themeColor.copy(alpha = 0.18f) else themeColor.copy(alpha = 0.14f))
+                    (if (isDark) Color.White.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.10f))
                 ),
-                center = Offset(w * 0.5f, h * 0.5f),
-                radius = kotlin.math.max(w, h) * 0.70f
+                center = Offset(w * 0.5f, h * 0.35f),
+                radius = kotlin.math.max(w, h) * 0.65f
             )
 
             onDrawWithContent {
@@ -713,25 +713,25 @@ fun Modifier.frostedOrganicCapsule(
     shape: Shape = CircleShape,
     cornerRadius: Dp = 36.dp,
     tintColor: Color? = null,
-    alpha: Float = 0.25f
+    alpha: Float = 0.50f
 ): Modifier = composed {
     val isDark = isAppInDarkTheme()
     val themeColor = tintColor ?: MaterialTheme.colorScheme.primary
     val surfaceColor = MaterialTheme.colorScheme.surface
 
-    // 25% translucent frosted base tinted naturally with theme and surface (مطابق للصور مع شفافية 25%)
+    // 50% translucent frosted base tinted naturally with theme and surface (متوافق مع الوضع الفاتح والداكن)
     val capsuleBg = if (isDark) {
         Color(
-            red = surfaceColor.red * 0.55f + themeColor.red * 0.45f,
-            green = surfaceColor.green * 0.55f + themeColor.green * 0.45f,
-            blue = surfaceColor.blue * 0.55f + themeColor.blue * 0.45f,
+            red = surfaceColor.red * 0.40f + themeColor.red * 0.60f,
+            green = surfaceColor.green * 0.40f + themeColor.green * 0.60f,
+            blue = surfaceColor.blue * 0.40f + themeColor.blue * 0.60f,
             alpha = alpha
         )
     } else {
         Color(
-            red = surfaceColor.red * 0.35f + themeColor.red * 0.65f,
-            green = surfaceColor.green * 0.35f + themeColor.green * 0.65f,
-            blue = surfaceColor.blue * 0.35f + themeColor.blue * 0.65f,
+            red = surfaceColor.red * 0.30f + themeColor.red * 0.70f,
+            green = surfaceColor.green * 0.30f + themeColor.green * 0.70f,
+            blue = surfaceColor.blue * 0.30f + themeColor.blue * 0.70f,
             alpha = alpha
         )
     }
@@ -745,57 +745,25 @@ fun Modifier.frostedOrganicCapsule(
             val radiusPx = cornerRadius.toPx().coerceAtMost(minOf(w, h) / 2f)
             val isHorizontal = w >= h
 
-            // 1. التحدب ثلاثي الأبعاد والضوء الحجمي الناعم (Soft 3D Convex Volume Gradient)
-            val convexVolumeBrush = Brush.verticalGradient(
-                0.0f to (if (isDark) Color.White.copy(alpha = 0.16f) else Color.White.copy(alpha = 0.24f)),
-                0.32f to (if (isDark) themeColor.copy(alpha = 0.07f) else Color.White.copy(alpha = 0.08f)),
-                0.75f to Color.Transparent,
-                1.0f to (if (isDark) themeColor.copy(alpha = 0.12f) else themeColor.copy(alpha = 0.14f))
-            )
-
-            // 2. القوسان الجانبيان وحواف الكبسولة الناعمة (Cap Specular Highlights)
-            val cap1Brush = if (isHorizontal) {
-                Brush.radialGradient(
-                    colors = listOf(
-                        (if (isDark) Color.White.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.18f)),
-                        Color.Transparent
-                    ),
-                    center = Offset(h * 0.5f, h * 0.5f),
-                    radius = h * 0.85f
+            // 1. التحدب ثلاثي الأبعاد والضوء الحجمي الناعم العضوي (Tone-on-tone Sea Stone Convex Volume)
+            val convexVolumeBrush = if (isDark) {
+                Brush.verticalGradient(
+                    0.0f to Color.White.copy(alpha = 0.12f),
+                    0.28f to themeColor.copy(alpha = 0.08f),
+                    0.65f to Color.Transparent,
+                    1.0f to themeColor.copy(alpha = 0.16f)
                 )
             } else {
-                Brush.radialGradient(
-                    colors = listOf(
-                        (if (isDark) Color.White.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.18f)),
-                        Color.Transparent
-                    ),
-                    center = Offset(w * 0.5f, w * 0.5f),
-                    radius = w * 0.85f
+                Brush.verticalGradient(
+                    0.0f to Color.White.copy(alpha = 0.38f),
+                    0.30f to Color.White.copy(alpha = 0.14f),
+                    0.65f to Color.Transparent,
+                    1.0f to themeColor.copy(alpha = 0.18f)
                 )
             }
 
-            val cap2Brush = if (isHorizontal) {
-                Brush.radialGradient(
-                    colors = listOf(
-                        (if (isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.16f)),
-                        Color.Transparent
-                    ),
-                    center = Offset(w - h * 0.5f, h * 0.5f),
-                    radius = h * 0.85f
-                )
-            } else {
-                Brush.radialGradient(
-                    colors = listOf(
-                        (if (isDark) themeColor.copy(alpha = 0.12f) else themeColor.copy(alpha = 0.16f)),
-                        Color.Transparent
-                    ),
-                    center = Offset(w * 0.5f, h - w * 0.5f),
-                    radius = w * 0.85f
-                )
-            }
-
-            // 3. النسيج الحبيبي الملحي الناعم المنتشر على جسم الكبسولة (Stippled Frosted Salt Texture)
-            val grainCount = 140
+            // 2. النسيج الحبيبي الملحي الناعم المنتشر على جسم الكبسولة (Stippled Frosted Salt Texture)
+            val grainCount = 100
             var seed = 42L
             fun nextFloat(): Float {
                 seed = (seed * 1664525L + 1013904223L) and 0xFFFFFFFFL
@@ -830,44 +798,26 @@ fun Modifier.frostedOrganicCapsule(
                 }
 
                 if (inBounds) {
-                    val dotRadius = 0.65f + nextFloat() * 0.75f
-                    val isLight = nextFloat() > 0.40f
+                    val dotRadius = 0.65f + nextFloat() * 0.70f
+                    val isLight = nextFloat() > 0.45f
                     val alphaGrain = if (isLight) {
-                        (if (isDark) 0.24f else 0.32f) + nextFloat() * 0.12f
+                        (if (isDark) 0.16f else 0.22f) + nextFloat() * 0.08f
                     } else {
-                        (if (isDark) 0.18f else 0.24f) + nextFloat() * 0.10f
+                        (if (isDark) 0.12f else 0.16f) + nextFloat() * 0.08f
                     }
                     val col = if (isLight) Color.White.copy(alpha = alphaGrain) else themeColor.copy(alpha = alphaGrain)
                     grainPoints.add(Triple(Offset(px, py), dotRadius, col))
                 }
             }
 
-            // 4. إطار زجاجي دقيق جداً (Micro Frost Border) لتعريف حافة الكبسولة بدون أي ظلال خارجية
-            val borderSheen = Brush.verticalGradient(
-                0.0f to (if (isDark) Color.White.copy(alpha = 0.24f) else Color.White.copy(alpha = 0.35f)),
-                0.55f to (if (isDark) themeColor.copy(alpha = 0.10f) else themeColor.copy(alpha = 0.14f)),
-                1.0f to (if (isDark) themeColor.copy(alpha = 0.16f) else Color.White.copy(alpha = 0.22f))
-            )
-
             onDrawWithContent {
-                // 1. رسم التحدب الحجمي للكبسولة
+                // 1. رسم التحدب الحجمي للكبسولة العضوية
                 drawRoundRect(
                     brush = convexVolumeBrush,
                     size = size,
                     cornerRadius = CornerRadius(radiusPx, radiusPx)
                 )
-                // 2. إبراز قوسي الكبسولة
-                drawRoundRect(
-                    brush = cap1Brush,
-                    size = size,
-                    cornerRadius = CornerRadius(radiusPx, radiusPx)
-                )
-                drawRoundRect(
-                    brush = cap2Brush,
-                    size = size,
-                    cornerRadius = CornerRadius(radiusPx, radiusPx)
-                )
-                // 3. رسم النسيج الحبيبي الملحي العضوي على السطح
+                // 2. رسم النسيج الحبيبي الملحي العضوي على السطح
                 for (grain in grainPoints) {
                     drawCircle(
                         color = grain.third,
@@ -875,15 +825,8 @@ fun Modifier.frostedOrganicCapsule(
                         center = grain.first
                     )
                 }
-                // 4. رسم الإطار الزجاجي فائق الرقة
-                drawRoundRect(
-                    brush = borderSheen,
-                    size = size,
-                    cornerRadius = CornerRadius(radiusPx, radiusPx),
-                    style = Stroke(width = 0.8f)
-                )
 
-                // 5. رسم محتوى الشريط (الأيقونات ومؤشر الاختيار) بنقاء تام
+                // 3. رسم محتوى الشريط (الأيقونات ومؤشر الاختيار) بنقاء تام
                 drawContent()
             }
         }
