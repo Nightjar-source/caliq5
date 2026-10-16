@@ -806,7 +806,7 @@ fun CaliqNavItem(
 ) {
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val activeColor = MaterialTheme.colorScheme.primary
-    val inactiveColor = if (isDark) Color.White.copy(alpha = 0.72f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f)
+    val inactiveColor = if (isDark) Color.White.copy(alpha = 0.88f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
 
     val iconColor by animateColorAsState(
         if (isSelected) activeColor else inactiveColor

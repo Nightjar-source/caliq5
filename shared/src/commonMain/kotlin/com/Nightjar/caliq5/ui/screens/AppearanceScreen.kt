@@ -190,7 +190,7 @@ fun AppearanceScreen(viewModel: AppViewModel) {
 
                         AnimatedVisibility(
                             visible = !settings.useMaterialYou,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().clipToBounds(),
                             enter = expandVertically(
                                 animationSpec = androidx.compose.animation.core.spring(
                                     dampingRatio = 0.82f,

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">حاسبة الإعفاء والسعي لطلاب وطالبات العراق</string>
+    <string name="launcher_app_name">حاسبة الاعفاء والسعي</string>
     <string name="shortcut_exemption_short">الإعفاء</string>
     <string name="shortcut_exemption_long">حساب الإعفاء الفردي والعام</string>
     <string name="shortcut_annual_short">السعي السنوي</string>

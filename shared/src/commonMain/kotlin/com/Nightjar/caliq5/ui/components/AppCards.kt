@@ -250,40 +250,40 @@ fun FeatureExplanationCard(
         darkText = Color(0xFF0F172A),
         lightText = Color.White
     )
-    val cardTitleColor = if (cardTextColor == Color.White) Color.White else primaryColor
+    val cardTitleColor = if (cardTextColor == Color.White) Color.White else Color(0xFF0F172A)
 
-    // Dynamic contrast-adaptive shadow scaling based on theme background luminance
+    // Dynamic contrast-adaptive shadow scaling based on theme background luminance and WCAG contrast
     val bgLum = (0.2126f * effectiveBgColor.red + 0.7152f * effectiveBgColor.green + 0.0722f * effectiveBgColor.blue).coerceIn(0f, 1f)
     
     val cardTextShadow = if (cardTextColor == Color.White) {
-        val blackAlpha = (0.55f + bgLum * 0.30f).coerceIn(0.55f, 0.85f)
+        val blackAlpha = (0.65f + bgLum * 0.30f).coerceIn(0.65f, 0.95f)
         androidx.compose.ui.graphics.Shadow(
             color = Color.Black.copy(alpha = blackAlpha),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
-            blurRadius = 3.0f
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
+            blurRadius = 4.0f
         )
     } else {
-        val whiteAlpha = (0.70f + (1f - bgLum) * 0.25f).coerceIn(0.70f, 0.95f)
+        val whiteAlpha = (0.80f + (1f - bgLum) * 0.20f).coerceIn(0.80f, 1.0f)
         androidx.compose.ui.graphics.Shadow(
             color = Color.White.copy(alpha = whiteAlpha),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.0f),
-            blurRadius = 2.5f
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
+            blurRadius = 3.5f
         )
     }
 
     val cardTitleShadow = if (cardTitleColor == Color.White) {
-        val blackAlpha = (0.55f + bgLum * 0.30f).coerceIn(0.55f, 0.85f)
+        val blackAlpha = (0.65f + bgLum * 0.30f).coerceIn(0.65f, 0.95f)
         androidx.compose.ui.graphics.Shadow(
             color = Color.Black.copy(alpha = blackAlpha),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
-            blurRadius = 3.0f
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
+            blurRadius = 4.0f
         )
     } else {
-        val whiteAlpha = (0.70f + (1f - bgLum) * 0.25f).coerceIn(0.70f, 0.95f)
+        val whiteAlpha = (0.80f + (1f - bgLum) * 0.20f).coerceIn(0.80f, 1.0f)
         androidx.compose.ui.graphics.Shadow(
             color = Color.White.copy(alpha = whiteAlpha),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.0f),
-            blurRadius = 2.5f
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
+            blurRadius = 3.5f
         )
     }
 

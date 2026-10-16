@@ -571,19 +571,7 @@ fun Modifier.neuralAmbientGlow(
         val h = size.height
         if (w <= 0f || h <= 0f) return@drawBehind
 
-        val steps = 4
-        for (i in 1..steps) {
-            val spread = (i * 2.5f).dp.toPx()
-            val yOffset = (ePx * 0.40f) + (i * 1.5f).dp.toPx()
-            val alpha = (baseShadowColor.alpha / (i * 1.5f))
-            drawRoundRect(
-                color = baseShadowColor.copy(alpha = alpha),
-                topLeft = Offset(-spread * 0.35f, yOffset - spread * 0.15f),
-                size = androidx.compose.ui.geometry.Size(w + spread * 0.70f, h + spread * 0.35f),
-                cornerRadius = CornerRadius(rPx + spread * 0.45f, rPx + spread * 0.45f)
-            )
-        }
-
+        // Zero drop shadows: only pure organic salt motes (حبات الملح) floating 360° around the card
         if (hasSaltMotes) {
             val cr = rPx.coerceAtMost(minOf(w, h) / 2f)
             val moteCount = 28
