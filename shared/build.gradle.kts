@@ -36,6 +36,8 @@ kotlin {
             implementation(libs.material.kolor)
             implementation(libs.androidx.navigation3.runtime)
             implementation(libs.androidx.navigation3.ui)
+            implementation(libs.jetbrains.navigation3.ui)
+            implementation(libs.jetbrains.lifecycle.viewmodel.navigation3)
         }
         androidMain.dependencies {
             implementation(compose.preview)

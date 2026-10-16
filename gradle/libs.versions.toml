@@ -14,6 +14,8 @@ core-splashscreen = "1.0.1"
 kotlinx-datetime = "0.6.2"
 material-kolor = "2.1.1"
 navigation3 = "1.2.0"
+multiplatform-nav3 = "1.2.0-rc01"
+multiplatform-lifecycle = "2.11.0"
 
 [libraries]
 # AndroidX
@@ -42,6 +44,11 @@ androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstall
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 
+# مكتبة التنقل الأساسية للواجهات لكوتلن متعدد المنصات
+jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3" }
+# ربط الـ ViewModel مع التنقل (لحفظ حالة الشاشات أثناء التنقل)
+jetbrains-lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "multiplatform-lifecycle" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
@@ -49,5 +56,6 @@ androidKmpLibrary = { id = "com.android.kotlin.multiplatform.library", version.r
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
