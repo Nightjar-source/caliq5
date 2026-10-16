@@ -38,6 +38,9 @@ kotlin {
             implementation(libs.androidx.navigation3.ui)
             implementation(libs.jetbrains.navigation3.ui)
             implementation(libs.jetbrains.lifecycle.viewmodel.navigation3)
+            implementation(libs.jetbrains.compose.material3.adaptive)
+            implementation(libs.jetbrains.compose.material3.adaptive.layout)
+            implementation(libs.jetbrains.compose.material3.adaptive.navigation)
         }
         androidMain.dependencies {
             implementation(compose.preview)

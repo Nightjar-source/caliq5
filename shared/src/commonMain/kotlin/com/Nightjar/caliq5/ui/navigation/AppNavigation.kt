@@ -50,8 +50,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.window.core.layout.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import com.Nightjar.caliq5.data.*
 import com.Nightjar.caliq5.ui.screens.*
@@ -61,7 +62,7 @@ import com.Nightjar.caliq5.ui.background.MathBackground
 import com.Nightjar.caliq5.viewmodel.AppViewModel
 
 /**
- * Main navigation host.
+ * Main navigation host with official Material 3 Adaptive layout support.
  */
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -83,15 +84,19 @@ fun AppNavigation(
         viewModel.handleTopBarBack()
     }
 
+    // Official Material 3 Adaptive Window & Posture Calculation
+    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val adaptiveWindowSizeClass = adaptiveInfo.windowSizeClass
+    val isTabletop = adaptiveInfo.windowPosture.isTabletop
+
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val windowInfo = LocalWindowInfo.current
         val density = LocalDensity.current
         val size = with(density) {
             DpSize(windowInfo.containerSize.width.toDp(), windowInfo.containerSize.height.toDp())
         }
-        val windowSizeClass = WindowSizeClass.calculateFromSize(size)
         val isLandscape = size.height < 500.dp && size.width > size.height
-        val isWideScreen = (windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact) || isLandscape || size.width >= 600.dp
+        val isWideScreen = (adaptiveWindowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT) || isLandscape || size.width >= 600.dp || isTabletop
 
         MathBackground(modifier = Modifier.fillMaxSize())
 

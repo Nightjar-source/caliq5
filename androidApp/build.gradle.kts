@@ -87,6 +87,9 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation("androidx.glance:glance-appwidget:1.1.0")
     implementation("androidx.glance:glance-material3:1.1.0")
     implementation(libs.androidx.profileinstaller) // Baseline Profile installer for Android 7-9
