@@ -42,19 +42,24 @@ actual object MemoryManager {
         try {
             val cache = context.cacheDir
             cache?.listFiles()?.forEach { file ->
-                if (file.isFile) {
-                    file.delete()
-                } else if (file.isDirectory && file.name.startsWith("temp", ignoreCase = true)) {
-                    file.deleteRecursively()
-                }
+                try {
+                    if (file.isFile) {
+                        file.delete()
+                    } else if (file.isDirectory) {
+                        file.deleteRecursively()
+                    }
+                } catch (_: Throwable) {}
             }
             context.externalCacheDir?.listFiles()?.forEach { file ->
-                if (file.isFile) {
-                    file.delete()
-                }
+                try {
+                    if (file.isFile) {
+                        file.delete()
+                    } else if (file.isDirectory) {
+                        file.deleteRecursively()
+                    }
+                } catch (_: Throwable) {}
             }
-            System.gc()
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             // Ignore errors during cache cleanup
         }
     }

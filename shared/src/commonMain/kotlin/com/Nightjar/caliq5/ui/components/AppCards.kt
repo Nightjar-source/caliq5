@@ -237,44 +237,53 @@ fun FeatureExplanationCard(
         )
     }
 
-    // Dynamic contrast-compliant calculation strictly following Material 3 and WCAG 2.1
-    // In Dark mode: crisp white text with protective subtle black shadow.
-    // In Light mode: deep slate text with protective subtle white halo shadow.
-    val cardTextColor = if (isDark) {
-        Color.White
+    val effectiveBgColor = if (isDark) {
+        primaryColor.copy(alpha = 0.55f)
     } else {
-        Color(0xFF0F172A)
+        Color(
+            red = primaryColor.red * 0.45f + surfaceColor.red * 0.55f,
+            green = primaryColor.green * 0.45f + surfaceColor.green * 0.55f,
+            blue = primaryColor.blue * 0.45f + surfaceColor.blue * 0.55f
+        )
     }
-    val cardTitleColor = if (isDark) {
-        Color.White
-    } else {
-        primaryColor
-    }
+    val cardTextColor = effectiveBgColor.contrastingTextColor(
+        darkText = Color(0xFF0F172A),
+        lightText = Color.White
+    )
+    val cardTitleColor = if (cardTextColor == Color.White) Color.White else primaryColor
 
-    // Subtle complementary text shadow: opposite to font color to enhance crispness without clutter
+    // Dynamic contrast-adaptive shadow scaling based on theme background luminance
+    val bgLum = (0.2126f * effectiveBgColor.red + 0.7152f * effectiveBgColor.green + 0.0722f * effectiveBgColor.blue).coerceIn(0f, 1f)
+    
     val cardTextShadow = if (cardTextColor == Color.White) {
+        val blackAlpha = (0.35f + bgLum * 0.35f).coerceIn(0.35f, 0.68f)
+        val blur = (3.5f + bgLum * 2.0f).coerceIn(3.5f, 5.5f)
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = 0.40f),
+            color = Color.Black.copy(alpha = blackAlpha),
             offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
-            blurRadius = 4.0f
+            blurRadius = blur
         )
     } else {
+        val whiteAlpha = (0.45f + (1f - bgLum) * 0.35f).coerceIn(0.45f, 0.75f)
+        val blur = (3.5f + (1f - bgLum) * 2.0f).coerceIn(3.5f, 5.5f)
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = 0.60f),
+            color = Color.White.copy(alpha = whiteAlpha),
             offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
-            blurRadius = 3.5f
+            blurRadius = blur
         )
     }
 
     val cardTitleShadow = if (cardTitleColor == Color.White) {
+        val blackAlpha = (0.35f + bgLum * 0.35f).coerceIn(0.35f, 0.68f)
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = 0.40f),
+            color = Color.Black.copy(alpha = blackAlpha),
             offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
             blurRadius = 4.0f
         )
     } else {
+        val whiteAlpha = (0.45f + (1f - bgLum) * 0.35f).coerceIn(0.45f, 0.75f)
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = 0.60f),
+            color = Color.White.copy(alpha = whiteAlpha),
             offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
             blurRadius = 3.5f
         )
@@ -291,7 +300,6 @@ fun FeatureExplanationCard(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
-                .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 5.dp, tintColor = primaryColor, hasSaltMotes = false)
                 .clip(shape)
                 .background(surfaceColor.copy(alpha = 0.20f))
                 .background(
@@ -401,7 +409,6 @@ fun MainGradeBox(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
-                .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 6.dp, tintColor = gradientColors?.firstOrNull() ?: primaryColor, hasSaltMotes = false)
                 .clip(boxShape)
                 .background(
                     brush = Brush.linearGradient(
@@ -521,7 +528,6 @@ fun Term2GradeBox(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
-                .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 6.dp, tintColor = actualGradient.firstOrNull() ?: primaryColor, hasSaltMotes = false)
                 .clip(boxShape)
                 .background(
                     brush = Brush.linearGradient(actualGradient)

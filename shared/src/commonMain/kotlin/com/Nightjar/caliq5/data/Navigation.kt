@@ -59,8 +59,8 @@ data class NavItem(
 )
 
 object AppVersion {
-    const val VERSION_NAME = "5.13.0"
-    const val VERSION_CODE = 51300
+    const val VERSION_NAME = "5.13.1"
+    const val VERSION_CODE = 51301
     const val EDITION = "Material 3 Expressive"
     val FULL_DISPLAY = "الإصدار $VERSION_NAME ($EDITION)"
 }

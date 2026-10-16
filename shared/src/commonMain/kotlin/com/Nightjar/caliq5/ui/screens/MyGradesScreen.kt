@@ -732,12 +732,26 @@ Box(modifier = Modifier.fillMaxWidth()) {
                                     thickness = 0.8.dp,
                                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
                                 )
+                                val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
+                                val itemShape = remember { RoundedCornerShape(14.dp) }
+                                val primaryCol = MaterialTheme.colorScheme.primary
+                                val surfaceCol = MaterialTheme.colorScheme.surface
+                                val outlineVariantCol = MaterialTheme.colorScheme.outlineVariant
+                                val unselectedBg = surfaceCol.copy(alpha = if (isDark) 0.50f else 0.70f)
+                                val unselectedBorder = BorderStroke(0.8.dp, outlineVariantCol.copy(alpha = 0.40f))
+                                val selectedTextColor = remember(primaryCol) {
+                                    primaryCol.contrastingTextColor(darkText = Color(0xFF0F172A), lightText = Color.White)
+                                }
+                                val unselectedTextColor = if (isDark) Color.White else Color(0xFF0F172A)
+
                                 classList.forEach { cls ->
                                     val isSelectedClass = cls == selectedClassName
-                                    Surface(
+                                    Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .clip(RoundedCornerShape(14.dp))
+                                            .clip(itemShape)
+                                            .background(if (isSelectedClass) primaryCol else unselectedBg)
+                                            .then(if (isSelectedClass) Modifier else Modifier.border(unselectedBorder, itemShape))
                                             .clickable {
                                                 expandedClassSelect = false
                                                 if (selectedClassName != cls) {
@@ -750,22 +764,9 @@ Box(modifier = Modifier.fillMaxWidth()) {
                                                     subjectsList.clear()
                                                     subjectsList.addAll(newEntries)
                                                 }
-                                            },
-                                        shape = RoundedCornerShape(14.dp),
-                                        color = if (isSelectedClass) MaterialTheme.colorScheme.primary
-                                                else MaterialTheme.colorScheme.surface.copy(alpha = if (com.Nightjar.caliq5.theme.isAppInDarkTheme()) 0.50f else 0.70f),
-                                        border = if (isSelectedClass) null
-                                                else BorderStroke(0.8.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.40f))
+                                            }
                                     ) {
-                                        val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-                                        val itemBg = if (isSelectedClass) MaterialTheme.colorScheme.primary
-                                                else MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.50f else 0.70f)
-                                        val itemTextColor = if (isSelectedClass) {
-                                            MaterialTheme.colorScheme.primary.contrastingTextColor(darkText = Color(0xFF0F172A), lightText = Color.White)
-                                        } else {
-                                            if (isDark) Color.White else Color(0xFF0F172A)
-                                        }
-
+                                        val itemTextColor = if (isSelectedClass) selectedTextColor else unselectedTextColor
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()

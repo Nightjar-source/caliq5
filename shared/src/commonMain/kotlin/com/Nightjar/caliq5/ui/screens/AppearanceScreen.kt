@@ -230,6 +230,10 @@ fun AppearanceScreen(viewModel: AppViewModel) {
                                     verticalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
                                     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
+                                    val cardShape = remember { RoundedCornerShape(16.dp) }
+                                    val outlineVariant = MaterialTheme.colorScheme.outlineVariant
+                                    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+
                                     colorPairs.forEach { (colorA, colorB) ->
                                         Row(
                                             modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
@@ -243,10 +247,10 @@ fun AppearanceScreen(viewModel: AppViewModel) {
                                                 val colorObj = remember(colorItem.hex, isDark) {
                                                     ensureReadableContrast(parseHexColor(colorItem.hex), isDark)
                                                 }
-                                                val cardBorder = BorderStroke(
-                                                    width = if (isSelected) 2.5.dp else 1.5.dp,
-                                                    color = if (isSelected) colorObj else MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.55f else 0.65f)
-                                                )
+                                                val borderColor = if (isSelected) colorObj else outlineVariant.copy(alpha = if (isDark) 0.55f else 0.65f)
+                                                val cardBorder = remember(isSelected, colorObj, isDark) {
+                                                    BorderStroke(width = if (isSelected) 2.5.dp else 1.5.dp, color = borderColor)
+                                                }
                                                 
                                                 val cardScale by androidx.compose.animation.core.animateFloatAsState(
                                                     targetValue = if (isSelected) 1.025f else 1f,
@@ -273,13 +277,13 @@ fun AppearanceScreen(viewModel: AppViewModel) {
                                                             scaleX = cardScale
                                                             scaleY = cardScale
                                                         }
-                                                        .clip(RoundedCornerShape(16.dp))
+                                                        .clip(cardShape)
                                                         .clickable {
                                                             viewModel.updateSettings(settings.copy(primaryColor = colorItem.hex, useMaterialYou = false))
                                                         },
-                                                    shape = RoundedCornerShape(16.dp),
+                                                    shape = cardShape,
                                                     color = if (isSelected) colorObj.copy(alpha = if (isDark) 0.22f else 0.15f)
-                                                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isDark) 0.35f else 0.45f),
+                                                            else surfaceVariant.copy(alpha = if (isDark) 0.35f else 0.45f),
                                                     border = cardBorder
                                                 ) {
                                                     Row(

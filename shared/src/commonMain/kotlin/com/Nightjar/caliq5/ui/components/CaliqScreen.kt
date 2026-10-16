@@ -45,7 +45,10 @@ fun CaliqScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Spacer(modifier = Modifier.fillMaxWidth(1f).windowInsetsPadding(WindowInsets.statusBars).height(topBarHeight))
+                    val topSafeInsets = WindowInsets.statusBars
+                        .union(WindowInsets.captionBar)
+                        .union(WindowInsets.displayCutout)
+                    Spacer(modifier = Modifier.fillMaxWidth(1f).windowInsetsPadding(topSafeInsets).height(topBarHeight))
                     content()
                     Spacer(modifier = Modifier.fillMaxWidth(1f).height(bottomPadding).windowInsetsPadding(WindowInsets.navigationBars))
                 }
