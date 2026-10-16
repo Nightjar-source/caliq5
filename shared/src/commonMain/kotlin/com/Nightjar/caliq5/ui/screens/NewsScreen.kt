@@ -17,16 +17,25 @@ import androidx.compose.material.icons.filled.*
 @Composable
 fun NewsScreen(viewModel: AppViewModel) {
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+    val topSafeInset = WindowInsets.statusBars
+        .union(WindowInsets.captionBar)
+        .union(WindowInsets.displayCutout)
+        .asPaddingValues()
+        .calculateTopPadding()
+    val bottomSafeInset = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+
     CaliqScreen(title = "آخر الأخبار", onBack = { viewModel.goBack() }, scrollable = false) {
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = gridState,
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp),
+            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 120.dp + bottomSafeInset),
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
         ) {
-            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+            item(key = "news_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                     ResultCard {
                         Column(

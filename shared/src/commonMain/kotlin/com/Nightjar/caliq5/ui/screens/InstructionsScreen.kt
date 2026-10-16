@@ -27,15 +27,24 @@ import caliq5.shared.generated.resources.exemption_rules
 
 @Composable
 fun InstructionsScreen(viewModel: AppViewModel) {
+    val topSafeInset = WindowInsets.statusBars
+        .union(WindowInsets.captionBar)
+        .union(WindowInsets.displayCutout)
+        .asPaddingValues()
+        .calculateTopPadding()
+    val bottomSafeInset = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+
     CaliqScreen(title = "كيفية الاستخدام", onBack = { viewModel.goBack() }, scrollable = false) {
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp),
+            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 120.dp + bottomSafeInset),
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
         ) {
-            item {
+            item(key = "instructions_header") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                     ExpandableInstructionCard(
                         title = "ضوابط الإعفاء العام والفردي للعام 2024-2025",

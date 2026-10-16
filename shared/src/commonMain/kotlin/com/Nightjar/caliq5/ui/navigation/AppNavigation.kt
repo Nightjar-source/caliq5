@@ -534,14 +534,15 @@ fun CaliqBottomNav(
 
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val themePrimary = MaterialTheme.colorScheme.primary
-    val barHeight = 58.dp
+    val barHeight = 54.dp
+    val squircleSize = 48.dp
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(barHeight)
-            .padding(horizontal = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // 1. الكبسولة العضوية الحبيبية الرئيسية (تحتوي على التبويبات الـ 4 مع مؤشر زجاجي سائل)
@@ -555,7 +556,7 @@ fun CaliqBottomNav(
             val tabWidth = totalWidth / 4f
             val tabWidthPx = with(LocalDensity.current) { tabWidth.toPx() }
             val pillWidth = (tabWidth - 6.dp).coerceAtMost(62.dp)
-            val innerPillHeight = 46.dp
+            val innerPillHeight = 44.dp
 
             var dragOffset by remember { mutableStateOf<Float?>(null) }
             var localSelectedIndex by remember { mutableStateOf(selectedIndex) }
@@ -608,7 +609,7 @@ fun CaliqBottomNav(
                         shape = navShape,
                         cornerRadius = 32.dp,
                         tintColor = MaterialTheme.colorScheme.primary,
-                        alpha = 0.50f
+                        alpha = 0.80f
                     )
             ) {
                 if ((localSelectedIndex in 0..3) || dragOffset != null) {
@@ -625,18 +626,18 @@ fun CaliqBottomNav(
                             }
                             .drawBehind {
                                 val rPx = size.height / 2f
-                                // 1. Liquid droplet body with subtle theme-tinted organic liquid surface
+                                // 1. Liquid droplet body: distinct frosted glass droplet that lets active icons pop
                                 val liquidBody = if (isDark) {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.20f),
-                                        0.40f to themePrimary.copy(alpha = 0.35f),
-                                        1.0f to themePrimary.copy(alpha = 0.52f)
+                                        0.0f to Color.White.copy(alpha = 0.25f),
+                                        0.35f to MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
+                                        1.0f to themePrimary.copy(alpha = 0.30f)
                                     )
                                 } else {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.72f),
-                                        0.45f to themePrimary.copy(alpha = 0.26f),
-                                        1.0f to themePrimary.copy(alpha = 0.42f)
+                                        0.0f to Color.White.copy(alpha = 0.90f),
+                                        0.45f to Color.White.copy(alpha = 0.72f),
+                                        1.0f to themePrimary.copy(alpha = 0.16f)
                                     )
                                 }
                                 drawRoundRect(
@@ -697,15 +698,15 @@ fun CaliqBottomNav(
         }
 
         // 2. زر القائمة المربع المنفصل الزجاجي العضوي المطابق للصورة تماماً (Companion Floating Action Squircle)
-        val fabShape = RoundedCornerShape(20.dp)
+        val fabShape = RoundedCornerShape(18.dp)
         Box(
             modifier = Modifier
-                .size(barHeight)
+                .size(squircleSize)
                 .frostedOrganicCapsule(
                     shape = fabShape,
-                    cornerRadius = 20.dp,
+                    cornerRadius = 18.dp,
                     tintColor = MaterialTheme.colorScheme.primary,
-                    alpha = 0.50f
+                    alpha = 0.80f
                 )
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -718,20 +719,20 @@ fun CaliqBottomNav(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(5.dp)
+                        .padding(4.dp)
                         .drawBehind {
-                            val rPx = 15.dp.toPx()
+                            val rPx = 14.dp.toPx()
                             val liquidBody = if (isDark) {
                                 Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.20f),
-                                    0.40f to themePrimary.copy(alpha = 0.35f),
-                                    1.0f to themePrimary.copy(alpha = 0.52f)
+                                    0.0f to Color.White.copy(alpha = 0.25f),
+                                    0.35f to MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
+                                    1.0f to themePrimary.copy(alpha = 0.30f)
                                 )
                             } else {
                                 Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.72f),
-                                    0.45f to themePrimary.copy(alpha = 0.26f),
-                                    1.0f to themePrimary.copy(alpha = 0.42f)
+                                    0.0f to Color.White.copy(alpha = 0.90f),
+                                    0.45f to Color.White.copy(alpha = 0.72f),
+                                    1.0f to themePrimary.copy(alpha = 0.16f)
                                 )
                             }
                             drawRoundRect(
@@ -750,7 +751,7 @@ fun CaliqBottomNav(
                 } else {
                     if (isDark) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant
                 },
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(22.dp)
             )
         }
     }
@@ -891,7 +892,7 @@ fun CaliqNavigationRail(
                         shape = railShape,
                         cornerRadius = 32.dp,
                         tintColor = MaterialTheme.colorScheme.primary,
-                        alpha = 0.50f
+                        alpha = 0.80f
                     )
             ) {
                 if ((localSelectedIndex in 0..3) || dragOffset != null) {
@@ -908,18 +909,18 @@ fun CaliqNavigationRail(
                             }
                             .drawBehind {
                                 val rPx = size.width / 2f
-                                // 1. Liquid droplet body with subtle theme-tinted organic liquid surface
+                                // 1. Liquid droplet body: distinct frosted glass droplet that lets active icons pop
                                 val liquidBody = if (isDark) {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.20f),
-                                        0.40f to themePrimary.copy(alpha = 0.35f),
-                                        1.0f to themePrimary.copy(alpha = 0.52f)
+                                        0.0f to Color.White.copy(alpha = 0.25f),
+                                        0.35f to MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
+                                        1.0f to themePrimary.copy(alpha = 0.30f)
                                     )
                                 } else {
                                     Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.72f),
-                                        0.45f to themePrimary.copy(alpha = 0.26f),
-                                        1.0f to themePrimary.copy(alpha = 0.42f)
+                                        0.0f to Color.White.copy(alpha = 0.90f),
+                                        0.45f to Color.White.copy(alpha = 0.72f),
+                                        1.0f to themePrimary.copy(alpha = 0.16f)
                                     )
                                 }
                                 drawRoundRect(
@@ -980,15 +981,16 @@ fun CaliqNavigationRail(
         }
 
         // 2. زر القائمة المربع المنفصل الزجاجي العضوي المطابق للصورة تماماً (Floating Action Squircle)
-        val fabShape = RoundedCornerShape(20.dp)
+        val fabShape = RoundedCornerShape(18.dp)
+        val railSquircleSize = 50.dp
         Box(
             modifier = Modifier
-                .size(railWidth)
+                .size(railSquircleSize)
                 .frostedOrganicCapsule(
                     shape = fabShape,
-                    cornerRadius = 20.dp,
+                    cornerRadius = 18.dp,
                     tintColor = MaterialTheme.colorScheme.primary,
-                    alpha = 0.50f
+                    alpha = 0.80f
                 )
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -1001,20 +1003,20 @@ fun CaliqNavigationRail(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(5.dp)
+                        .padding(4.dp)
                         .drawBehind {
-                            val rPx = 15.dp.toPx()
+                            val rPx = 14.dp.toPx()
                             val liquidBody = if (isDark) {
                                 Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.20f),
-                                    0.40f to themePrimary.copy(alpha = 0.35f),
-                                    1.0f to themePrimary.copy(alpha = 0.52f)
+                                    0.0f to Color.White.copy(alpha = 0.25f),
+                                    0.35f to MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.60f),
+                                    1.0f to themePrimary.copy(alpha = 0.30f)
                                 )
                             } else {
                                 Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.72f),
-                                    0.45f to themePrimary.copy(alpha = 0.26f),
-                                    1.0f to themePrimary.copy(alpha = 0.42f)
+                                    0.0f to Color.White.copy(alpha = 0.90f),
+                                    0.45f to Color.White.copy(alpha = 0.72f),
+                                    1.0f to themePrimary.copy(alpha = 0.16f)
                                 )
                             }
                             drawRoundRect(

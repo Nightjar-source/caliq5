@@ -32,17 +32,26 @@ import com.Nightjar.caliq5.viewmodel.AppViewModel
 fun AboutScreen(viewModel: AppViewModel) {
     val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+    val topSafeInset = WindowInsets.statusBars
+        .union(WindowInsets.captionBar)
+        .union(WindowInsets.displayCutout)
+        .asPaddingValues()
+        .calculateTopPadding()
+    val bottomSafeInset = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+
     CaliqScreen(title = "حول التطبيق", onBack = { viewModel.goBack() }, scrollable = false) {
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = gridState,
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp),
+            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 120.dp + bottomSafeInset),
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
         ) {
             // App Icon & Animated Shimmer Title
-            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+            item(key = "about_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp).popInOnInitialLoad(0),
                     horizontalAlignment = Alignment.CenterHorizontally

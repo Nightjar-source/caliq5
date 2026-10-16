@@ -642,6 +642,10 @@ fun Modifier.expressive3DCurvature(
     cornerRadius: androidx.compose.ui.unit.Dp = 24.dp,
     shape: androidx.compose.ui.graphics.Shape? = null,
     tintColor: androidx.compose.ui.graphics.Color? = null
+fun Modifier.expressive3DCurvature(
+    cornerRadius: Dp = 28.dp,
+    shape: Shape? = null,
+    tintColor: Color? = null
 ): Modifier = composed {
     val isDark = isAppInDarkTheme()
     val effectiveShape = shape ?: RoundedCornerShape(cornerRadius)
@@ -654,46 +658,46 @@ fun Modifier.expressive3DCurvature(
             val w = size.width
             val h = size.height
 
-            // 1. Sea Stone Convex Volume: Top specular crest highlight derived purely from the theme color itself (من جنس اللون نفسه)
+            // 1. Elevated Sea Stone 3D Convex Volume: Rich tone-on-tone specular crest (من جنس ولون الثيم نفسه)
             val crestColor = if (isDark) {
                 Color(
-                    red = (themeColor.red * 0.55f + 0.45f).coerceIn(0f, 1f),
-                    green = (themeColor.green * 0.55f + 0.45f).coerceIn(0f, 1f),
-                    blue = (themeColor.blue * 0.55f + 0.45f).coerceIn(0f, 1f),
-                    alpha = 0.35f
+                    red = (themeColor.red * 0.50f + 0.50f).coerceIn(0f, 1f),
+                    green = (themeColor.green * 0.50f + 0.50f).coerceIn(0f, 1f),
+                    blue = (themeColor.blue * 0.50f + 0.50f).coerceIn(0f, 1f),
+                    alpha = 0.48f
                 )
             } else {
                 Color(
-                    red = (themeColor.red * 0.35f + 0.65f).coerceIn(0f, 1f),
-                    green = (themeColor.green * 0.35f + 0.65f).coerceIn(0f, 1f),
-                    blue = (themeColor.blue * 0.35f + 0.65f).coerceIn(0f, 1f),
-                    alpha = 0.45f
+                    red = (themeColor.red * 0.30f + 0.70f).coerceIn(0f, 1f),
+                    green = (themeColor.green * 0.30f + 0.70f).coerceIn(0f, 1f),
+                    blue = (themeColor.blue * 0.30f + 0.70f).coerceIn(0f, 1f),
+                    alpha = 0.58f
                 )
             }
-            val midCurveColor = themeColor.copy(alpha = if (isDark) 0.16f else 0.18f)
+            val midCurveColor = themeColor.copy(alpha = if (isDark) 0.22f else 0.26f)
 
             val volumeBrush = Brush.verticalGradient(
                 0.0f to crestColor,
-                0.28f to midCurveColor,
-                0.65f to Color.Transparent,
+                0.22f to midCurveColor,
+                0.55f to Color.Transparent,
                 1.0f to Color.Transparent
             )
 
-            // 2. Soft perimeter contouring embracing the organic curved pebble crest from theme color
+            // 2. Pronounced 3D Organic Pebble Curvature embracing the edges (تحدب واعوجاج مجسم أصيل)
             val perimeterCurvature = Brush.radialGradient(
                 colors = listOf(
                     Color.Transparent,
-                    themeColor.copy(alpha = if (isDark) 0.10f else 0.14f)
+                    themeColor.copy(alpha = if (isDark) 0.18f else 0.24f)
                 ),
-                center = Offset(w * 0.5f, h * 0.35f),
-                radius = kotlin.math.max(w, h) * 0.65f
+                center = Offset(w * 0.5f, h * 0.25f),
+                radius = kotlin.math.max(w, h) * 0.75f
             )
 
             onDrawWithContent {
                 // محتوى الكارت والنصوص أولاً لضمان نقاء القراءة التام
                 drawContent()
 
-                // رسم التحدب الحجمي العضوي الناعم كأحجار البحر
+                // رسم التحدب الحجمي العضوي المعزز كأحجار البحر
                 drawRoundRect(
                     brush = volumeBrush,
                     size = size,
@@ -711,7 +715,7 @@ fun Modifier.expressive3DCurvature(
 
 /**
  * Frosted Organic Capsule (تصميم الكبسولة الزجاجية العضوية بنسيج ملحي ناعم وتحدب ثلاثي الأبعاد):
- * - 25% translucent frosted glass surface tinted dynamically with theme color.
+ * - 80% translucent frosted glass surface tinted dynamically with theme color.
  * - Fine stippled / granular salt-mote tactile texture distributed evenly across the capsule.
  * - Gentle 3D convex volume with top specular crest highlight and bottom soft radiance.
  * - Zero heavy drop shadows (بدون ظلال التي في الصور).
@@ -721,25 +725,25 @@ fun Modifier.frostedOrganicCapsule(
     shape: Shape = CircleShape,
     cornerRadius: Dp = 36.dp,
     tintColor: Color? = null,
-    alpha: Float = 0.50f
+    alpha: Float = 0.80f
 ): Modifier = composed {
     val isDark = isAppInDarkTheme()
     val themeColor = tintColor ?: MaterialTheme.colorScheme.primary
     val surfaceColor = MaterialTheme.colorScheme.surface
 
-    // 50% translucent frosted base tinted naturally with theme and surface (متوافق مع الوضع الفاتح والداكن)
+    // 80% translucent frosted base tinted naturally with theme and surface (متوافق مع الوضع الفاتح والداكن)
     val capsuleBg = if (isDark) {
-        Color(
-            red = surfaceColor.red * 0.40f + themeColor.red * 0.60f,
-            green = surfaceColor.green * 0.40f + themeColor.green * 0.60f,
-            blue = surfaceColor.blue * 0.40f + themeColor.blue * 0.60f,
-            alpha = alpha
-        )
-    } else {
         Color(
             red = surfaceColor.red * 0.30f + themeColor.red * 0.70f,
             green = surfaceColor.green * 0.30f + themeColor.green * 0.70f,
             blue = surfaceColor.blue * 0.30f + themeColor.blue * 0.70f,
+            alpha = alpha
+        )
+    } else {
+        Color(
+            red = surfaceColor.red * 0.25f + themeColor.red * 0.75f,
+            green = surfaceColor.green * 0.25f + themeColor.green * 0.75f,
+            blue = surfaceColor.blue * 0.25f + themeColor.blue * 0.75f,
             alpha = alpha
         )
     }
@@ -756,17 +760,17 @@ fun Modifier.frostedOrganicCapsule(
             // 1. التحدب ثلاثي الأبعاد والضوء الحجمي الناعم العضوي (Tone-on-tone Sea Stone Convex Volume)
             val convexVolumeBrush = if (isDark) {
                 Brush.verticalGradient(
-                    0.0f to Color.White.copy(alpha = 0.12f),
-                    0.28f to themeColor.copy(alpha = 0.08f),
+                    0.0f to themeColor.copy(alpha = 0.28f),
+                    0.28f to themeColor.copy(alpha = 0.12f),
                     0.65f to Color.Transparent,
-                    1.0f to themeColor.copy(alpha = 0.16f)
+                    1.0f to themeColor.copy(alpha = 0.20f)
                 )
             } else {
                 Brush.verticalGradient(
-                    0.0f to Color.White.copy(alpha = 0.38f),
-                    0.30f to Color.White.copy(alpha = 0.14f),
+                    0.0f to Color.White.copy(alpha = 0.45f),
+                    0.30f to themeColor.copy(alpha = 0.18f),
                     0.65f to Color.Transparent,
-                    1.0f to themeColor.copy(alpha = 0.18f)
+                    1.0f to themeColor.copy(alpha = 0.22f)
                 )
             }
 

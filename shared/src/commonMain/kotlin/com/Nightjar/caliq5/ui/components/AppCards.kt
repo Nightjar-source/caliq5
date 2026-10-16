@@ -247,32 +247,32 @@ fun FeatureExplanationCard(
     )
     val cardTitleColor = if (cardTextColor == Color.White) Color.White else Color(0xFF0F172A)
 
-    // Dynamic contrast-adaptive shadow: High-contrast inversion to ensure maximum clarity on 10% translucent side
+    // Zero-offset diffused Gaussian aura shadow (ضبابية ناعمة كالهالة تمنع تكرار الحروف وتبرز النص بحدة تامة)
     val cardTextShadow = if (cardTextColor == Color.White) {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = if (isDark) 0.80f else 0.92f),
-            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.8f),
-            blurRadius = 4.0f
+            color = Color.Black.copy(alpha = if (isDark) 0.85f else 0.94f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 0.5f),
+            blurRadius = 7.5f
         )
     } else {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = if (isDark) 0.85f else 0.98f),
-            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.5f),
-            blurRadius = 3.5f
+            color = Color.White.copy(alpha = if (isDark) 0.88f else 0.98f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 0.5f),
+            blurRadius = 7.0f
         )
     }
 
     val cardTitleShadow = if (cardTitleColor == Color.White) {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = if (isDark) 0.80f else 0.92f),
-            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.8f),
-            blurRadius = 4.0f
+            color = Color.Black.copy(alpha = if (isDark) 0.85f else 0.94f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 0.5f),
+            blurRadius = 7.5f
         )
     } else {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = if (isDark) 0.85f else 0.98f),
-            offset = androidx.compose.ui.geometry.Offset(0.5f, 1.5f),
-            blurRadius = 3.5f
+            color = Color.White.copy(alpha = if (isDark) 0.88f else 0.98f),
+            offset = androidx.compose.ui.geometry.Offset(0f, 0.5f),
+            blurRadius = 7.0f
         )
     }
 

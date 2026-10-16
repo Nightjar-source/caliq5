@@ -219,16 +219,25 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                 onShowMessage = { viewModel.showAlert(it) }
             )
         } else {
-        CaliqScreen(title = "درجاتي (السجل الشامل)", onBack = { viewModel.goBack() }, scrollable = false) {
+            val topSafeInset = WindowInsets.statusBars
+                .union(WindowInsets.captionBar)
+                .union(WindowInsets.displayCutout)
+                .asPaddingValues()
+                .calculateTopPadding()
+            val bottomSafeInset = WindowInsets.navigationBars
+                .asPaddingValues()
+                .calculateBottomPadding()
+
+            CaliqScreen(title = "درجاتي (السجل الشامل)", onBack = { viewModel.goBack() }, scrollable = false) {
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                 state = listGridState,
                 columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 260.dp),
                 modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                contentPadding = PaddingValues(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp, bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
+                contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 120.dp + bottomSafeInset),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                item(key = "mygrades_list_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                     Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                         FeatureExplanationCard(
                             icon = "person_add",
@@ -584,7 +593,14 @@ fun StudentEditView(
         if (isCustomClass) emptyList() else com.Nightjar.caliq5.data.ClassData.getSubjects(selectedClassName).map { it.name }
     }
 
-    val editGridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+    val topSafeInset = WindowInsets.statusBars
+        .union(WindowInsets.captionBar)
+        .union(WindowInsets.displayCutout)
+        .asPaddingValues()
+        .calculateTopPadding()
+    val bottomSafeInset = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
 
     CaliqScreen(title = if (student == null) "إضافة سجل درجاتي (السجل الشامل)" else "تعديل سجل درجاتي (السجل الشامل)", onBack = { if (hasUnsavedChanges) showUnsavedDialog = true else onCancel() }, scrollable = false) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -592,7 +608,7 @@ fun StudentEditView(
             state = editGridState,
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 260.dp),
             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp, bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()),
+            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 120.dp + bottomSafeInset),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
