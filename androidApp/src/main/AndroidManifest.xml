@@ -9,6 +9,9 @@
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.hardware.faketouch" android:required="false" />
 
+    <!-- Android XR Spatial Computing Support: allows running as a spatial panel in XR headsets -->
+    <uses-feature android:name="android.software.xr.api.spatial" android:required="false" />
+
     <!-- Googlebook OS, Samsung DeX, Tablets & Foldable Screens Support -->
     <supports-screens
         android:anyDensity="true"
@@ -63,6 +66,9 @@
             <property
                 android:name="android.window.PROPERTY_ACTIVITY_EMBEDDING_SPLITS_ENABLED"
                 android:value="true" />
+            <property
+                android:name="android.window.PROPERTY_XR_ACTIVITY_START_MODE"
+                android:value="XR_ACTIVITY_START_MODE_HOME_SPACE" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
