@@ -13,6 +13,7 @@ kotlinx-serialization = "1.8.1"
 core-splashscreen = "1.0.1"
 kotlinx-datetime = "0.6.2"
 material-kolor = "2.1.1"
+navigation3 = "1.2.0"
 
 [libraries]
 # AndroidX
@@ -36,6 +37,10 @@ material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "m
 
 # Profile Installer (Mandatory for Baseline Profiles on Android 7 to 9)
 androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version = "1.4.1" }
+
+# Navigation 3 (Official Stable Release 1.2.0 for Multiplatform & Android)
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
+androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
