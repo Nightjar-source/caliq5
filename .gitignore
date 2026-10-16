@@ -13,6 +13,7 @@
 *.bak
 *.tmp
 *.txt
+!fastlane/**/*.txt
 *.html
 old_animations.kt
 old_animations.txt

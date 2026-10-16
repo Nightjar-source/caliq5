@@ -1,0 +1,11 @@
+{
+  "name": "حاسبة الإعفاء والسعي لطلاب وطالبات العراق",
+  "short_name": "كاليك 5 (Caliq 5)",
+  "package_name": "com.Nightjar.caliq5",
+  "description": "التطبيق الشامل لحساب الإعفاء الفردي والعام، السعي السنوي، والمعدل الفصلي لطلاب وطالبات العراق.",
+  "version": "5.13.2",
+  "version_code": 51302,
+  "category": "Education",
+  "language": "ar",
+  "source_url": "https://github.com/Nightjar-source/caliq5"
+}
