@@ -190,31 +190,20 @@ fun AppearanceScreen(viewModel: AppViewModel) {
 
                         AnimatedVisibility(
                             visible = !settings.useMaterialYou,
-                            modifier = Modifier.fillMaxWidth().clipToBounds(),
+                            modifier = Modifier.fillMaxWidth(),
                             enter = expandVertically(
-                                animationSpec = androidx.compose.animation.core.tween(
-                                    durationMillis = 260,
-                                    easing = androidx.compose.animation.core.CubicBezierEasing(0.0f, 0.0f, 0.2f, 1.0f)
+                                animationSpec = androidx.compose.animation.core.spring(
+                                    dampingRatio = 0.82f,
+                                    stiffness = 420f
                                 )
-                            ) + fadeIn(animationSpec = androidx.compose.animation.core.tween(180)) + slideInVertically(
-                                initialOffsetY = { -it / 6 },
-                                animationSpec = androidx.compose.animation.core.tween(260)
-                            ),
+                            ) + fadeIn(animationSpec = androidx.compose.animation.core.tween(160)),
                             exit = shrinkVertically(
-                                animationSpec = androidx.compose.animation.core.tween(
-                                    durationMillis = 240,
-                                    easing = androidx.compose.animation.core.CubicBezierEasing(0.25f, 0.1f, 0.25f, 1.0f)
+                                animationSpec = androidx.compose.animation.core.spring(
+                                    dampingRatio = 0.85f,
+                                    stiffness = 480f
                                 ),
                                 shrinkTowards = Alignment.Top
-                            ) + fadeOut(
-                                animationSpec = androidx.compose.animation.core.tween(
-                                    durationMillis = 200,
-                                    easing = androidx.compose.animation.core.LinearEasing
-                                )
-                            ) + slideOutVertically(
-                                targetOffsetY = { -it / 6 },
-                                animationSpec = androidx.compose.animation.core.tween(240)
-                            )
+                            ) + fadeOut(animationSpec = androidx.compose.animation.core.tween(120))
                         ) {
                             Column(
                                 modifier = Modifier.fillMaxWidth().clipToBounds(),

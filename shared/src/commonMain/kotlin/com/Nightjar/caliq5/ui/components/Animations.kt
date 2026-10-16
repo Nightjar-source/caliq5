@@ -119,23 +119,23 @@ fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
     var isLoaded by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         if (index > 0) {
-            kotlinx.coroutines.delay((index.coerceAtMost(6) * 16L))
+            kotlinx.coroutines.delay((index * 42L).coerceAtMost(280L))
         }
         isLoaded = true
     }
     val animProgress by animateFloatAsState(
         targetValue = if (isLoaded) 1f else 0f,
         animationSpec = spring(
-            dampingRatio = 0.85f,
-            stiffness = Spring.StiffnessMediumLow
+            dampingRatio = 0.72f,
+            stiffness = Spring.StiffnessLow
         ),
         label = "fluidSlide_$index"
     )
     this.graphicsLayer {
         this.alpha = animProgress.coerceIn(0f, 1f)
-        this.translationY = (1f - animProgress) * 16.dp.toPx()
-        this.scaleX = 0.98f + 0.02f * animProgress
-        this.scaleY = 0.98f + 0.02f * animProgress
+        this.translationY = (1f - animProgress) * 28.dp.toPx()
+        this.scaleX = 0.95f + 0.05f * animProgress
+        this.scaleY = 0.95f + 0.05f * animProgress
         this.clip = false
     }
 }
@@ -546,15 +546,67 @@ fun Modifier.neuralExpressiveShadow(
  * - No hard/solid borders.
  */
 /**
- * 4-sided Neural Expressive ambient depth.
- * Reverted to clean no-op (Modifier = this) to remove all unwanted drop shadows and external halos.
+ * 4-sided Neural Expressive ambient elevation glow.
+ * Creates an authentic floating 3D depth underneath the capsule/card tinted with the element's OWN theme color (Tone-on-tone).
+ * When [hasSaltMotes] is true, renders organic floating salt motes around the perimeter in 360° (حبات الملح العضوية).
  */
 fun Modifier.neuralAmbientGlow(
     cornerRadius: androidx.compose.ui.unit.Dp = 28.dp,
-    elevation: androidx.compose.ui.unit.Dp = 0.dp,
+    elevation: androidx.compose.ui.unit.Dp = 6.dp,
     tintColor: androidx.compose.ui.graphics.Color? = null,
     hasSaltMotes: Boolean = false
-): Modifier = this
+): Modifier = composed {
+    val isDark = isAppInDarkTheme()
+    val themeColor = tintColor ?: MaterialTheme.colorScheme.primary
+    val baseShadowColor = if (isDark) {
+        themeColor.copy(alpha = 0.25f)
+    } else {
+        themeColor.copy(alpha = 0.20f)
+    }
+
+    this.drawBehind {
+        val rPx = cornerRadius.toPx()
+        val ePx = elevation.toPx()
+        val w = size.width
+        val h = size.height
+        if (w <= 0f || h <= 0f) return@drawBehind
+
+        val steps = 4
+        for (i in 1..steps) {
+            val spread = (i * 2.5f).dp.toPx()
+            val yOffset = (ePx * 0.40f) + (i * 1.5f).dp.toPx()
+            val alpha = (baseShadowColor.alpha / (i * 1.5f))
+            drawRoundRect(
+                color = baseShadowColor.copy(alpha = alpha),
+                topLeft = Offset(-spread * 0.35f, yOffset - spread * 0.15f),
+                size = androidx.compose.ui.geometry.Size(w + spread * 0.70f, h + spread * 0.35f),
+                cornerRadius = CornerRadius(rPx + spread * 0.45f, rPx + spread * 0.45f)
+            )
+        }
+
+        if (hasSaltMotes) {
+            val cr = rPx.coerceAtMost(minOf(w, h) / 2f)
+            val moteCount = 28
+            val moteAlpha = if (isDark) 0.55f else 0.40f
+            for (idx in 0 until moteCount) {
+                val angle = (idx.toFloat() / moteCount) * (2f * kotlin.math.PI.toFloat())
+                val cosA = kotlin.math.cos(angle)
+                val sinA = kotlin.math.sin(angle)
+                val dist = ePx * (0.25f + 0.65f * ((idx * 7) % 11) / 10f)
+                val px = if (cosA >= 0) w - cr + cosA * (cr + dist) else cr + cosA * (cr + dist)
+                val py = if (sinA >= 0) h - cr + sinA * (cr + dist) else cr + sinA * (cr + dist)
+                val pRadius = 1.0f + 0.8f * ((idx * 3) % 5) / 4f
+                val pAlpha = (moteAlpha * (0.80f + 0.20f * ((idx * 5) % 7) / 6f)).coerceIn(0.25f, 0.65f)
+
+                drawCircle(
+                    color = themeColor.copy(alpha = pAlpha),
+                    radius = pRadius,
+                    center = Offset(px, py)
+                )
+            }
+        }
+    }
+}
 
 
 /**
@@ -617,17 +669,17 @@ fun Modifier.expressive3DCurvature(
             // 1. Sea Stone Convex Volume: Top soft highlight crest fading into subtle lower theme-toned depth
             val volumeBrush = if (isDark) {
                 Brush.verticalGradient(
-                    0.0f to Color.White.copy(alpha = 0.10f),
-                    0.28f to Color.White.copy(alpha = 0.03f),
+                    0.0f to Color.White.copy(alpha = 0.28f),
+                    0.25f to themeColor.copy(alpha = 0.08f),
                     0.60f to Color.Transparent,
-                    1.0f to themeColor.copy(alpha = 0.14f)
+                    1.0f to themeColor.copy(alpha = 0.26f)
                 )
             } else {
                 Brush.verticalGradient(
-                    0.0f to Color.White.copy(alpha = 0.16f),
-                    0.28f to Color.White.copy(alpha = 0.04f),
+                    0.0f to Color.White.copy(alpha = 0.45f),
+                    0.28f to Color.White.copy(alpha = 0.12f),
                     0.60f to Color.Transparent,
-                    1.0f to themeColor.copy(alpha = 0.10f)
+                    1.0f to themeColor.copy(alpha = 0.22f)
                 )
             }
 
@@ -635,7 +687,7 @@ fun Modifier.expressive3DCurvature(
             val perimeterCurvature = Brush.radialGradient(
                 colors = listOf(
                     Color.Transparent,
-                    (if (isDark) themeColor.copy(alpha = 0.08f) else themeColor.copy(alpha = 0.06f))
+                    (if (isDark) themeColor.copy(alpha = 0.18f) else themeColor.copy(alpha = 0.14f))
                 ),
                 center = Offset(w * 0.5f, h * 0.5f),
                 radius = kotlin.math.max(w, h) * 0.70f

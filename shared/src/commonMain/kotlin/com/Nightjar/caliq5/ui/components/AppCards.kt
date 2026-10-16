@@ -256,36 +256,34 @@ fun FeatureExplanationCard(
     val bgLum = (0.2126f * effectiveBgColor.red + 0.7152f * effectiveBgColor.green + 0.0722f * effectiveBgColor.blue).coerceIn(0f, 1f)
     
     val cardTextShadow = if (cardTextColor == Color.White) {
-        val blackAlpha = (0.35f + bgLum * 0.35f).coerceIn(0.35f, 0.68f)
-        val blur = (3.5f + bgLum * 2.0f).coerceIn(3.5f, 5.5f)
+        val blackAlpha = (0.55f + bgLum * 0.30f).coerceIn(0.55f, 0.85f)
         androidx.compose.ui.graphics.Shadow(
             color = Color.Black.copy(alpha = blackAlpha),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
-            blurRadius = blur
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
+            blurRadius = 3.0f
         )
     } else {
-        val whiteAlpha = (0.45f + (1f - bgLum) * 0.35f).coerceIn(0.45f, 0.75f)
-        val blur = (3.5f + (1f - bgLum) * 2.0f).coerceIn(3.5f, 5.5f)
+        val whiteAlpha = (0.70f + (1f - bgLum) * 0.25f).coerceIn(0.70f, 0.95f)
         androidx.compose.ui.graphics.Shadow(
             color = Color.White.copy(alpha = whiteAlpha),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
-            blurRadius = blur
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.0f),
+            blurRadius = 2.5f
         )
     }
 
     val cardTitleShadow = if (cardTitleColor == Color.White) {
-        val blackAlpha = (0.35f + bgLum * 0.35f).coerceIn(0.35f, 0.68f)
+        val blackAlpha = (0.55f + bgLum * 0.30f).coerceIn(0.55f, 0.85f)
         androidx.compose.ui.graphics.Shadow(
             color = Color.Black.copy(alpha = blackAlpha),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.5f),
-            blurRadius = 4.0f
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
+            blurRadius = 3.0f
         )
     } else {
-        val whiteAlpha = (0.45f + (1f - bgLum) * 0.35f).coerceIn(0.45f, 0.75f)
+        val whiteAlpha = (0.70f + (1f - bgLum) * 0.25f).coerceIn(0.70f, 0.95f)
         androidx.compose.ui.graphics.Shadow(
             color = Color.White.copy(alpha = whiteAlpha),
-            offset = androidx.compose.ui.geometry.Offset(0f, 1.2f),
-            blurRadius = 3.5f
+            offset = androidx.compose.ui.geometry.Offset(0f, 1.0f),
+            blurRadius = 2.5f
         )
     }
 
@@ -300,6 +298,12 @@ fun FeatureExplanationCard(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
+                .neuralAmbientGlow(
+                    cornerRadius = 28.dp,
+                    elevation = 6.dp,
+                    tintColor = primaryColor,
+                    hasSaltMotes = true
+                )
                 .clip(shape)
                 .background(surfaceColor.copy(alpha = 0.20f))
                 .background(
@@ -409,6 +413,12 @@ fun MainGradeBox(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
+                .neuralAmbientGlow(
+                    cornerRadius = 28.dp,
+                    elevation = 7.dp,
+                    tintColor = gradientColors?.firstOrNull() ?: primaryColor,
+                    hasSaltMotes = true
+                )
                 .clip(boxShape)
                 .background(
                     brush = Brush.linearGradient(
@@ -528,6 +538,12 @@ fun Term2GradeBox(
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
+                .neuralAmbientGlow(
+                    cornerRadius = 28.dp,
+                    elevation = 7.dp,
+                    tintColor = actualGradient.firstOrNull() ?: primaryColor,
+                    hasSaltMotes = true
+                )
                 .clip(boxShape)
                 .background(
                     brush = Brush.linearGradient(actualGradient)

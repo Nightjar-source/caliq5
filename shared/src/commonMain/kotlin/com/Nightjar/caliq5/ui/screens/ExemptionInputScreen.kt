@@ -53,27 +53,28 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
     ) {
         val lazyGridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
         var isControlVisible by remember { mutableStateOf(true) }
-        var previousScrollOffset by remember { mutableStateOf(0) }
-        var previousFirstVisibleItem by remember { mutableStateOf(0) }
 
-        LaunchedEffect(lazyGridState.firstVisibleItemScrollOffset, lazyGridState.firstVisibleItemIndex) {
-            val currentOffset = lazyGridState.firstVisibleItemScrollOffset
-            val currentIndex = lazyGridState.firstVisibleItemIndex
-
-            if (currentIndex > previousFirstVisibleItem) {
-                isControlVisible = false
-            } else if (currentIndex < previousFirstVisibleItem) {
-                isControlVisible = true
-            } else {
-                val delta = currentOffset - previousScrollOffset
-                if (delta > 10 && currentOffset > 30) {
+        LaunchedEffect(lazyGridState) {
+            var prevIndex = 0
+            var prevOffset = 0
+            androidx.compose.runtime.snapshotFlow {
+                Pair(lazyGridState.firstVisibleItemIndex, lazyGridState.firstVisibleItemScrollOffset)
+            }.collect { (currentIndex, currentOffset) ->
+                if (currentIndex > prevIndex) {
                     isControlVisible = false
-                } else if (delta < -10 || currentOffset <= 10) {
+                } else if (currentIndex < prevIndex) {
                     isControlVisible = true
+                } else {
+                    val delta = currentOffset - prevOffset
+                    if (delta > 12 && currentOffset > 30) {
+                        isControlVisible = false
+                    } else if (delta < -12 || currentOffset <= 10) {
+                        isControlVisible = true
+                    }
                 }
+                prevOffset = currentOffset
+                prevIndex = currentIndex
             }
-            previousScrollOffset = currentOffset
-            previousFirstVisibleItem = currentIndex
         }
 
         Box(modifier = Modifier.fillMaxSize()) {

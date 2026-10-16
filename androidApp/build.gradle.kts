@@ -17,8 +17,8 @@ android {
         applicationId = "com.Nightjar.caliq5"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 51301
-        versionName = "5.13.1"
+        versionCode = 51302
+        versionName = "5.13.2"
     }
 
     packaging {
@@ -85,6 +85,7 @@ dependencies {
     implementation(project(":shared"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
+    implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation("androidx.glance:glance-appwidget:1.1.0")
     implementation("androidx.glance:glance-material3:1.1.0")
     implementation(libs.androidx.profileinstaller) // Baseline Profile installer for Android 7-9

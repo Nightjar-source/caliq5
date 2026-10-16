@@ -751,11 +751,38 @@ fun CaliqBottomNav(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(4.dp)
-                        .background(
-                            color = if (isDark) MaterialTheme.colorScheme.surface.copy(alpha = 0.38f) else Color.White.copy(alpha = 0.55f),
-                            shape = RoundedCornerShape(16.dp)
-                        )
+                        .padding(5.dp)
+                        .drawBehind {
+                            val rPx = 15.dp.toPx()
+                            val liquidBody = if (isDark) {
+                                Brush.verticalGradient(
+                                    0.0f to Color.White.copy(alpha = 0.14f),
+                                    0.40f to themePrimary.copy(alpha = 0.28f),
+                                    1.0f to themePrimary.copy(alpha = 0.40f)
+                                )
+                            } else {
+                                Brush.verticalGradient(
+                                    0.0f to Color.White.copy(alpha = 0.70f),
+                                    0.45f to themePrimary.copy(alpha = 0.18f),
+                                    1.0f to themePrimary.copy(alpha = 0.28f)
+                                )
+                            }
+                            drawRoundRect(
+                                brush = liquidBody,
+                                size = size,
+                                cornerRadius = CornerRadius(rPx, rPx)
+                            )
+                            val rimBrush = Brush.verticalGradient(
+                                0.0f to (if (isDark) Color.White.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.50f)),
+                                1.0f to themePrimary.copy(alpha = if (isDark) 0.30f else 0.24f)
+                            )
+                            drawRoundRect(
+                                brush = rimBrush,
+                                size = size,
+                                cornerRadius = CornerRadius(rPx, rPx),
+                                style = Stroke(width = 1.dp.toPx())
+                            )
+                        }
                 )
             }
             Icon(
@@ -1041,11 +1068,38 @@ fun CaliqNavigationRail(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(4.dp)
-                        .background(
-                            color = if (isDark) MaterialTheme.colorScheme.surface.copy(alpha = 0.38f) else Color.White.copy(alpha = 0.55f),
-                            shape = RoundedCornerShape(16.dp)
-                        )
+                        .padding(5.dp)
+                        .drawBehind {
+                            val rPx = 15.dp.toPx()
+                            val liquidBody = if (isDark) {
+                                Brush.verticalGradient(
+                                    0.0f to Color.White.copy(alpha = 0.14f),
+                                    0.40f to themePrimary.copy(alpha = 0.28f),
+                                    1.0f to themePrimary.copy(alpha = 0.40f)
+                                )
+                            } else {
+                                Brush.verticalGradient(
+                                    0.0f to Color.White.copy(alpha = 0.70f),
+                                    0.45f to themePrimary.copy(alpha = 0.18f),
+                                    1.0f to themePrimary.copy(alpha = 0.28f)
+                                )
+                            }
+                            drawRoundRect(
+                                brush = liquidBody,
+                                size = size,
+                                cornerRadius = CornerRadius(rPx, rPx)
+                            )
+                            val rimBrush = Brush.verticalGradient(
+                                0.0f to (if (isDark) Color.White.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.50f)),
+                                1.0f to themePrimary.copy(alpha = if (isDark) 0.30f else 0.24f)
+                            )
+                            drawRoundRect(
+                                brush = rimBrush,
+                                size = size,
+                                cornerRadius = CornerRadius(rPx, rPx),
+                                style = Stroke(width = 1.dp.toPx())
+                            )
+                        }
                 )
             }
             Icon(

@@ -417,22 +417,30 @@ fun StudentEditView(
     }
 
     var hasUnsavedChanges by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(name, selectedClassName, subjectsMap.toMap()) {
-        if (student == null) {
-            hasUnsavedChanges = name.isNotEmpty() || selectedClassName.isNotEmpty() || subjectsMap.isNotEmpty()
-        } else {
-            val originalSubjects = student.subjects
-            hasUnsavedChanges = name != student.name || selectedClassName != student.className || subjectsMap.toMap() != originalSubjects
+    LaunchedEffect(Unit) {
+        @OptIn(kotlinx.coroutines.FlowPreview::class)
+        androidx.compose.runtime.snapshotFlow {
+            val listSnapshot = subjectsList.toList()
+            Triple(name, selectedClassName, listSnapshot.hashCode())
         }
-        if (hasUnsavedChanges) {
-            kotlinx.coroutines.delay(400) // Debounce auto-draft writing to eliminate UI stutter
-            val draft = StudentEditDraft(
-                studentId = student?.id,
-                name = name,
-                className = selectedClassName,
-                subjects = subjectsList.toList()
-            )
-            com.Nightjar.caliq5.viewmodel.DataRepository.savePreference("student_edit_draft_v2", json.encodeToString(draft))
+        .kotlinx.coroutines.flow.debounce(400)
+        .collect {
+            if (student == null) {
+                hasUnsavedChanges = name.isNotEmpty() || selectedClassName.isNotEmpty() || subjectsList.isNotEmpty()
+            } else {
+                val originalSubjects = student.subjects
+                val currentMap = subjectsList.associate { it.name to it.record }
+                hasUnsavedChanges = name != student.name || selectedClassName != student.className || currentMap != originalSubjects
+            }
+            if (hasUnsavedChanges) {
+                val draft = StudentEditDraft(
+                    studentId = student?.id,
+                    name = name,
+                    className = selectedClassName,
+                    subjects = subjectsList.toList()
+                )
+                com.Nightjar.caliq5.viewmodel.DataRepository.savePreference("student_edit_draft_v2", json.encodeToString(draft))
+            }
         }
     }
 
@@ -701,22 +709,35 @@ Box(modifier = Modifier.fillMaxWidth()) {
                             )
                         }
 
+                        val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
+                        val itemShape = remember { RoundedCornerShape(14.dp) }
+                        val primaryCol = MaterialTheme.colorScheme.primary
+                        val surfaceCol = MaterialTheme.colorScheme.surface
+                        val outlineVariantCol = MaterialTheme.colorScheme.outlineVariant
+                        val unselectedBg = remember(isDark, surfaceCol) { surfaceCol.copy(alpha = if (isDark) 0.50f else 0.70f) }
+                        val unselectedBorder = remember(outlineVariantCol) { BorderStroke(0.8.dp, outlineVariantCol.copy(alpha = 0.40f)) }
+                        val selectedTextColor = remember(primaryCol) {
+                            primaryCol.contrastingTextColor(darkText = Color(0xFF0F172A), lightText = Color.White)
+                        }
+                        val unselectedTextColor = if (isDark) Color.White else Color(0xFF0F172A)
+
                         // Connected Accordion Dropdown
                         androidx.compose.animation.AnimatedVisibility(
                             visible = expandedClassSelect,
                             enter = androidx.compose.animation.expandVertically(
                                 animationSpec = androidx.compose.animation.core.spring(
-                                    dampingRatio = 0.85f,
-                                    stiffness = 450f
+                                    dampingRatio = 0.82f,
+                                    stiffness = 420f
                                 )
                             ) + androidx.compose.animation.fadeIn(
-                                animationSpec = androidx.compose.animation.core.tween(150)
+                                animationSpec = androidx.compose.animation.core.tween(160)
                             ),
                             exit = androidx.compose.animation.shrinkVertically(
                                 animationSpec = androidx.compose.animation.core.spring(
-                                    dampingRatio = 0.90f,
-                                    stiffness = 500f
-                                )
+                                    dampingRatio = 0.85f,
+                                    stiffness = 480f
+                                ),
+                                shrinkTowards = Alignment.Top
                             ) + androidx.compose.animation.fadeOut(
                                 animationSpec = androidx.compose.animation.core.tween(120)
                             )
@@ -732,17 +753,6 @@ Box(modifier = Modifier.fillMaxWidth()) {
                                     thickness = 0.8.dp,
                                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
                                 )
-                                val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-                                val itemShape = remember { RoundedCornerShape(14.dp) }
-                                val primaryCol = MaterialTheme.colorScheme.primary
-                                val surfaceCol = MaterialTheme.colorScheme.surface
-                                val outlineVariantCol = MaterialTheme.colorScheme.outlineVariant
-                                val unselectedBg = surfaceCol.copy(alpha = if (isDark) 0.50f else 0.70f)
-                                val unselectedBorder = BorderStroke(0.8.dp, outlineVariantCol.copy(alpha = 0.40f))
-                                val selectedTextColor = remember(primaryCol) {
-                                    primaryCol.contrastingTextColor(darkText = Color(0xFF0F172A), lightText = Color.White)
-                                }
-                                val unselectedTextColor = if (isDark) Color.White else Color(0xFF0F172A)
 
                                 classList.forEach { cls ->
                                     val isSelectedClass = cls == selectedClassName

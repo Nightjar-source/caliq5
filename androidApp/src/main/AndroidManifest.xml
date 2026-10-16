@@ -27,6 +27,11 @@
 
         <meta-data android:name="com.samsung.android.keepalive.density" android:value="true" />
         <meta-data android:name="android.supports_size_changes" android:value="true" />
+        <meta-data android:name="android.allow_multiple_resumed_activities" android:value="true" />
+        <meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />
+        <meta-data android:name="com.sec.android.multiwindow.activity.STYLE" android:value="fullscreen|freeform|split" />
+        <meta-data android:name="com.samsung.android.sdk.multiwindow.enable" android:value="true" />
+        <meta-data android:name="miui.freeform.support" android:value="true" />
         
         <activity
             android:name=".MainActivity"
@@ -40,12 +45,15 @@
             <layout
                 android:defaultWidth="600dp"
                 android:defaultHeight="820dp"
-                android:minWidth="320dp"
-                android:minHeight="480dp"
+                android:minWidth="280dp"
+                android:minHeight="320dp"
                 android:gravity="center" />
 
             <property
                 android:name="android.window.PROPERTY_FREEFORM_WINDOW_MANAGEMENT"
+                android:value="true" />
+            <property
+                android:name="android.window.PROPERTY_SUPPORT_MULTI_WINDOW_MODE"
                 android:value="true" />
             <property
                 android:name="android.window.PROPERTY_ACTIVITY_EMBEDDING_SPLITS_ENABLED"
