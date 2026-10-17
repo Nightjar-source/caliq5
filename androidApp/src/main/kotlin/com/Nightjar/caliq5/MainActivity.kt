@@ -96,15 +96,6 @@ class MainActivity : ComponentActivity() {
         outState.putString("savedDeepLinkUri", deepLinkUri.value)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isFinishing) {
-            try {
-                CaliqCleanupService.purgeAppCache(applicationContext)
-            } catch (_: Throwable) {}
-        }
-    }
-
     /**
      * AI Agent & Digital Assistant Semantic Knowledge Provider (Android Assist API / Gemini Nano).
      * Provides structured Schema.org JSON-LD and canonical deep links to digital assistants
@@ -164,7 +155,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Proactively purge transient cache on exit so cache never accumulates
-        com.Nightjar.caliq5.utils.MemoryManager.deepPurgeMemory(this)
+        try {
+            CaliqCleanupService.purgeAppCache(applicationContext)
+            com.Nightjar.caliq5.utils.MemoryManager.deepPurgeMemory(this)
+        } catch (_: Throwable) {}
     }
 }
