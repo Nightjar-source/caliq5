@@ -539,9 +539,15 @@ fun CaliqBottomNav(
 
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val themePrimary = MaterialTheme.colorScheme.primary
-    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
     val barHeight = 54.dp
     val squircleSize = 48.dp
+
+    // Neutral flat liquid indicator color (Material 3 Expressive flat pill that never clashes with icons or bar)
+    val indicatorColor = if (isDark) {
+        Color(0xFF334155).copy(alpha = 0.88f)
+    } else {
+        Color(0xFFE2E8F0).copy(alpha = 0.94f)
+    }
 
     Row(
         modifier = modifier
@@ -551,7 +557,7 @@ fun CaliqBottomNav(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 1. الكبسولة العضوية الحبيبية الرئيسية (تحتوي على التبويبات الـ 4 مع مؤشر زجاجي سائل)
+        // 1. الكبسولة العضوية الحبيبية الرئيسية الشفافة (Original 25% frosted glass from backup)
         BoxWithConstraints(
             modifier = Modifier
                 .weight(1f)
@@ -562,15 +568,17 @@ fun CaliqBottomNav(
             val tabWidth = totalWidth / 4f
             val tabWidthPx = with(LocalDensity.current) { tabWidth.toPx() }
             val pillWidth = (tabWidth - 6.dp).coerceAtMost(62.dp)
-            val innerPillHeight = 44.dp
+            val innerPillHeight = 42.dp
 
             var dragOffset by remember { mutableStateOf<Float?>(null) }
-            var localSelectedIndex by remember { mutableStateOf(selectedIndex) }
-            var lastValidIndex by remember { mutableStateOf(if (selectedIndex in 0..3) selectedIndex else 0) }
-            LaunchedEffect(selectedIndex) {
-                localSelectedIndex = selectedIndex
-                if (selectedIndex in 0..3) lastValidIndex = selectedIndex
+            val displayIndex = if (dragOffset != null) {
+                ((dragOffset!! / tabWidthPx).toInt()).coerceIn(0, 3)
+            } else if (selectedIndex in 0..3) {
+                selectedIndex
+            } else {
+                0
             }
+
             val layoutDirection = LocalLayoutDirection.current
             val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
 
@@ -580,30 +588,30 @@ fun CaliqBottomNav(
                 val maxX = (tabWidth * 3) + (tabWidth - pillWidth) / 2f
                 offsetDp.coerceIn(minX, maxX)
             } else {
-                (tabWidth * lastValidIndex) + (tabWidth - pillWidth) / 2f
+                (tabWidth * displayIndex) + (tabWidth - pillWidth) / 2f
             }
 
-            // Authentic liquid spring physics: soft, organic, elastic fluidity like mercury/water
+            // Authentic M3 Expressive liquid fluid spring motion (zero vertical squash, purely horizontal)
             val animX by animateDpAsState(
                 targetValue = targetX,
                 animationSpec = spring(
-                    dampingRatio = 0.60f, // Liquid fluid elasticity
-                    stiffness = 220f      // Soft fluid movement following finger seamlessly
+                    dampingRatio = 0.65f, // Liquid fluid elasticity
+                    stiffness = 300f      // Responsive fluid movement
                 ),
                 label = "bottom_nav_pill_x"
             )
 
             val animScale by animateFloatAsState(
-                targetValue = if ((localSelectedIndex in 0..3) || dragOffset != null) 1f else 0f,
-                animationSpec = spring(dampingRatio = 0.60f, stiffness = 260f),
+                targetValue = if (selectedIndex in 0..3 || dragOffset != null) 1f else 0f,
+                animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
                 label = "bottom_nav_pill_scale"
             )
 
-            // Liquid horizontal stretch during lateral velocity
+            // Liquid horizontal expansion while traveling (تمدد سائل مسطح أفقي بدون أي انكماش عمودي)
             val moveDeltaX = kotlin.math.abs(animX.value - targetX.value)
-            val maxNormX = tabWidth.value.coerceAtLeast(1f)
-            val velocityRatio = (moveDeltaX / maxNormX).coerceIn(0f, 1f)
-            val stretchFactorX = 1f + (velocityRatio * 0.16f)
+            val stretchX = (moveDeltaX * 0.16f).coerceAtMost(10.dp)
+            val dynamicPillWidth = pillWidth + stretchX
+            val dynamicPillX = animX - (stretchX / 2f)
 
             val navShape = CircleShape
 
@@ -613,46 +621,24 @@ fun CaliqBottomNav(
                     .frostedOrganicCapsule(
                         shape = navShape,
                         cornerRadius = 32.dp,
-                        tintColor = MaterialTheme.colorScheme.primary,
-                        alpha = 0.80f
+                        tintColor = themePrimary,
+                        alpha = 0.25f
                     )
             ) {
-                if ((localSelectedIndex in 0..3) || dragOffset != null) {
+                if (selectedIndex in 0..3 || dragOffset != null) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
-                            .offset(x = animX)
-                            .size(width = pillWidth, height = innerPillHeight)
+                            .offset(x = dynamicPillX)
+                            .size(width = dynamicPillWidth, height = innerPillHeight)
                             .graphicsLayer {
-                                scaleX = stretchFactorX.coerceIn(1f, 1.25f)
-                                scaleY = 1f
                                 alpha = animScale.coerceIn(0f, 1f)
                                 clip = false
                             }
                             .background(
-                                color = if (isDark) {
-                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.38f)
-                                } else {
-                                    Color.White.copy(alpha = 0.55f)
-                                },
-                                shape = RoundedCornerShape(24.dp)
+                                color = indicatorColor,
+                                shape = RoundedCornerShape(22.dp)
                             )
-                            .drawWithCache {
-                                val rPx = 24.dp.toPx()
-                                val indicatorSheen = Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = if (isDark) 0.20f else 0.40f),
-                                    0.45f to Color.Transparent,
-                                    1.0f to (if (isDark) themePrimary.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.25f))
-                                )
-                                onDrawWithContent {
-                                    drawContent()
-                                    drawRoundRect(
-                                        brush = indicatorSheen,
-                                        size = size,
-                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx)
-                                    )
-                                }
-                            }
                     )
                 }
             }
@@ -673,8 +659,6 @@ fun CaliqBottomNav(
                                     } else {
                                         if (dragOffset != null) {
                                             val idx = (dragOffset!! / tabWidthPx).toInt().coerceIn(0, 3)
-                                            localSelectedIndex = idx
-                                            lastValidIndex = idx
                                             onScreenSelected(bottomNavItems[idx].screen)
                                             dragOffset = null
                                         }
@@ -704,16 +688,32 @@ fun CaliqBottomNav(
             }
         }
 
-        // 2. زر القائمة المربع المنفصل الزجاجي العضوي المطابق للصورة تماماً (Companion Floating Action Squircle)
+        // 2. زر القائمة المربع المنفصل الزجاجي العضوي (Companion Floating Action Squircle)
         val fabShape = RoundedCornerShape(18.dp)
+        val isFabActive = isMenuOpen || showSideMenuPill(currentScreen)
+        val fabIndicatorScale by animateFloatAsState(
+            targetValue = if (isFabActive) 1f else 0f,
+            animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
+            label = "fab_indicator_scale"
+        )
+        val fabIconColor by animateColorAsState(
+            targetValue = if (isFabActive) {
+                themePrimary
+            } else {
+                if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1E293B).copy(alpha = 0.85f)
+            },
+            animationSpec = tween(200),
+            label = "fab_icon_color"
+        )
+
         Box(
             modifier = Modifier
                 .size(squircleSize)
                 .frostedOrganicCapsule(
                     shape = fabShape,
                     cornerRadius = 18.dp,
-                    tintColor = MaterialTheme.colorScheme.primary,
-                    alpha = 0.80f
+                    tintColor = themePrimary,
+                    alpha = 0.25f
                 )
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -722,42 +722,26 @@ fun CaliqBottomNav(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            if (isMenuOpen || showSideMenuPill(currentScreen)) {
+            if (fabIndicatorScale > 0.01f) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(4.dp)
-                        .drawBehind {
-                            val rPx = 14.dp.toPx()
-                            val liquidBody = if (isDark) {
-                                Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.25f),
-                                    0.35f to surfaceVariant.copy(alpha = 0.60f),
-                                    1.0f to themePrimary.copy(alpha = 0.30f)
-                                )
-                            } else {
-                                Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.90f),
-                                    0.45f to Color.White.copy(alpha = 0.72f),
-                                    1.0f to themePrimary.copy(alpha = 0.16f)
-                                )
-                            }
-                            drawRoundRect(
-                                brush = liquidBody,
-                                size = size,
-                                cornerRadius = CornerRadius(rPx, rPx)
-                            )
+                        .graphicsLayer {
+                            alpha = fabIndicatorScale
+                            scaleX = 0.85f + 0.15f * fabIndicatorScale
+                            scaleY = 0.85f + 0.15f * fabIndicatorScale
                         }
+                        .background(
+                            color = indicatorColor,
+                            shape = RoundedCornerShape(14.dp)
+                        )
                 )
             }
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "القائمة",
-                tint = if (isMenuOpen || showSideMenuPill(currentScreen)) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    if (isDark) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant
-                },
+                tint = fabIconColor,
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -830,8 +814,14 @@ fun CaliqNavigationRail(
 
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val themePrimary = MaterialTheme.colorScheme.primary
-    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
     val railWidth = 64.dp
+
+    // Neutral flat liquid indicator color (Material 3 Expressive flat pill that never clashes with icons or bar)
+    val indicatorColor = if (isDark) {
+        Color(0xFF334155).copy(alpha = 0.88f)
+    } else {
+        Color(0xFFE2E8F0).copy(alpha = 0.94f)
+    }
 
     Column(
         modifier = modifier
@@ -852,43 +842,47 @@ fun CaliqNavigationRail(
             val totalHeight = maxHeight
             val tabHeight = totalHeight / 4f
             val tabHeightPx = with(LocalDensity.current) { tabHeight.toPx() }
-            val pillWidth = 54.dp
+            val pillWidth = 52.dp
             val pillHeight = (tabHeight - 6.dp).coerceAtMost(56.dp)
 
             var dragOffset by remember { mutableStateOf<Float?>(null) }
-            var localSelectedIndex by remember { mutableStateOf(selectedIndex) }
-            var lastValidIndex by remember { mutableStateOf(if (selectedIndex in 0..3) selectedIndex else 0) }
-            LaunchedEffect(selectedIndex) {
-                localSelectedIndex = selectedIndex
-                if (selectedIndex in 0..3) lastValidIndex = selectedIndex
+            val displayIndex = if (dragOffset != null) {
+                ((dragOffset!! / tabHeightPx).toInt()).coerceIn(0, 3)
+            } else if (selectedIndex in 0..3) {
+                selectedIndex
+            } else {
+                0
             }
 
             val targetY = if (dragOffset != null) {
-                with(LocalDensity.current) { (dragOffset!! - (pillHeight.toPx() / 2f)).toDp() }
+                val offsetDp = with(LocalDensity.current) { (dragOffset!! - (pillHeight.toPx() / 2f)).toDp() }
+                val minY = (tabHeight - pillHeight) / 2f
+                val maxY = (tabHeight * 3) + (tabHeight - pillHeight) / 2f
+                offsetDp.coerceIn(minY, maxY)
             } else {
-                (tabHeight * lastValidIndex) + (tabHeight - pillHeight) / 2f
+                (tabHeight * displayIndex) + (tabHeight - pillHeight) / 2f
             }
 
             val animY by animateDpAsState(
                 targetValue = targetY,
                 animationSpec = spring(
-                    dampingRatio = 0.60f, // Liquid fluid elasticity
-                    stiffness = 220f      // Soft fluid movement following finger seamlessly
+                    dampingRatio = 0.65f,
+                    stiffness = 300f
                 ),
                 label = "rail_pill_y"
             )
 
             val animScale by animateFloatAsState(
-                targetValue = if ((localSelectedIndex in 0..3) || dragOffset != null) 1f else 0f,
-                animationSpec = spring(dampingRatio = 0.60f, stiffness = 260f),
+                targetValue = if (selectedIndex in 0..3 || dragOffset != null) 1f else 0f,
+                animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
                 label = "rail_pill_scale"
             )
 
-            // Liquid vertical stretch during vertical velocity
+            // Liquid vertical expansion while traveling (تمدد سائل مسطح عمودي بدون أي انكماش أفقي)
             val moveDeltaY = kotlin.math.abs(animY.value - targetY.value)
-            val maxNormY = tabHeight.value.coerceAtLeast(1f)
-            val velocityRatioY = (moveDeltaY / maxNormY).coerceIn(0f, 1f)
-            val stretchFactorY = 1f + (velocityRatioY * 0.16f)
+            val stretchY = (moveDeltaY * 0.16f).coerceAtMost(10.dp)
+            val dynamicPillHeight = pillHeight + stretchY
+            val dynamicPillY = animY - (stretchY / 2f)
 
             val railShape = RoundedCornerShape(32.dp)
 
@@ -898,46 +892,24 @@ fun CaliqNavigationRail(
                     .frostedOrganicCapsule(
                         shape = railShape,
                         cornerRadius = 32.dp,
-                        tintColor = MaterialTheme.colorScheme.primary,
-                        alpha = 0.80f
+                        tintColor = themePrimary,
+                        alpha = 0.25f
                     )
             ) {
-                if ((localSelectedIndex in 0..3) || dragOffset != null) {
+                if (selectedIndex in 0..3 || dragOffset != null) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
-                            .offset(y = animY)
-                            .size(width = pillWidth, height = pillHeight)
+                            .offset(y = dynamicPillY)
+                            .size(width = pillWidth, height = dynamicPillHeight)
                             .graphicsLayer {
-                                scaleX = 1f
-                                scaleY = stretchFactorY.coerceIn(1f, 1.25f)
                                 alpha = animScale.coerceIn(0f, 1f)
                                 clip = false
                             }
                             .background(
-                                color = if (isDark) {
-                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.38f)
-                                } else {
-                                    Color.White.copy(alpha = 0.55f)
-                                },
-                                shape = RoundedCornerShape(24.dp)
+                                color = indicatorColor,
+                                shape = RoundedCornerShape(22.dp)
                             )
-                            .drawWithCache {
-                                val rPx = 24.dp.toPx()
-                                val indicatorSheen = Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = if (isDark) 0.20f else 0.40f),
-                                    0.45f to Color.Transparent,
-                                    1.0f to (if (isDark) themePrimary.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.25f))
-                                )
-                                onDrawWithContent {
-                                    drawContent()
-                                    drawRoundRect(
-                                        brush = indicatorSheen,
-                                        size = size,
-                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx)
-                                    )
-                                }
-                            }
                     )
                 }
             }
@@ -957,8 +929,6 @@ fun CaliqNavigationRail(
                                     } else {
                                         if (dragOffset != null) {
                                             val idx = (dragOffset!! / tabHeightPx).toInt().coerceIn(0, 3)
-                                            localSelectedIndex = idx
-                                            lastValidIndex = idx
                                             onScreenSelected(bottomNavItems[idx].screen)
                                             dragOffset = null
                                         }
@@ -977,7 +947,12 @@ fun CaliqNavigationRail(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
+                            .weight(1f)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { onScreenSelected(item.screen) }
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         CaliqNavItem(
@@ -992,14 +967,30 @@ fun CaliqNavigationRail(
         // 2. زر القائمة المربع المنفصل الزجاجي العضوي المطابق للصورة تماماً (Floating Action Squircle)
         val fabShape = RoundedCornerShape(18.dp)
         val railSquircleSize = 50.dp
+        val isFabActive = isMenuOpen || showSideMenuPill(currentScreen)
+        val fabIndicatorScale by animateFloatAsState(
+            targetValue = if (isFabActive) 1f else 0f,
+            animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
+            label = "rail_fab_indicator_scale"
+        )
+        val fabIconColor by animateColorAsState(
+            targetValue = if (isFabActive) {
+                themePrimary
+            } else {
+                if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1E293B).copy(alpha = 0.85f)
+            },
+            animationSpec = tween(200),
+            label = "rail_fab_icon_color"
+        )
+
         Box(
             modifier = Modifier
                 .size(railSquircleSize)
                 .frostedOrganicCapsule(
                     shape = fabShape,
                     cornerRadius = 18.dp,
-                    tintColor = MaterialTheme.colorScheme.primary,
-                    alpha = 0.80f
+                    tintColor = themePrimary,
+                    alpha = 0.25f
                 )
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -1008,42 +999,26 @@ fun CaliqNavigationRail(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            if (isMenuOpen || showSideMenuPill(currentScreen)) {
+            if (fabIndicatorScale > 0.01f) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(4.dp)
-                        .drawBehind {
-                            val rPx = 14.dp.toPx()
-                            val liquidBody = if (isDark) {
-                                Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.25f),
-                                    0.35f to surfaceVariant.copy(alpha = 0.60f),
-                                    1.0f to themePrimary.copy(alpha = 0.30f)
-                                )
-                            } else {
-                                Brush.verticalGradient(
-                                    0.0f to Color.White.copy(alpha = 0.90f),
-                                    0.45f to Color.White.copy(alpha = 0.72f),
-                                    1.0f to themePrimary.copy(alpha = 0.16f)
-                                )
-                            }
-                            drawRoundRect(
-                                brush = liquidBody,
-                                size = size,
-                                cornerRadius = CornerRadius(rPx, rPx)
-                            )
+                        .graphicsLayer {
+                            alpha = fabIndicatorScale
+                            scaleX = 0.85f + 0.15f * fabIndicatorScale
+                            scaleY = 0.85f + 0.15f * fabIndicatorScale
                         }
+                        .background(
+                            color = indicatorColor,
+                            shape = RoundedCornerShape(14.dp)
+                        )
                 )
             }
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "القائمة",
-                tint = if (isMenuOpen || showSideMenuPill(currentScreen)) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    if (isDark) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant
-                },
+                tint = fabIconColor,
                 modifier = Modifier.size(24.dp)
             )
         }

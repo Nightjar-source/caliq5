@@ -213,20 +213,20 @@ fun FeatureExplanationCard(
     val shape = RoundedCornerShape(28.dp)
     val isRtl = androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
 
-    // Smooth theme color gradient from 95% down to 10%
+    // Smooth theme color gradient strictly from 90% down to 10%
     val gradientColors = if (isRtl) {
         listOf(
-            primaryColor.copy(alpha = if (isDark) 0.15f else 0.10f),
-            primaryColor.copy(alpha = if (isDark) 0.38f else 0.45f),
-            primaryColor.copy(alpha = if (isDark) 0.68f else 0.75f),
-            primaryColor.copy(alpha = 0.95f)
+            primaryColor.copy(alpha = if (isDark) 0.12f else 0.10f),
+            primaryColor.copy(alpha = if (isDark) 0.45f else 0.40f),
+            primaryColor.copy(alpha = if (isDark) 0.72f else 0.70f),
+            primaryColor.copy(alpha = if (isDark) 0.90f else 0.90f)
         )
     } else {
         listOf(
-            primaryColor.copy(alpha = 0.95f),
-            primaryColor.copy(alpha = if (isDark) 0.68f else 0.75f),
-            primaryColor.copy(alpha = if (isDark) 0.38f else 0.45f),
-            primaryColor.copy(alpha = if (isDark) 0.15f else 0.10f)
+            primaryColor.copy(alpha = if (isDark) 0.90f else 0.90f),
+            primaryColor.copy(alpha = if (isDark) 0.72f else 0.70f),
+            primaryColor.copy(alpha = if (isDark) 0.45f else 0.40f),
+            primaryColor.copy(alpha = if (isDark) 0.12f else 0.10f)
         )
     }
 
@@ -246,32 +246,32 @@ fun FeatureExplanationCard(
     )
     val cardTitleColor = if (cardTextColor == Color.White) Color.White else Color(0xFF0F172A)
 
-    // Deep diffused Gaussian blur aura shadow without character repetition (ظل ضبابي كالهالة يبرز النص بنقاء بدون تكرار الحروف)
+    // 100% diffused Gaussian aura shadow strictly opposite of text color with Zero offset (ظل ضبابي 100% بدون أي تكرار للحرف)
     val cardTextShadow = if (cardTextColor == Color.White) {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = if (isDark) 0.90f else 0.95f),
+            color = Color.Black,
             offset = androidx.compose.ui.geometry.Offset.Zero,
-            blurRadius = 16f
+            blurRadius = 24f
         )
     } else {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = if (isDark) 0.90f else 0.98f),
+            color = Color.White,
             offset = androidx.compose.ui.geometry.Offset.Zero,
-            blurRadius = 15f
+            blurRadius = 24f
         )
     }
 
     val cardTitleShadow = if (cardTitleColor == Color.White) {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = if (isDark) 0.90f else 0.95f),
+            color = Color.Black,
             offset = androidx.compose.ui.geometry.Offset.Zero,
-            blurRadius = 16f
+            blurRadius = 24f
         )
     } else {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = if (isDark) 0.90f else 0.98f),
+            color = Color.White,
             offset = androidx.compose.ui.geometry.Offset.Zero,
-            blurRadius = 15f
+            blurRadius = 24f
         )
     }
 
