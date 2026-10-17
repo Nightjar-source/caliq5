@@ -599,12 +599,11 @@ fun CaliqBottomNav(
                 label = "bottom_nav_pill_scale"
             )
 
-            // Volume-conserving liquid squash and stretch during lateral velocity
+            // Liquid horizontal stretch during lateral velocity
             val moveDeltaX = kotlin.math.abs(animX.value - targetX.value)
             val maxNormX = tabWidth.value.coerceAtLeast(1f)
             val velocityRatio = (moveDeltaX / maxNormX).coerceIn(0f, 1f)
-            val stretchFactorX = 1f + (velocityRatio * 0.22f)
-            val squashFactorY = 1f - (velocityRatio * 0.08f)
+            val stretchFactorX = 1f + (velocityRatio * 0.16f)
 
             val navShape = CircleShape
 
@@ -625,32 +624,34 @@ fun CaliqBottomNav(
                             .offset(x = animX)
                             .size(width = pillWidth, height = innerPillHeight)
                             .graphicsLayer {
-                                scaleX = stretchFactorX.coerceIn(1f, 1.42f)
-                                scaleY = (1f - ((stretchFactorX - 1f) * 0.65f)).coerceIn(0.72f, 1f)
+                                scaleX = stretchFactorX.coerceIn(1f, 1.25f)
+                                scaleY = 1f
                                 alpha = animScale.coerceIn(0f, 1f)
                                 clip = false
                             }
-                            .drawBehind {
-                                val rPx = size.height / 2f
-                                // 1. Liquid droplet body: distinct frosted glass droplet that lets active icons pop
-                                val liquidBody = if (isDark) {
-                                    Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.25f),
-                                        0.35f to surfaceVariant.copy(alpha = 0.60f),
-                                        1.0f to themePrimary.copy(alpha = 0.30f)
-                                    )
+                            .background(
+                                color = if (isDark) {
+                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.38f)
                                 } else {
-                                    Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.90f),
-                                        0.45f to Color.White.copy(alpha = 0.72f),
-                                        1.0f to themePrimary.copy(alpha = 0.16f)
+                                    Color.White.copy(alpha = 0.55f)
+                                },
+                                shape = RoundedCornerShape(24.dp)
+                            )
+                            .drawWithCache {
+                                val rPx = 24.dp.toPx()
+                                val indicatorSheen = Brush.verticalGradient(
+                                    0.0f to Color.White.copy(alpha = if (isDark) 0.20f else 0.40f),
+                                    0.45f to Color.Transparent,
+                                    1.0f to (if (isDark) themePrimary.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.25f))
+                                )
+                                onDrawWithContent {
+                                    drawContent()
+                                    drawRoundRect(
+                                        brush = indicatorSheen,
+                                        size = size,
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx)
                                     )
                                 }
-                                drawRoundRect(
-                                    brush = liquidBody,
-                                    size = size,
-                                    cornerRadius = CornerRadius(rPx, rPx)
-                                )
                             }
                     )
                 }
@@ -883,12 +884,11 @@ fun CaliqNavigationRail(
                 label = "rail_pill_scale"
             )
 
-            // Volume-conserving liquid squash and stretch during vertical velocity
+            // Liquid vertical stretch during vertical velocity
             val moveDeltaY = kotlin.math.abs(animY.value - targetY.value)
             val maxNormY = tabHeight.value.coerceAtLeast(1f)
             val velocityRatioY = (moveDeltaY / maxNormY).coerceIn(0f, 1f)
-            val stretchFactorY = 1f + (velocityRatioY * 0.22f)
-            val squashFactorX = 1f - (velocityRatioY * 0.08f)
+            val stretchFactorY = 1f + (velocityRatioY * 0.16f)
 
             val railShape = RoundedCornerShape(32.dp)
 
@@ -909,32 +909,34 @@ fun CaliqNavigationRail(
                             .offset(y = animY)
                             .size(width = pillWidth, height = pillHeight)
                             .graphicsLayer {
-                                scaleX = (1f - ((stretchFactorY - 1f) * 0.65f)).coerceIn(0.72f, 1f)
-                                scaleY = stretchFactorY.coerceIn(1f, 1.42f)
+                                scaleX = 1f
+                                scaleY = stretchFactorY.coerceIn(1f, 1.25f)
                                 alpha = animScale.coerceIn(0f, 1f)
                                 clip = false
                             }
-                            .drawBehind {
-                                val rPx = size.width / 2f
-                                // 1. Liquid droplet body: distinct frosted glass droplet that lets active icons pop
-                                val liquidBody = if (isDark) {
-                                    Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.25f),
-                                        0.35f to surfaceVariant.copy(alpha = 0.60f),
-                                        1.0f to themePrimary.copy(alpha = 0.30f)
-                                    )
+                            .background(
+                                color = if (isDark) {
+                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.38f)
                                 } else {
-                                    Brush.verticalGradient(
-                                        0.0f to Color.White.copy(alpha = 0.90f),
-                                        0.45f to Color.White.copy(alpha = 0.72f),
-                                        1.0f to themePrimary.copy(alpha = 0.16f)
+                                    Color.White.copy(alpha = 0.55f)
+                                },
+                                shape = RoundedCornerShape(24.dp)
+                            )
+                            .drawWithCache {
+                                val rPx = 24.dp.toPx()
+                                val indicatorSheen = Brush.verticalGradient(
+                                    0.0f to Color.White.copy(alpha = if (isDark) 0.20f else 0.40f),
+                                    0.45f to Color.Transparent,
+                                    1.0f to (if (isDark) themePrimary.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.25f))
+                                )
+                                onDrawWithContent {
+                                    drawContent()
+                                    drawRoundRect(
+                                        brush = indicatorSheen,
+                                        size = size,
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(rPx, rPx)
                                     )
                                 }
-                                drawRoundRect(
-                                    brush = liquidBody,
-                                    size = size,
-                                    cornerRadius = CornerRadius(rPx, rPx)
-                                )
                             }
                     )
                 }

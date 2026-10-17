@@ -51,11 +51,17 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|density|uiMode|keyboard|navigation|layoutDirection">
             
             <layout
-                android:defaultWidth="600dp"
-                android:defaultHeight="820dp"
-                android:minWidth="280dp"
-                android:minHeight="320dp"
+                android:defaultWidth="320dp"
+                android:defaultHeight="480dp"
+                android:minWidth="100dp"
+                android:minHeight="100dp"
                 android:gravity="center" />
+
+            <!-- Samsung One UI, Xiaomi HyperOS/MIUI & Android Multi-Window and Freeform Pop-up Window Support -->
+            <meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />
+            <meta-data android:name="com.sec.android.multiwindow.activity.STYLE" android:value="fullscreen|freeform|split" />
+            <meta-data android:name="com.samsung.android.sdk.multiwindow.enable" android:value="true" />
+            <meta-data android:name="miui.freeform.support" android:value="true" />
 
             <property
                 android:name="android.window.PROPERTY_FREEFORM_WINDOW_MANAGEMENT"

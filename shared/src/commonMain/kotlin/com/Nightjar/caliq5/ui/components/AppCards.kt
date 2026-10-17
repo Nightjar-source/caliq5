@@ -136,7 +136,6 @@ fun ResultCard(
                         }
                     )
                 )
-                .expressive3DCurvature(cornerRadius = 28.dp, shape = cardShape, tintColor = primaryContainer)
         ) {
         CompositionLocalProvider(LocalContentColor provides textColor) {
             Column(
@@ -247,32 +246,32 @@ fun FeatureExplanationCard(
     )
     val cardTitleColor = if (cardTextColor == Color.White) Color.White else Color(0xFF0F172A)
 
-    // Zero-offset diffused Gaussian aura shadow (ضبابية ناعمة كالهالة تمنع تكرار الحروف وتبرز النص بحدة تامة)
+    // Deep diffused Gaussian blur aura shadow without character repetition (ظل ضبابي كالهالة يبرز النص بنقاء بدون تكرار الحروف)
     val cardTextShadow = if (cardTextColor == Color.White) {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = if (isDark) 0.85f else 0.94f),
-            offset = androidx.compose.ui.geometry.Offset(0f, 0.5f),
-            blurRadius = 7.5f
+            color = Color.Black.copy(alpha = if (isDark) 0.90f else 0.95f),
+            offset = androidx.compose.ui.geometry.Offset.Zero,
+            blurRadius = 16f
         )
     } else {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = if (isDark) 0.88f else 0.98f),
-            offset = androidx.compose.ui.geometry.Offset(0f, 0.5f),
-            blurRadius = 7.0f
+            color = Color.White.copy(alpha = if (isDark) 0.90f else 0.98f),
+            offset = androidx.compose.ui.geometry.Offset.Zero,
+            blurRadius = 15f
         )
     }
 
     val cardTitleShadow = if (cardTitleColor == Color.White) {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.Black.copy(alpha = if (isDark) 0.85f else 0.94f),
-            offset = androidx.compose.ui.geometry.Offset(0f, 0.5f),
-            blurRadius = 7.5f
+            color = Color.Black.copy(alpha = if (isDark) 0.90f else 0.95f),
+            offset = androidx.compose.ui.geometry.Offset.Zero,
+            blurRadius = 16f
         )
     } else {
         androidx.compose.ui.graphics.Shadow(
-            color = Color.White.copy(alpha = if (isDark) 0.88f else 0.98f),
-            offset = androidx.compose.ui.geometry.Offset(0f, 0.5f),
-            blurRadius = 7.0f
+            color = Color.White.copy(alpha = if (isDark) 0.90f else 0.98f),
+            offset = androidx.compose.ui.geometry.Offset.Zero,
+            blurRadius = 15f
         )
     }
 

@@ -34,12 +34,18 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
 
     // Disable default CaliqScreen scroll so we can use LazyColumn for smooth item animations
     CaliqScreen(title = "حاسبة الفصلي", onBack = { viewModel.goBack() }, scrollable = false) {
+        val topSafeInset = WindowInsets.statusBars
+            .union(WindowInsets.captionBar)
+            .union(WindowInsets.displayCutout)
+            .asPaddingValues()
+            .calculateTopPadding()
+        val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = gridState,
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
-            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
-            contentPadding = PaddingValues(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 90.dp, bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), start = 4.dp, end = 4.dp),
+            modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 12.dp),
+            contentPadding = PaddingValues(top = topSafeInset + 90.dp, bottom = 120.dp + bottomNavPadding, start = 4.dp, end = 4.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {

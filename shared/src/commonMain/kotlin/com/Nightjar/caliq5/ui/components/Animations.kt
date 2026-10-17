@@ -116,10 +116,10 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
  * Replays smoothly on every navigation with an elegant, moist (Fluid) spring motion.
  */
 fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
-    var isLoaded by remember { mutableStateOf(false) }
+    var isLoaded by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         if (index > 0) {
-            kotlinx.coroutines.delay((index * 42L).coerceAtMost(280L))
+            kotlinx.coroutines.delay((index * 18L).coerceAtMost(120L))
         }
         isLoaded = true
     }
@@ -127,15 +127,15 @@ fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
         targetValue = if (isLoaded) 1f else 0f,
         animationSpec = spring(
             dampingRatio = 0.72f,
-            stiffness = Spring.StiffnessLow
+            stiffness = Spring.StiffnessMediumLow
         ),
         label = "fluidSlide_$index"
     )
     this.graphicsLayer {
         this.alpha = animProgress.coerceIn(0f, 1f)
-        this.translationY = (1f - animProgress) * 28.dp.toPx()
-        this.scaleX = 0.95f + 0.05f * animProgress
-        this.scaleY = 0.95f + 0.05f * animProgress
+        this.translationY = (1f - animProgress) * 20.dp.toPx()
+        this.scaleX = 0.96f + 0.04f * animProgress
+        this.scaleY = 0.96f + 0.04f * animProgress
         this.clip = false
     }
 }
@@ -654,39 +654,40 @@ fun Modifier.expressive3DCurvature(
             val w = size.width
             val h = size.height
 
-            // 1. Elevated Sea Stone 3D Convex Volume: Rich tone-on-tone specular crest (من جنس ولون الثيم نفسه)
+            // 1. Elevated Sea Stone 3D Convex Volume: Rich tone-on-tone specular crest (من جنس ولون الثيم نفسه مع عمق سفلي)
             val crestColor = if (isDark) {
                 Color(
-                    red = (themeColor.red * 0.50f + 0.50f).coerceIn(0f, 1f),
-                    green = (themeColor.green * 0.50f + 0.50f).coerceIn(0f, 1f),
-                    blue = (themeColor.blue * 0.50f + 0.50f).coerceIn(0f, 1f),
-                    alpha = 0.48f
+                    red = (themeColor.red * 0.55f + 0.45f).coerceIn(0f, 1f),
+                    green = (themeColor.green * 0.55f + 0.45f).coerceIn(0f, 1f),
+                    blue = (themeColor.blue * 0.55f + 0.45f).coerceIn(0f, 1f),
+                    alpha = 0.55f
                 )
             } else {
                 Color(
-                    red = (themeColor.red * 0.30f + 0.70f).coerceIn(0f, 1f),
-                    green = (themeColor.green * 0.30f + 0.70f).coerceIn(0f, 1f),
-                    blue = (themeColor.blue * 0.30f + 0.70f).coerceIn(0f, 1f),
-                    alpha = 0.58f
+                    red = (themeColor.red * 0.35f + 0.65f).coerceIn(0f, 1f),
+                    green = (themeColor.green * 0.35f + 0.65f).coerceIn(0f, 1f),
+                    blue = (themeColor.blue * 0.35f + 0.65f).coerceIn(0f, 1f),
+                    alpha = 0.65f
                 )
             }
-            val midCurveColor = themeColor.copy(alpha = if (isDark) 0.22f else 0.26f)
+            val midCurveColor = themeColor.copy(alpha = if (isDark) 0.28f else 0.32f)
+            val bottomDepthColor = themeColor.copy(alpha = if (isDark) 0.30f else 0.22f)
 
             val volumeBrush = Brush.verticalGradient(
                 0.0f to crestColor,
-                0.22f to midCurveColor,
-                0.55f to Color.Transparent,
-                1.0f to Color.Transparent
+                0.20f to midCurveColor,
+                0.60f to Color.Transparent,
+                1.0f to bottomDepthColor
             )
 
             // 2. Pronounced 3D Organic Pebble Curvature embracing the edges (تحدب واعوجاج مجسم أصيل)
             val perimeterCurvature = Brush.radialGradient(
                 colors = listOf(
                     Color.Transparent,
-                    themeColor.copy(alpha = if (isDark) 0.18f else 0.24f)
+                    themeColor.copy(alpha = if (isDark) 0.24f else 0.30f)
                 ),
                 center = Offset(w * 0.5f, h * 0.25f),
-                radius = kotlin.math.max(w, h) * 0.75f
+                radius = kotlin.math.max(w, h) * 0.80f
             )
 
             onDrawWithContent {

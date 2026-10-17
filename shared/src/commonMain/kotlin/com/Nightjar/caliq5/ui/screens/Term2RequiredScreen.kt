@@ -21,13 +21,20 @@ fun Term2Screen(viewModel: AppViewModel) {
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
 
     CaliqScreen(title = "كم تحتاج في الفصل الثاني", onBack = { viewModel.goBack() }, scrollable = false) {
+        val topSafeInset = WindowInsets.statusBars
+            .union(WindowInsets.captionBar)
+            .union(WindowInsets.displayCutout)
+            .asPaddingValues()
+            .calculateTopPadding()
+        val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = gridState,
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 250.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp),
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
+            contentPadding = PaddingValues(bottom = 120.dp + bottomNavPadding, top = topSafeInset + 65.dp),
+            modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 16.dp)
         ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
