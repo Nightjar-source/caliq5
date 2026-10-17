@@ -608,7 +608,7 @@ fun CaliqBottomNav(
             )
 
             // Liquid horizontal expansion while traveling (تمدد سائل مسطح أفقي بدون أي انكماش عمودي)
-            val moveDeltaX = kotlin.math.abs(animX.value - targetX.value)
+            val moveDeltaX = kotlin.math.abs(animX.value - targetX.value).dp
             val stretchX = (moveDeltaX * 0.16f).coerceAtMost(10.dp)
             val dynamicPillWidth = pillWidth + stretchX
             val dynamicPillX = animX - (stretchX / 2f)
@@ -879,7 +879,7 @@ fun CaliqNavigationRail(
             )
 
             // Liquid vertical expansion while traveling (تمدد سائل مسطح عمودي بدون أي انكماش أفقي)
-            val moveDeltaY = kotlin.math.abs(animY.value - targetY.value)
+            val moveDeltaY = kotlin.math.abs(animY.value - targetY.value).dp
             val stretchY = (moveDeltaY * 0.16f).coerceAtMost(10.dp)
             val dynamicPillHeight = pillHeight + stretchY
             val dynamicPillY = animY - (stretchY / 2f)
