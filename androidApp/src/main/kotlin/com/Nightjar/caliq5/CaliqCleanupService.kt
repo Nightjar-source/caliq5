@@ -18,30 +18,35 @@ class CaliqCleanupService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        try {
-            // Immediate synchronous cache deletion across Android 7 to 17, Samsung One UI & Xiaomi HyperOS
-            cleanDirectoryContents(applicationContext.cacheDir)
-            cleanDirectoryContents(applicationContext.externalCacheDir)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                cleanDirectoryContents(applicationContext.codeCacheDir)
-            }
-            val userCache = java.io.File(applicationContext.filesDir, "cache")
-            if (userCache.exists()) cleanDirectoryContents(userCache)
-            val userTemp = java.io.File(applicationContext.filesDir, "temp")
-            if (userTemp.exists()) cleanDirectoryContents(userTemp)
-
-            MemoryManager.deepPurgeMemory(applicationContext)
-        } catch (_: Throwable) {}
+        purgeAppCache(applicationContext)
         stopSelf()
     }
 
-    private fun cleanDirectoryContents(dir: java.io.File?) {
-        try {
-            dir?.listFiles()?.forEach { file ->
-                try {
-                    if (file.isDirectory) file.deleteRecursively() else file.delete()
-                } catch (_: Throwable) {}
-            }
-        } catch (_: Throwable) {}
+    companion object {
+        fun purgeAppCache(context: android.content.Context) {
+            try {
+                cleanDirectoryContents(context.cacheDir)
+                cleanDirectoryContents(context.externalCacheDir)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    cleanDirectoryContents(context.codeCacheDir)
+                }
+                val userCache = java.io.File(context.filesDir, "cache")
+                if (userCache.exists()) cleanDirectoryContents(userCache)
+                val userTemp = java.io.File(context.filesDir, "temp")
+                if (userTemp.exists()) cleanDirectoryContents(userTemp)
+
+                MemoryManager.deepPurgeMemory(context)
+            } catch (_: Throwable) {}
+        }
+
+        private fun cleanDirectoryContents(dir: java.io.File?) {
+            try {
+                dir?.listFiles()?.forEach { file ->
+                    try {
+                        if (file.isDirectory) file.deleteRecursively() else file.delete()
+                    } catch (_: Throwable) {}
+                }
+            } catch (_: Throwable) {}
+        }
     }
 }

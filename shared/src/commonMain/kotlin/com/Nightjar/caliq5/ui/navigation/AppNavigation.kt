@@ -607,10 +607,11 @@ fun CaliqBottomNav(
                 label = "bottom_nav_pill_scale"
             )
 
-            // Liquid horizontal expansion while traveling (تمدد سائل مسطح أفقي بدون أي انكماش عمودي)
+            // Dynamic liquid fluid stretch and squash (تمدد وانكماش سائل ديناميكي طبيعي)
             val moveDeltaX = kotlin.math.abs(animX.value - targetX.value).dp
-            val stretchX = (moveDeltaX * 0.16f).coerceAtMost(10.dp)
+            val stretchX = (moveDeltaX * 0.20f).coerceAtMost(10.dp)
             val dynamicPillWidth = pillWidth + stretchX
+            val dynamicPillHeight = (innerPillHeight - (stretchX * 0.22f)).coerceAtLeast(36.dp)
             val dynamicPillX = animX - (stretchX / 2f)
 
             val navShape = CircleShape
@@ -630,7 +631,7 @@ fun CaliqBottomNav(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .offset(x = dynamicPillX)
-                            .size(width = dynamicPillWidth, height = innerPillHeight)
+                            .size(width = dynamicPillWidth, height = dynamicPillHeight)
                             .graphicsLayer {
                                 alpha = animScale.coerceIn(0f, 1f)
                                 clip = false
@@ -878,10 +879,11 @@ fun CaliqNavigationRail(
                 label = "rail_pill_scale"
             )
 
-            // Liquid vertical expansion while traveling (تمدد سائل مسطح عمودي بدون أي انكماش أفقي)
+            // Dynamic liquid fluid stretch and squash (تمدد وانكماش سائل ديناميكي طبيعي)
             val moveDeltaY = kotlin.math.abs(animY.value - targetY.value).dp
-            val stretchY = (moveDeltaY * 0.16f).coerceAtMost(10.dp)
+            val stretchY = (moveDeltaY * 0.20f).coerceAtMost(10.dp)
             val dynamicPillHeight = pillHeight + stretchY
+            val dynamicPillWidth = (pillWidth - (stretchY * 0.22f)).coerceAtLeast(42.dp)
             val dynamicPillY = animY - (stretchY / 2f)
 
             val railShape = RoundedCornerShape(32.dp)
@@ -901,7 +903,7 @@ fun CaliqNavigationRail(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .offset(y = dynamicPillY)
-                            .size(width = pillWidth, height = dynamicPillHeight)
+                            .size(width = dynamicPillWidth, height = dynamicPillHeight)
                             .graphicsLayer {
                                 alpha = animScale.coerceIn(0f, 1f)
                                 clip = false

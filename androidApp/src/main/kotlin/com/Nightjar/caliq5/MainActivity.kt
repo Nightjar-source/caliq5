@@ -96,6 +96,15 @@ class MainActivity : ComponentActivity() {
         outState.putString("savedDeepLinkUri", deepLinkUri.value)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isFinishing) {
+            try {
+                CaliqCleanupService.purgeAppCache(applicationContext)
+            } catch (_: Throwable) {}
+        }
+    }
+
     /**
      * AI Agent & Digital Assistant Semantic Knowledge Provider (Android Assist API / Gemini Nano).
      * Provides structured Schema.org JSON-LD and canonical deep links to digital assistants
