@@ -27,9 +27,6 @@ class CaliqCleanupService : Service() {
             try {
                 cleanDirectoryContents(context.cacheDir)
                 cleanDirectoryContents(context.externalCacheDir)
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    cleanDirectoryContents(context.codeCacheDir)
-                }
                 val userCache = java.io.File(context.filesDir, "cache")
                 if (userCache.exists()) cleanDirectoryContents(userCache)
                 val userTemp = java.io.File(context.filesDir, "temp")
