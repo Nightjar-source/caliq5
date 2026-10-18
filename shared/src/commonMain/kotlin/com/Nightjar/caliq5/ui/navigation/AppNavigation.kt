@@ -494,7 +494,13 @@ private fun MainContent(
             Surface(
                 modifier = Modifier
                     .height(topCapsuleHeight)
-                    .widthIn(min = 130.dp, max = 460.dp),
+                    .widthIn(min = 130.dp, max = 460.dp)
+                    .animateContentSize(
+                        animationSpec = spring(
+                            dampingRatio = 0.72f,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
                 border = BorderStroke(
