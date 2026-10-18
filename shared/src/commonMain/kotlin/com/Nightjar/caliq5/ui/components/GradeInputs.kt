@@ -48,7 +48,12 @@ fun GradeInputField(
                 val cleaned = cleanGradeInput(newVal.text)
                 if (cleaned != null) {
                     val justAddedCommaOrDot = (newVal.text.endsWith(".") || newVal.text.endsWith(",") || newVal.text.endsWith("،") || newVal.text.endsWith("٫"))
-                    val targetSelection = if (cleaned == "0." && justAddedCommaOrDot) {
+                    val targetSelection = if (!newVal.selection.collapsed) {
+                        TextRange(
+                            newVal.selection.start.coerceIn(0, cleaned.length),
+                            newVal.selection.end.coerceIn(0, cleaned.length)
+                        )
+                    } else if (cleaned == "0." && justAddedCommaOrDot) {
                         TextRange(2)
                     } else if (cleaned.contains(".") && justAddedCommaOrDot) {
                         TextRange(cleaned.indexOf('.') + 1)
@@ -81,7 +86,11 @@ fun GradeInputField(
             disabledBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.25f else 0.35f),
             disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-            disabledPlaceholderColor = com.Nightjar.caliq5.theme.successColor.copy(alpha = 0.85f)
+            disabledPlaceholderColor = com.Nightjar.caliq5.theme.successColor.copy(alpha = 0.85f),
+            selectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
+                handleColor = MaterialTheme.colorScheme.primary,
+                backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+            )
         )
     )
 }
@@ -132,45 +141,58 @@ fun SmallGradeInput(
             .padding(vertical = 12.dp, horizontal = 6.dp),
         contentAlignment = Alignment.Center
     ) {
-        BasicTextField(
-            value = tfv,
-            onValueChange = { newVal ->
-                val cleaned = cleanGradeInput(newVal.text)
-                if (cleaned != null) {
-                    val justAddedCommaOrDot = (newVal.text.endsWith(".") || newVal.text.endsWith(",") || newVal.text.endsWith("،") || newVal.text.endsWith("٫"))
-                    val targetSelection = if (cleaned == "0." && justAddedCommaOrDot) {
-                        TextRange(2)
-                    } else if (cleaned.contains(".") && justAddedCommaOrDot) {
-                        TextRange(cleaned.indexOf('.') + 1)
-                    } else {
-                        val sel = newVal.selection.end.coerceIn(0, cleaned.length)
-                        TextRange(sel)
-                    }
-                    tfv = TextFieldValue(text = cleaned, selection = targetSelection)
-                    onValueChange(cleaned)
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(
-                textAlign = TextAlign.Center, 
-                color = if (isHighlighted) primaryColor else onSurface, 
-                fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.SemiBold,
-                fontSize = dynamicFontSize
-            ),
-            cursorBrush = SolidColor(primaryColor),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            enabled = enabled,
-            readOnly = isReadOnly,
-            singleLine = true,
-            decorationBox = { innerTextField ->
-                Box(contentAlignment = Alignment.Center) {
-                    if (value.isEmpty()) {
-                        Text(placeholder, style = MaterialTheme.typography.bodyMedium.copy(color = onSurfaceVariant.copy(alpha = 0.55f), fontSize = 14.sp, fontWeight = FontWeight.Medium), maxLines = 1)
-                    }
-                    innerTextField()
-                }
-            }
+        val selectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
+            handleColor = primaryColor,
+            backgroundColor = primaryColor.copy(alpha = 0.35f)
         )
+        CompositionLocalProvider(
+            androidx.compose.foundation.text.selection.LocalTextSelectionColors provides selectionColors
+        ) {
+            BasicTextField(
+                value = tfv,
+                onValueChange = { newVal ->
+                    val cleaned = cleanGradeInput(newVal.text)
+                    if (cleaned != null) {
+                        val justAddedCommaOrDot = (newVal.text.endsWith(".") || newVal.text.endsWith(",") || newVal.text.endsWith("،") || newVal.text.endsWith("٫"))
+                        val targetSelection = if (!newVal.selection.collapsed) {
+                            TextRange(
+                                newVal.selection.start.coerceIn(0, cleaned.length),
+                                newVal.selection.end.coerceIn(0, cleaned.length)
+                            )
+                        } else if (cleaned == "0." && justAddedCommaOrDot) {
+                            TextRange(2)
+                        } else if (cleaned.contains(".") && justAddedCommaOrDot) {
+                            TextRange(cleaned.indexOf('.') + 1)
+                        } else {
+                            val sel = newVal.selection.end.coerceIn(0, cleaned.length)
+                            TextRange(sel)
+                        }
+                        tfv = TextFieldValue(text = cleaned, selection = targetSelection)
+                        onValueChange(cleaned)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(
+                    textAlign = TextAlign.Center, 
+                    color = if (isHighlighted) primaryColor else onSurface, 
+                    fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.SemiBold,
+                    fontSize = dynamicFontSize
+                ),
+                cursorBrush = SolidColor(primaryColor),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                enabled = enabled,
+                readOnly = isReadOnly,
+                singleLine = true,
+                decorationBox = { innerTextField ->
+                    Box(contentAlignment = Alignment.Center) {
+                        if (value.isEmpty()) {
+                            Text(placeholder, style = MaterialTheme.typography.bodyMedium.copy(color = onSurfaceVariant.copy(alpha = 0.55f), fontSize = 14.sp, fontWeight = FontWeight.Medium), maxLines = 1)
+                        }
+                        innerTextField()
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -215,44 +237,57 @@ fun CaliqOutlinedInput(
             .padding(vertical = 12.dp, horizontal = 6.dp),
         contentAlignment = Alignment.Center
     ) {
-        BasicTextField(
-            value = tfv,
-            onValueChange = { newVal ->
-                val cleaned = cleanGradeInput(newVal.text)
-                if (cleaned != null) {
-                    val justAddedCommaOrDot = (newVal.text.endsWith(".") || newVal.text.endsWith(",") || newVal.text.endsWith("،") || newVal.text.endsWith("٫"))
-                    val targetSelection = if (cleaned == "0." && justAddedCommaOrDot) {
-                        TextRange(2)
-                    } else if (cleaned.contains(".") && justAddedCommaOrDot) {
-                        TextRange(cleaned.indexOf('.') + 1)
-                    } else {
-                        val sel = newVal.selection.end.coerceIn(0, cleaned.length)
-                        TextRange(sel)
-                    }
-                    tfv = TextFieldValue(text = cleaned, selection = targetSelection)
-                    onValueChange(cleaned)
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(
-                textAlign = TextAlign.Center, 
-                color = if (isHighlighted) primaryColor else onSurface, 
-                fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.SemiBold,
-                fontSize = 16.sp
-            ),
-            cursorBrush = SolidColor(primaryColor),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            enabled = enabled,
-            readOnly = isReadOnly,
-            singleLine = true,
-            decorationBox = { innerTextField ->
-                Box(contentAlignment = Alignment.Center) {
-                    if (value.isEmpty()) {
-                        Text(placeholder, style = MaterialTheme.typography.bodyMedium.copy(color = onSurfaceVariant.copy(alpha = 0.55f), fontSize = 14.sp, fontWeight = FontWeight.Medium), maxLines = 1)
-                    }
-                    innerTextField()
-                }
-            }
+        val selectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
+            handleColor = primaryColor,
+            backgroundColor = primaryColor.copy(alpha = 0.35f)
         )
+        CompositionLocalProvider(
+            androidx.compose.foundation.text.selection.LocalTextSelectionColors provides selectionColors
+        ) {
+            BasicTextField(
+                value = tfv,
+                onValueChange = { newVal ->
+                    val cleaned = cleanGradeInput(newVal.text)
+                    if (cleaned != null) {
+                        val justAddedCommaOrDot = (newVal.text.endsWith(".") || newVal.text.endsWith(",") || newVal.text.endsWith("،") || newVal.text.endsWith("٫"))
+                        val targetSelection = if (!newVal.selection.collapsed) {
+                            TextRange(
+                                newVal.selection.start.coerceIn(0, cleaned.length),
+                                newVal.selection.end.coerceIn(0, cleaned.length)
+                            )
+                        } else if (cleaned == "0." && justAddedCommaOrDot) {
+                            TextRange(2)
+                        } else if (cleaned.contains(".") && justAddedCommaOrDot) {
+                            TextRange(cleaned.indexOf('.') + 1)
+                        } else {
+                            val sel = newVal.selection.end.coerceIn(0, cleaned.length)
+                            TextRange(sel)
+                        }
+                        tfv = TextFieldValue(text = cleaned, selection = targetSelection)
+                        onValueChange(cleaned)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(
+                    textAlign = TextAlign.Center, 
+                    color = if (isHighlighted) primaryColor else onSurface, 
+                    fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.SemiBold,
+                    fontSize = 16.sp
+                ),
+                cursorBrush = SolidColor(primaryColor),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                enabled = enabled,
+                readOnly = isReadOnly,
+                singleLine = true,
+                decorationBox = { innerTextField ->
+                    Box(contentAlignment = Alignment.Center) {
+                        if (value.isEmpty()) {
+                            Text(placeholder, style = MaterialTheme.typography.bodyMedium.copy(color = onSurfaceVariant.copy(alpha = 0.55f), fontSize = 14.sp, fontWeight = FontWeight.Medium), maxLines = 1)
+                        }
+                        innerTextField()
+                    }
+                }
+            )
+        }
     }
 }

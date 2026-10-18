@@ -367,12 +367,18 @@ fun CaliqTheme(
 
     val animatedColorScheme = animateColorScheme(colorScheme)
 
+    val globalSelectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
+        handleColor = animatedColorScheme.primary,
+        backgroundColor = animatedColorScheme.primary.copy(alpha = 0.35f)
+    )
+
     androidx.compose.runtime.CompositionLocalProvider(
         LocalIsDark provides darkTheme,
         LocalSuccessColor provides if (darkTheme) Color(0xFF4ADE80) else Color(0xFF28A745),
         LocalSuccessContainerColor provides if (darkTheme) Color(0xFF14532D) else Color(0xFFE8F5E9),
         LocalErrorColor provides if (darkTheme) Color(0xFFEF4444) else Color(0xFFDC2626),
-        LocalErrorContainerColor provides if (darkTheme) Color(0xFF7F1D1D) else Color(0xFFFFEBEE)
+        LocalErrorContainerColor provides if (darkTheme) Color(0xFF7F1D1D) else Color(0xFFFFEBEE),
+        androidx.compose.foundation.text.selection.LocalTextSelectionColors provides globalSelectionColors
     ) {
         MaterialTheme(
             colorScheme = animatedColorScheme,

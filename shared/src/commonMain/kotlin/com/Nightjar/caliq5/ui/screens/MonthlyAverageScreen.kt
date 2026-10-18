@@ -40,12 +40,19 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
             .asPaddingValues()
             .calculateTopPadding()
         val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        val isImeVisible = WindowInsets.ime.getBottom(density) > 0
+        val dynamicBottomPadding by androidx.compose.animation.core.animateDpAsState(
+            targetValue = if (isImeVisible) 20.dp else (120.dp + bottomNavPadding),
+            animationSpec = spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow),
+            label = "monthlyBottomPadding"
+        )
         
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = gridState,
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
             modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 12.dp),
-            contentPadding = PaddingValues(top = topSafeInset + 90.dp, bottom = 120.dp + bottomNavPadding, start = 4.dp, end = 4.dp),
+            contentPadding = PaddingValues(top = topSafeInset + 90.dp, bottom = dynamicBottomPadding, start = 4.dp, end = 4.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {

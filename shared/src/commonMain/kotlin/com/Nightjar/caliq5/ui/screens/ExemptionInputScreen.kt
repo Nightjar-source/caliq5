@@ -86,7 +86,14 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
+            val density = androidx.compose.ui.platform.LocalDensity.current
+            val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            val dynamicBottomPadding by androidx.compose.animation.core.animateDpAsState(
+                targetValue = if (isImeVisible) 20.dp else (120.dp + bottomNavPadding),
+                animationSpec = spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow),
+                label = "gridBottomPadding"
+            )
             
             LazyVerticalGrid(
                 state = lazyGridState,
@@ -97,7 +104,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(
                     top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 115.dp,
-                    bottom = 120.dp + bottomNavPadding
+                    bottom = dynamicBottomPadding
                 ),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 horizontalArrangement = Arrangement.spacedBy(14.dp)

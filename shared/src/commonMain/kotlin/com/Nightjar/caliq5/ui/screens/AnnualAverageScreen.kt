@@ -28,13 +28,20 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
             .asPaddingValues()
             .calculateTopPadding()
         val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        val isImeVisible = WindowInsets.ime.getBottom(density) > 0
+        val dynamicBottomPadding by androidx.compose.animation.core.animateDpAsState(
+            targetValue = if (isImeVisible) 20.dp else (120.dp + bottomNavPadding),
+            animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),
+            label = "annualBottomPadding"
+        )
 
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = gridState,
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 250.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 120.dp + bottomNavPadding, top = topSafeInset + 65.dp),
+            contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
             modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 16.dp)
         ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {

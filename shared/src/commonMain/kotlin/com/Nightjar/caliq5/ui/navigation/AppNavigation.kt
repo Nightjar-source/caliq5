@@ -100,9 +100,9 @@ fun AppNavigation(
         val isLandscape = size.height < 500.dp && size.width > size.height
         val isWideScreen = (adaptiveWindowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT) || isLandscape || size.width >= 600.dp || isTabletop
         val railWidth = when (adaptiveWindowSizeClass.windowWidthSizeClass) {
-            WindowWidthSizeClass.EXPANDED -> 72.dp
-            WindowWidthSizeClass.MEDIUM -> 64.dp
-            else -> 64.dp
+            WindowWidthSizeClass.EXPANDED -> 80.dp
+            WindowWidthSizeClass.MEDIUM -> 72.dp
+            else -> if (isLandscape) 72.dp else 80.dp
         }
 
         MathBackground(modifier = Modifier.fillMaxSize())
@@ -151,8 +151,9 @@ fun AppNavigation(
                     Screen.MONTHLY_AVERAGE,
                     Screen.TERM2_CALCULATION
                 )
+                val isImeVisible = WindowInsets.ime.getBottom(density) > 0
                 AnimatedVisibility(
-                    visible = isMainTab && !isNavHidden && !isWideScreen,
+                    visible = isMainTab && !isNavHidden && !isWideScreen && !isImeVisible,
                     enter = slideInVertically(
                         initialOffsetY = { it },
                         animationSpec = tween(400, easing = FastOutSlowInEasing)
@@ -869,7 +870,7 @@ fun CaliqNavigationRail(
     onScreenSelected: (Screen) -> Unit,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
-    railWidth: Dp = 64.dp,
+    railWidth: Dp = 72.dp,
 ) {
     val selectedIndex = when {
         currentScreen == Screen.EXEMPTION_SELECT || currentScreen == Screen.EXEMPTION_INPUT -> 0

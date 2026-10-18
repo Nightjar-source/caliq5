@@ -40,6 +40,7 @@ fun CaliqScreen(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .fillMaxSize()
+                        .imePadding()
                         .verticalScroll(scrollState)
                         .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
