@@ -423,6 +423,13 @@ private fun MainContent(
                            currentScreen == Screen.TERM2_CALCULATION
         val showTopBack = !isMainScreen || editingStudentMode != null || resultState != null
 
+        // Material 3 Expressive adaptive dimensions (ultra-compact in landscape/tablets, sleek in portrait)
+        val topBarTopPad = if (isWideOrLandscape) 4.dp else 8.dp
+        val topCapsuleHeight = if (isWideOrLandscape) 36.dp else 42.dp
+        val iconBtnSize = if (isWideOrLandscape) 36.dp else 40.dp
+        val iconInnerSize = if (isWideOrLandscape) 18.dp else 22.dp
+        val titleSideClearance = if (isWideOrLandscape) 56.dp else 64.dp
+
         // 1. Separate Floating Circular Back Button at Start Edge with Material Touch Morphing Effect
         AnimatedVisibility(
             visible = showTopBack && resultState == null,
@@ -431,7 +438,7 @@ private fun MainContent(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .statusBarsPadding()
-                .padding(top = 8.dp)
+                .padding(top = topBarTopPad)
                 .padding(start = topBarStartPadding + 16.dp)
         ) {
             CaliqIconButton(
@@ -441,12 +448,13 @@ private fun MainContent(
                 border = BorderStroke(
                     1.dp,
                     MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
-                )
+                ),
+                modifier = Modifier.size(iconBtnSize)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "رجوع",
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(iconInnerSize)
                 )
             }
         }
@@ -454,7 +462,7 @@ private fun MainContent(
         // Responsive horizontal padding adapting smoothly between main screens and sub-screens
         val titleCapsuleStartPad by animateDpAsState(
             targetValue = if (showTopBack) {
-                if (isWideScreen) topBarStartPadding + 64.dp else 64.dp
+                if (isWideScreen) topBarStartPadding + titleSideClearance else titleSideClearance
             } else {
                 if (isWideScreen) topBarStartPadding + 20.dp else 20.dp
             },
@@ -463,7 +471,7 @@ private fun MainContent(
         )
         val titleCapsuleEndPad by animateDpAsState(
             targetValue = if (showTopBack) {
-                if (isWideScreen) topBarEndPadding + 64.dp else 64.dp
+                if (isWideScreen) topBarEndPadding + titleSideClearance else titleSideClearance
             } else {
                 if (isWideScreen) topBarEndPadding + 20.dp else 20.dp
             },
@@ -479,16 +487,16 @@ private fun MainContent(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .padding(top = 8.dp)
+                .padding(top = topBarTopPad)
                 .padding(start = titleCapsuleStartPad, end = titleCapsuleEndPad)
         ) {
             Surface(
                 modifier = Modifier
-                    .height(44.dp)
-                    .widthIn(min = 140.dp, max = 460.dp),
+                    .height(topCapsuleHeight)
+                    .widthIn(min = 130.dp, max = 460.dp),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
-                border = androidx.compose.foundation.BorderStroke(
+                border = BorderStroke(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
                 ),
@@ -497,7 +505,7 @@ private fun MainContent(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .padding(horizontal = 20.dp),
+                        .padding(horizontal = if (isWideOrLandscape) 14.dp else 20.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     AnimatedContent(

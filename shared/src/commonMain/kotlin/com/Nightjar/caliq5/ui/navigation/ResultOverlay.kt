@@ -91,6 +91,12 @@ fun ResultOverlay(
                 }
 
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
+                val isWideOrLandscape = maxWidth > 600.dp || maxHeight < 500.dp
+                val topPad = if (isWideOrLandscape) 4.dp else 8.dp
+                val topCapsuleHeight = if (isWideOrLandscape) 36.dp else 42.dp
+                val iconBtnSize = if (isWideOrLandscape) 36.dp else 40.dp
+                val iconInnerSize = if (isWideOrLandscape) 18.dp else 22.dp
+                val titleSideClearance = if (isWideOrLandscape) 56.dp else 64.dp
 
                 // 1. Separate Floating Circular Close Button at Start Edge (الطرف) with Material Touch Morphing
                 CaliqIconButton(
@@ -104,12 +110,13 @@ fun ResultOverlay(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .statusBarsPadding()
-                        .padding(top = 8.dp, start = 16.dp)
+                        .padding(top = topPad, start = 16.dp)
+                        .size(iconBtnSize)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "إغلاق",
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(iconInnerSize)
                     )
                 }
 
@@ -118,10 +125,10 @@ fun ResultOverlay(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .statusBarsPadding()
-                        .padding(top = 8.dp)
-                        .padding(horizontal = 68.dp)
-                        .height(44.dp)
-                        .widthIn(min = 140.dp, max = 460.dp),
+                        .padding(top = topPad)
+                        .padding(horizontal = titleSideClearance)
+                        .height(topCapsuleHeight)
+                        .widthIn(min = 130.dp, max = 460.dp),
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
                     border = BorderStroke(
@@ -133,7 +140,7 @@ fun ResultOverlay(
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .padding(horizontal = 20.dp),
+                            .padding(horizontal = if (isWideOrLandscape) 14.dp else 20.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         AnimatedContent(
@@ -157,7 +164,7 @@ fun ResultOverlay(
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
-                                    fontSize = 15.sp
+                                    fontSize = if (isWideOrLandscape) 14.sp else 15.sp
                                 ),
                                 maxLines = 1,
                                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
@@ -178,12 +185,13 @@ fun ResultOverlay(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .statusBarsPadding()
-                        .padding(top = 8.dp, end = 16.dp)
+                        .padding(top = topPad, end = 16.dp)
+                        .size(iconBtnSize)
                 ) {
                     Icon(
                         imageVector = Icons.Default.PictureAsPdf,
                         contentDescription = "تصدير PDF",
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(iconInnerSize)
                     )
                 }
             }
