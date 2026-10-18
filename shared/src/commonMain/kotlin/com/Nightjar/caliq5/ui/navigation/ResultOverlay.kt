@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -60,7 +61,7 @@ fun ResultOverlay(
                 color = MaterialTheme.colorScheme.background.copy(alpha = 0.98f),
             ) {}
 
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxHeight()
                     .widthIn(max = 680.dp)
@@ -105,7 +106,7 @@ fun ResultOverlay(
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     border = BorderStroke(
                         1.dp,
-                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
+                        SolidColor(MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f))
                     ),
                     modifier = Modifier
                         .align(Alignment.TopStart)
@@ -133,7 +134,7 @@ fun ResultOverlay(
                     color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
                     border = BorderStroke(
                         1.dp,
-                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
+                        SolidColor(MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f))
                     ),
                     shadowElevation = 0.dp
                 ) {
@@ -180,7 +181,7 @@ fun ResultOverlay(
                     contentColor = MaterialTheme.colorScheme.primary,
                     border = BorderStroke(
                         1.dp,
-                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
+                        SolidColor(MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f))
                     ),
                     modifier = Modifier
                         .align(Alignment.TopEnd)

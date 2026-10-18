@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -447,7 +448,7 @@ private fun MainContent(
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 border = BorderStroke(
                     1.dp,
-                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
+                    SolidColor(MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f))
                 ),
                 modifier = Modifier.size(iconBtnSize)
             ) {
@@ -498,7 +499,7 @@ private fun MainContent(
                 color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
                 border = BorderStroke(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
+                    brush = SolidColor(MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f))
                 ),
                 shadowElevation = 0.dp
             ) {
