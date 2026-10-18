@@ -2,6 +2,7 @@ package com.Nightjar.caliq5.ui.navigation
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -91,97 +92,99 @@ fun ResultOverlay(
 
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
 
-                // Floating Oval Capsule Top Bar (Unified with all screens, < 60dp height, translucent glass)
+                // 1. Separate Floating Circular Close Button at Start Edge (الطرف) with Material Touch Morphing
+                CaliqIconButton(
+                    onClick = onClose,
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    border = BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .statusBarsPadding()
+                        .padding(top = 8.dp, start = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "إغلاق",
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+
+                // 2. Separate Floating Oval Title Capsule in the Center (الوسط)
                 Surface(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .statusBarsPadding()
                         .padding(top = 8.dp)
-                        .padding(horizontal = 16.dp)
-                        .widthIn(max = 560.dp)
-                        .fillMaxWidth()
-                        .height(48.dp),
+                        .padding(horizontal = 68.dp)
+                        .height(44.dp)
+                        .widthIn(min = 140.dp, max = 460.dp),
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
-                    border = androidx.compose.foundation.BorderStroke(
+                    border = BorderStroke(
                         1.dp,
                         MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
                     ),
                     shadowElevation = 0.dp
                 ) {
-                    Row(
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                            .fillMaxHeight()
+                            .padding(horizontal = 20.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        // 1. Close button on the far right (Start in RTL)
-                        IconButton(
-                            onClick = onClose,
-                            modifier = Modifier.size(36.dp).clip(CircleShape)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "إغلاق",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(6.dp))
-
-                        // 2. Title in the middle with transition animation
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp),
-                            contentAlignment = Alignment.CenterStart
-                        ) {
-                            AnimatedContent(
-                                targetState = title,
-                                transitionSpec = {
-                                    val easeOut = androidx.compose.animation.core.CubicBezierEasing(0.25f, 1f, 0.5f, 1f)
-                                    (fadeIn(animationSpec = tween(300, easing = easeOut)) + 
-                                     slideInVertically(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)) { it / 2 } +
-                                     scaleIn(initialScale = 0.96f, animationSpec = tween(300, easing = easeOut))
-                                    ).togetherWith(
-                                        fadeOut(animationSpec = tween(220, easing = easeOut)) + 
-                                        slideOutVertically(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)) { -it / 2 } +
-                                        scaleOut(targetScale = 1.04f, animationSpec = tween(220, easing = easeOut))
-                                    ).using(SizeTransform(clip = false))
-                                },
-                                label = "result_title_motion"
-                            ) { targetTitle ->
-                                Text(
-                                    text = targetTitle,
-                                    textAlign = TextAlign.Start,
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontSize = 15.sp
-                                    ),
-                                    maxLines = 1,
-                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.width(4.dp))
-
-                        // 3. PDF button on the far left (End in RTL)
-                        IconButton(
-                            onClick = onExportPdf,
-                            modifier = Modifier.size(36.dp).clip(CircleShape)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.PictureAsPdf,
-                                contentDescription = "تصدير PDF",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp)
+                        AnimatedContent(
+                            targetState = title,
+                            transitionSpec = {
+                                val easeOut = androidx.compose.animation.core.CubicBezierEasing(0.25f, 1f, 0.5f, 1f)
+                                (fadeIn(animationSpec = tween(300, easing = easeOut)) + 
+                                 slideInVertically(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)) { it / 2 } +
+                                 scaleIn(initialScale = 0.96f, animationSpec = tween(300, easing = easeOut))
+                                ).togetherWith(
+                                    fadeOut(animationSpec = tween(220, easing = easeOut)) + 
+                                    slideOutVertically(animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)) { -it / 2 } +
+                                    scaleOut(targetScale = 1.04f, animationSpec = tween(220, easing = easeOut))
+                                ).using(SizeTransform(clip = false))
+                            },
+                            label = "result_title_motion"
+                        ) { targetTitle ->
+                            Text(
+                                text = targetTitle,
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = 15.sp
+                                ),
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                             )
                         }
                     }
+                }
+
+                // 3. Separate Floating Circular PDF Share Button at End Edge (الطرف) with Material Touch Morphing
+                CaliqIconButton(
+                    onClick = onExportPdf,
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    border = BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .statusBarsPadding()
+                        .padding(top = 8.dp, end = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PictureAsPdf,
+                        contentDescription = "تصدير PDF",
+                        modifier = Modifier.size(22.dp)
+                    )
                 }
             }
         }

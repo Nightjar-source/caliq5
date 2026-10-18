@@ -643,6 +643,7 @@ fun CaliqIconButton(
     enabled: Boolean = true,
     containerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     contentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    border: BorderStroke? = null,
     content: @Composable () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -674,6 +675,7 @@ fun CaliqIconButton(
         shape = RoundedCornerShape(cornerRadius),
         color = containerColor,
         contentColor = contentColor,
+        border = border,
         modifier = modifier
             .instantExpressivePress(enabled = enabled) { isInstantPressed.value = it }
             .size(40.dp)

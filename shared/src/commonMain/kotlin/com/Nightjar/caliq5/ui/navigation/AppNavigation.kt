@@ -416,24 +416,76 @@ private fun MainContent(
         val resultState by viewModel.resultState.collectAsState()
 
         val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
+        val editingStudentMode by viewModel.editingStudentMode.collectAsState()
+        val isMainScreen = currentScreen == Screen.EXEMPTION_SELECT || 
+                           currentScreen == Screen.ANNUAL_AVERAGE || 
+                           currentScreen == Screen.MONTHLY_AVERAGE || 
+                           currentScreen == Screen.TERM2_CALCULATION
+        val showTopBack = !isMainScreen || editingStudentMode != null || resultState != null
 
-        // Floating Oval Capsule Top Bar (< 60dp height, translucent organic glass, edge-to-edge transparent status bar)
-        // Strictly padded on start/end in wide screens so it centers gracefully without overlapping the side rail
+        // 1. Separate Floating Circular Back Button at Start Edge with Material Touch Morphing Effect
+        AnimatedVisibility(
+            visible = showTopBack && resultState == null,
+            enter = fadeIn(tween(250)) + scaleIn(initialScale = 0.75f, animationSpec = spring(dampingRatio = 0.65f, stiffness = Spring.StiffnessMediumLow)),
+            exit = fadeOut(tween(180)) + scaleOut(targetScale = 0.75f, animationSpec = tween(180)),
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .statusBarsPadding()
+                .padding(top = 8.dp)
+                .padding(start = topBarStartPadding + 16.dp)
+        ) {
+            CaliqIconButton(
+                onClick = { viewModel.handleTopBarBack() },
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                border = BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "رجوع",
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+        }
+
+        // Responsive horizontal padding adapting smoothly between main screens and sub-screens
+        val titleCapsuleStartPad by animateDpAsState(
+            targetValue = if (showTopBack) {
+                if (isWideScreen) topBarStartPadding + 64.dp else 64.dp
+            } else {
+                if (isWideScreen) topBarStartPadding + 20.dp else 20.dp
+            },
+            animationSpec = spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessMediumLow),
+            label = "title_capsule_start_pad"
+        )
+        val titleCapsuleEndPad by animateDpAsState(
+            targetValue = if (showTopBack) {
+                if (isWideScreen) topBarEndPadding + 64.dp else 64.dp
+            } else {
+                if (isWideScreen) topBarEndPadding + 20.dp else 20.dp
+            },
+            animationSpec = spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessMediumLow),
+            label = "title_capsule_end_pad"
+        )
+
+        // 2. Separate Floating Oval Title Capsule in the Center (الوسط) with responsive padding
         AnimatedVisibility(
             visible = resultState == null,
             enter = fadeIn(tween(200)),
             exit = fadeOut(tween(150)),
-            modifier = Modifier.align(Alignment.TopCenter)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 8.dp)
+                .padding(start = titleCapsuleStartPad, end = titleCapsuleEndPad)
         ) {
             Surface(
                 modifier = Modifier
-                    .statusBarsPadding()
-                    .padding(top = 8.dp)
-                    .padding(start = topBarStartPadding, end = topBarEndPadding)
-                    .padding(horizontal = 16.dp)
-                    .widthIn(max = 560.dp)
-                    .fillMaxWidth()
-                    .height(48.dp),
+                    .height(44.dp)
+                    .widthIn(min = 140.dp, max = 460.dp),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
                 border = androidx.compose.foundation.BorderStroke(
@@ -442,36 +494,12 @@ private fun MainContent(
                 ),
                 shadowElevation = 0.dp
             ) {
-                Row(
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxHeight()
+                        .padding(horizontal = 20.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    val editingStudentMode by viewModel.editingStudentMode.collectAsState()
-                    val showTopBack = currentScreen != Screen.EXEMPTION_SELECT || editingStudentMode != null || resultState != null
-
-                    AnimatedVisibility(
-                        visible = showTopBack,
-                        enter = fadeIn(tween(220)) + scaleIn(initialScale = 0.8f, animationSpec = spring(dampingRatio = 0.7f, stiffness = Spring.StiffnessMediumLow)) + expandHorizontally(),
-                        exit = fadeOut(tween(160)) + scaleOut(targetScale = 0.8f, animationSpec = tween(160)) + shrinkHorizontally()
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(
-                                onClick = { viewModel.handleTopBarBack() },
-                                modifier = Modifier.size(36.dp).clip(CircleShape)
-                            ) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "رجوع",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                            Spacer(Modifier.width(4.dp))
-                        }
-                    }
-                    
                     AnimatedContent(
                         targetState = Pair<Screen, String?>(currentScreen, editingStudentMode),
                         transitionSpec = {
@@ -485,7 +513,6 @@ private fun MainContent(
                                 scaleOut(targetScale = 1.04f, animationSpec = tween(220, easing = easeOut))
                             ).using(SizeTransform(clip = false))
                         },
-                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
                         label = "title_transition"
                     ) { statePair ->
                         val screen = statePair.first
@@ -517,9 +544,9 @@ private fun MainContent(
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = pColor,
-                                fontSize = if (isWideOrLandscape) 15.sp else 16.sp
+                                fontSize = if (isWideOrLandscape) 14.sp else 15.sp
                             ),
-                            textAlign = TextAlign.Start,
+                            textAlign = TextAlign.Center,
                             maxLines = 1,
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
