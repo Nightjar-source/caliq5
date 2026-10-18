@@ -97,6 +97,11 @@ fun AppNavigation(
         }
         val isLandscape = size.height < 500.dp && size.width > size.height
         val isWideScreen = (adaptiveWindowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT) || isLandscape || size.width >= 600.dp || isTabletop
+        val railWidth = when (adaptiveWindowSizeClass.windowWidthSizeClass) {
+            WindowWidthSizeClass.EXPANDED -> 72.dp
+            WindowWidthSizeClass.MEDIUM -> 64.dp
+            else -> 64.dp
+        }
 
         MathBackground(modifier = Modifier.fillMaxSize())
 
@@ -112,7 +117,7 @@ fun AppNavigation(
                 viewModel = viewModel,
                 contentPadding = PaddingValues(
                     start = if (isWideScreen) safeStart + 16.dp else 0.dp,
-                    end = if (isWideScreen) safeEnd + 90.dp else 0.dp
+                    end = if (isWideScreen) safeEnd + railWidth + 24.dp else 0.dp
                 ),
                 isWideScreen = isWideScreen
             )
@@ -133,6 +138,7 @@ fun AppNavigation(
                         isMenuOpen = showSideMenu,
                         onScreenSelected = { screen -> viewModel.navigateTo(screen) },
                         onMenuClick = { viewModel.openMenu() },
+                        railWidth = railWidth
                     )
                 }
             } else {
@@ -409,9 +415,10 @@ private fun MainContent(
 
         val resultState by viewModel.resultState.collectAsState()
 
-        // Static Glassy Top App Bar (Compact: < 56dp in portrait, even lower in landscape: 38dp)
-        // Strictly padded on end in wide/landscape screens so it never extends behind the side rail!
-        // Hidden when result overlay is visible to prevent duplicate headers or layer bleed-through
+        val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
+
+        // Floating Oval Capsule Top Bar (< 60dp height, translucent organic glass, edge-to-edge transparent status bar)
+        // Strictly padded on start/end in wide screens so it centers gracefully without overlapping the side rail
         AnimatedVisibility(
             visible = resultState == null,
             enter = fadeIn(tween(200)),
@@ -420,100 +427,103 @@ private fun MainContent(
         ) {
             Surface(
                 modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(top = 8.dp)
+                    .padding(start = topBarStartPadding, end = topBarEndPadding)
+                    .padding(horizontal = 16.dp)
+                    .widthIn(max = 560.dp)
                     .fillMaxWidth()
-                    .padding(start = topBarStartPadding, end = topBarEndPadding),
-            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f),
-            shadowElevation = 0.dp
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(
-                        WindowInsets.statusBars
-                            .union(WindowInsets.captionBar)
-                            .union(WindowInsets.displayCutout)
-                    )
-                    .defaultMinSize(minHeight = if (isWideOrLandscape) 48.dp else 54.dp)
-                    .padding(horizontal = if (isWideOrLandscape) 12.dp else 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .height(48.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
+                ),
+                shadowElevation = 0.dp
             ) {
-                val editingStudentMode by viewModel.editingStudentMode.collectAsState()
-                val showTopBack = currentScreen != Screen.EXEMPTION_SELECT || editingStudentMode != null || resultState != null
-
-                AnimatedVisibility(
-                    visible = showTopBack,
-                    enter = fadeIn(tween(220)) + scaleIn(initialScale = 0.8f, animationSpec = spring(dampingRatio = 0.7f, stiffness = Spring.StiffnessMediumLow)) + expandHorizontally(),
-                    exit = fadeOut(tween(160)) + scaleOut(targetScale = 0.8f, animationSpec = tween(160)) + shrinkHorizontally()
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(
-                            onClick = { viewModel.handleTopBarBack() },
-                            modifier = Modifier.size(44.dp).clip(CircleShape)
-                        ) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "رجوع",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        Spacer(Modifier.width(4.dp))
-                    }
-                }
-                
-                AnimatedContent(
-                    targetState = Pair<Screen, String?>(currentScreen, editingStudentMode),
-                    transitionSpec = {
-                        val easeOut = CubicBezierEasing(0.25f, 1f, 0.5f, 1f)
-                        (fadeIn(animationSpec = tween(300, easing = easeOut)) + 
-                         slideInVertically(animationSpec = spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow)) { it / 2 } +
-                         scaleIn(initialScale = 0.96f, animationSpec = tween(300, easing = easeOut))
-                        ).togetherWith(
-                            fadeOut(animationSpec = tween(220, easing = easeOut)) + 
-                            slideOutVertically(animationSpec = spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow)) { -it / 2 } +
-                            scaleOut(targetScale = 1.04f, animationSpec = tween(220, easing = easeOut))
-                        ).using(SizeTransform(clip = false))
-                    },
-                    modifier = Modifier.weight(1f),
-                    label = "title_transition"
-                ) { statePair ->
-                    val screen = statePair.first
-                    val editMode = statePair.second
-                    val selectedClass by viewModel.selectedClass.collectAsState()
-                    val title = when (screen) {
-                        Screen.EXEMPTION_SELECT -> "الاعفاء العام والفردي"
-                        Screen.EXEMPTION_INPUT -> if (selectedClass.isNotEmpty()) "إدخال درجات - $selectedClass" else "إدخال درجات الإعفاء"
-                        Screen.ANNUAL_AVERAGE -> "حاسبة السعي السنوي"
-                        Screen.MONTHLY_AVERAGE -> "حاسبة الفصلي"
-                        Screen.TERM2_CALCULATION -> "كم تحتاج في الفصل الثاني"
-                        Screen.STATISTICS -> "السجل"
-                        Screen.MY_GRADES -> when (editMode) {
-                            "add" -> "إضافة سجل درجاتي (السجل الشامل)"
-                            "edit" -> "تعديل سجل درجاتي (السجل الشامل)"
-                            else -> "درجاتي (السجل السنوي)"
-                        }
-                        Screen.INSTRUCTIONS -> "كيفية الاستخدام"
-                        Screen.ABOUT -> "حول التطبيق"
-                        Screen.NEWS -> "آخر الأخبار"
-                        Screen.UPDATES -> "التحديثات"
-                        Screen.WIDGET -> "إعداد التطبيق المصغر"
-                        Screen.APPEARANCE -> "المظهر والسمات"
-                    }
-                    val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-                    val pColor = MaterialTheme.colorScheme.primary
+                    val editingStudentMode by viewModel.editingStudentMode.collectAsState()
+                    val showTopBack = currentScreen != Screen.EXEMPTION_SELECT || editingStudentMode != null || resultState != null
 
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = pColor,
-                            fontSize = if (isWideOrLandscape) 15.sp else 17.sp
-                        ),
-                        textAlign = TextAlign.Start,
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                    )
+                    AnimatedVisibility(
+                        visible = showTopBack,
+                        enter = fadeIn(tween(220)) + scaleIn(initialScale = 0.8f, animationSpec = spring(dampingRatio = 0.7f, stiffness = Spring.StiffnessMediumLow)) + expandHorizontally(),
+                        exit = fadeOut(tween(160)) + scaleOut(targetScale = 0.8f, animationSpec = tween(160)) + shrinkHorizontally()
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(
+                                onClick = { viewModel.handleTopBarBack() },
+                                modifier = Modifier.size(36.dp).clip(CircleShape)
+                            ) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "رجوع",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Spacer(Modifier.width(4.dp))
+                        }
+                    }
+                    
+                    AnimatedContent(
+                        targetState = Pair<Screen, String?>(currentScreen, editingStudentMode),
+                        transitionSpec = {
+                            val easeOut = CubicBezierEasing(0.25f, 1f, 0.5f, 1f)
+                            (fadeIn(animationSpec = tween(300, easing = easeOut)) + 
+                             slideInVertically(animationSpec = spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow)) { it / 2 } +
+                             scaleIn(initialScale = 0.96f, animationSpec = tween(300, easing = easeOut))
+                            ).togetherWith(
+                                fadeOut(animationSpec = tween(220, easing = easeOut)) + 
+                                slideOutVertically(animationSpec = spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow)) { -it / 2 } +
+                                scaleOut(targetScale = 1.04f, animationSpec = tween(220, easing = easeOut))
+                            ).using(SizeTransform(clip = false))
+                        },
+                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
+                        label = "title_transition"
+                    ) { statePair ->
+                        val screen = statePair.first
+                        val editMode = statePair.second
+                        val selectedClass by viewModel.selectedClass.collectAsState()
+                        val title = when (screen) {
+                            Screen.EXEMPTION_SELECT -> "الاعفاء العام والفردي"
+                            Screen.EXEMPTION_INPUT -> if (selectedClass.isNotEmpty()) "إدخال درجات - $selectedClass" else "إدخال درجات الإعفاء"
+                            Screen.ANNUAL_AVERAGE -> "حاسبة السعي السنوي"
+                            Screen.MONTHLY_AVERAGE -> "حاسبة الفصلي"
+                            Screen.TERM2_CALCULATION -> "كم تحتاج في الفصل الثاني"
+                            Screen.STATISTICS -> "السجل"
+                            Screen.MY_GRADES -> when (editMode) {
+                                "add" -> "إضافة سجل درجاتي (السجل الشامل)"
+                                "edit" -> "تعديل سجل درجاتي (السجل الشامل)"
+                                else -> "درجاتي (السجل السنوي)"
+                            }
+                            Screen.INSTRUCTIONS -> "كيفية الاستخدام"
+                            Screen.ABOUT -> "حول التطبيق"
+                            Screen.NEWS -> "آخر الأخبار"
+                            Screen.UPDATES -> "التحديثات"
+                            Screen.WIDGET -> "إعداد التطبيق المصغر"
+                            Screen.APPEARANCE -> "المظهر والسمات"
+                        }
+                        val pColor = MaterialTheme.colorScheme.primary
+
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = pColor,
+                                fontSize = if (isWideOrLandscape) 15.sp else 16.sp
+                            ),
+                            textAlign = TextAlign.Start,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }
@@ -544,9 +554,9 @@ fun CaliqBottomNav(
 
     // Neutral flat liquid indicator color (Material 3 Expressive flat pill that never clashes with icons or bar)
     val indicatorColor = if (isDark) {
-        Color(0xFF334155).copy(alpha = 0.88f)
+        Color(0xFF334155).copy(alpha = 0.90f)
     } else {
-        Color(0xFFE2E8F0).copy(alpha = 0.94f)
+        Color(0xFFF1F5F9).copy(alpha = 0.95f)
     }
 
     Row(
@@ -571,12 +581,15 @@ fun CaliqBottomNav(
             val innerPillHeight = 42.dp
 
             var dragOffset by remember { mutableStateOf<Float?>(null) }
+            var lastValidIndex by remember { mutableIntStateOf(if (selectedIndex in 0..3) selectedIndex else 0) }
+            if (selectedIndex in 0..3) {
+                lastValidIndex = selectedIndex
+            }
+
             val displayIndex = if (dragOffset != null) {
                 ((dragOffset!! / tabWidthPx).toInt()).coerceIn(0, 3)
-            } else if (selectedIndex in 0..3) {
-                selectedIndex
             } else {
-                0
+                lastValidIndex
             }
 
             val layoutDirection = LocalLayoutDirection.current
@@ -609,9 +622,9 @@ fun CaliqBottomNav(
 
             // Dynamic liquid fluid stretch and squash (تمدد وانكماش سائل ديناميكي طبيعي)
             val moveDeltaX = kotlin.math.abs(animX.value - targetX.value).dp
-            val stretchX = (moveDeltaX * 0.20f).coerceAtMost(10.dp)
+            val stretchX = (moveDeltaX * 0.25f).coerceAtMost(12.dp)
             val dynamicPillWidth = pillWidth + stretchX
-            val dynamicPillHeight = (innerPillHeight - (stretchX * 0.22f)).coerceAtLeast(36.dp)
+            val dynamicPillHeight = (innerPillHeight - (stretchX * 0.20f)).coerceAtLeast(36.dp)
             val dynamicPillX = animX - (stretchX / 2f)
 
             val navShape = CircleShape
@@ -626,7 +639,7 @@ fun CaliqBottomNav(
                         alpha = 0.25f
                     )
             ) {
-                if (selectedIndex in 0..3 || dragOffset != null) {
+                if (animScale > 0.001f) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
@@ -634,11 +647,13 @@ fun CaliqBottomNav(
                             .size(width = dynamicPillWidth, height = dynamicPillHeight)
                             .graphicsLayer {
                                 alpha = animScale.coerceIn(0f, 1f)
+                                scaleX = 0.9f + 0.1f * animScale
+                                scaleY = 0.9f + 0.1f * animScale
                                 clip = false
                             }
                             .background(
                                 color = indicatorColor,
-                                shape = RoundedCornerShape(22.dp)
+                                shape = CircleShape
                             )
                     )
                 }
@@ -756,13 +771,21 @@ fun CaliqNavItem(
 ) {
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val activeColor = MaterialTheme.colorScheme.primary
-    val inactiveColor = if (isDark) Color.White.copy(alpha = 0.88f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
+    val inactiveColor = if (isDark) {
+        Color(0xFFCBD5E1).copy(alpha = 0.85f)
+    } else {
+        Color(0xFF475569).copy(alpha = 0.85f)
+    }
 
     val iconColor by animateColorAsState(
-        if (isSelected) activeColor else inactiveColor
+        targetValue = if (isSelected) activeColor else inactiveColor,
+        animationSpec = tween(220),
+        label = "nav_item_icon"
     )
     val labelColor by animateColorAsState(
-        if (isSelected) activeColor else inactiveColor
+        targetValue = if (isSelected) activeColor else inactiveColor,
+        animationSpec = tween(220),
+        label = "nav_item_label"
     )
 
     Column(
@@ -786,7 +809,7 @@ fun CaliqNavItem(
         Text(
             text = item.label,
             style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                 color = labelColor,
                 fontSize = 10.sp,
                 textAlign = TextAlign.Center
@@ -804,6 +827,7 @@ fun CaliqNavigationRail(
     onScreenSelected: (Screen) -> Unit,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
+    railWidth: Dp = 64.dp,
 ) {
     val selectedIndex = when {
         currentScreen == Screen.EXEMPTION_SELECT || currentScreen == Screen.EXEMPTION_INPUT -> 0
@@ -815,13 +839,12 @@ fun CaliqNavigationRail(
 
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val themePrimary = MaterialTheme.colorScheme.primary
-    val railWidth = 64.dp
 
     // Neutral flat liquid indicator color (Material 3 Expressive flat pill that never clashes with icons or bar)
     val indicatorColor = if (isDark) {
-        Color(0xFF334155).copy(alpha = 0.88f)
+        Color(0xFF334155).copy(alpha = 0.90f)
     } else {
-        Color(0xFFE2E8F0).copy(alpha = 0.94f)
+        Color(0xFFF1F5F9).copy(alpha = 0.95f)
     }
 
     Column(
@@ -843,16 +866,19 @@ fun CaliqNavigationRail(
             val totalHeight = maxHeight
             val tabHeight = totalHeight / 4f
             val tabHeightPx = with(LocalDensity.current) { tabHeight.toPx() }
-            val pillWidth = 52.dp
+            val pillWidth = (railWidth - 12.dp).coerceAtMost(56.dp)
             val pillHeight = (tabHeight - 6.dp).coerceAtMost(56.dp)
 
             var dragOffset by remember { mutableStateOf<Float?>(null) }
+            var lastValidIndex by remember { mutableIntStateOf(if (selectedIndex in 0..3) selectedIndex else 0) }
+            if (selectedIndex in 0..3) {
+                lastValidIndex = selectedIndex
+            }
+
             val displayIndex = if (dragOffset != null) {
                 ((dragOffset!! / tabHeightPx).toInt()).coerceIn(0, 3)
-            } else if (selectedIndex in 0..3) {
-                selectedIndex
             } else {
-                0
+                lastValidIndex
             }
 
             val targetY = if (dragOffset != null) {
@@ -881,9 +907,9 @@ fun CaliqNavigationRail(
 
             // Dynamic liquid fluid stretch and squash (تمدد وانكماش سائل ديناميكي طبيعي)
             val moveDeltaY = kotlin.math.abs(animY.value - targetY.value).dp
-            val stretchY = (moveDeltaY * 0.20f).coerceAtMost(10.dp)
+            val stretchY = (moveDeltaY * 0.25f).coerceAtMost(12.dp)
             val dynamicPillHeight = pillHeight + stretchY
-            val dynamicPillWidth = (pillWidth - (stretchY * 0.22f)).coerceAtLeast(42.dp)
+            val dynamicPillWidth = (pillWidth - (stretchY * 0.20f)).coerceAtLeast(38.dp)
             val dynamicPillY = animY - (stretchY / 2f)
 
             val railShape = RoundedCornerShape(32.dp)
@@ -898,7 +924,7 @@ fun CaliqNavigationRail(
                         alpha = 0.25f
                     )
             ) {
-                if (selectedIndex in 0..3 || dragOffset != null) {
+                if (animScale > 0.001f) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
@@ -906,11 +932,13 @@ fun CaliqNavigationRail(
                             .size(width = dynamicPillWidth, height = dynamicPillHeight)
                             .graphicsLayer {
                                 alpha = animScale.coerceIn(0f, 1f)
+                                scaleX = 0.9f + 0.1f * animScale
+                                scaleY = 0.9f + 0.1f * animScale
                                 clip = false
                             }
                             .background(
                                 color = indicatorColor,
-                                shape = RoundedCornerShape(22.dp)
+                                shape = CircleShape
                             )
                     )
                 }

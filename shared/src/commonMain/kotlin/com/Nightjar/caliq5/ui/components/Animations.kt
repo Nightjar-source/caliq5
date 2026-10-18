@@ -116,27 +116,34 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
  * Replays smoothly on every navigation with an elegant, moist (Fluid) spring motion.
  */
 fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
-    var isLoaded by remember { mutableStateOf(false) }
+    var hasTriggered by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        if (index > 0) {
-            kotlinx.coroutines.delay((index * 42L).coerceAtMost(280L))
+        if (!hasTriggered) {
+            if (index > 0) {
+                kotlinx.coroutines.delay((index * 28L).coerceAtMost(180L))
+            }
+            hasTriggered = true
         }
-        isLoaded = true
     }
     val animProgress by animateFloatAsState(
-        targetValue = if (isLoaded) 1f else 0f,
+        targetValue = if (hasTriggered) 1f else 0f,
         animationSpec = spring(
             dampingRatio = 0.72f,
-            stiffness = Spring.StiffnessLow
+            stiffness = Spring.StiffnessMediumLow
         ),
         label = "fluidSlide_$index"
     )
-    this.graphicsLayer {
-        this.alpha = animProgress.coerceIn(0f, 1f)
-        this.translationY = (1f - animProgress) * 28.dp.toPx()
-        this.scaleX = 0.95f + 0.05f * animProgress
-        this.scaleY = 0.95f + 0.05f * animProgress
-        this.clip = false
+    if (hasTriggered && animProgress >= 0.999f) {
+        Modifier
+    } else {
+        this.graphicsLayer {
+            val progress = animProgress.coerceIn(0f, 1f)
+            this.alpha = progress
+            this.translationY = (1f - progress) * 20.dp.toPx()
+            this.scaleX = 0.96f + 0.04f * progress
+            this.scaleY = 0.96f + 0.04f * progress
+            this.clip = false
+        }
     }
 }
 

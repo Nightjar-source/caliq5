@@ -58,19 +58,27 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             var prevIndex = 0
             var prevOffset = 0
             androidx.compose.runtime.snapshotFlow {
-                Pair(lazyGridState.firstVisibleItemIndex, lazyGridState.firstVisibleItemScrollOffset)
-            }.collect { (currentIndex, currentOffset) ->
-                if (currentIndex > prevIndex) {
-                    isControlVisible = false
-                } else if (currentIndex < prevIndex) {
-                    isControlVisible = true
-                } else {
-                    val delta = currentOffset - prevOffset
-                    if (delta > 12 && currentOffset > 30) {
+                Triple(
+                    lazyGridState.firstVisibleItemIndex,
+                    lazyGridState.firstVisibleItemScrollOffset,
+                    lazyGridState.isScrollInProgress
+                )
+            }.collect { (currentIndex, currentOffset, isScrolling) ->
+                if (isScrolling) {
+                    if (currentIndex > prevIndex) {
                         isControlVisible = false
-                    } else if (delta < -12 || currentOffset <= 10) {
+                    } else if (currentIndex < prevIndex) {
                         isControlVisible = true
+                    } else {
+                        val delta = currentOffset - prevOffset
+                        if (delta > 20 && currentOffset > 40) {
+                            isControlVisible = false
+                        } else if (delta < -20 || currentOffset <= 10) {
+                            isControlVisible = true
+                        }
                     }
+                } else if (currentIndex == 0 && currentOffset <= 10) {
+                    isControlVisible = true
                 }
                 prevOffset = currentOffset
                 prevIndex = currentIndex
