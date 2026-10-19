@@ -45,6 +45,7 @@ fun ResultOverlay(
     content: ResultDisplayState,
     onClose: () -> Unit,
     onExportPdf: () -> Unit,
+    adBanner: @Composable () -> Unit = {},
 ) {
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     LaunchedEffect(Unit) {
@@ -130,7 +131,7 @@ fun ResultOverlay(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(72.dp))
             }
 
             // 1. Separate Floating Circular Close Button at Screen Start Edge (الطرف) with Material Touch Morphing
@@ -232,6 +233,17 @@ fun ResultOverlay(
                     contentDescription = "تصدير PDF",
                     modifier = Modifier.size(iconInnerSize)
                 )
+            }
+
+            // 4. Persistent AdMob Adaptive Banner at bottom center of Result Screen
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .navigationBarsPadding(),
+                contentAlignment = Alignment.Center
+            ) {
+                adBanner()
             }
         }
     }

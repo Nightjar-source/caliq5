@@ -72,6 +72,7 @@ fun AppearanceScreen(viewModel: AppViewModel) {
     CaliqScreen(
         title = "إعدادات المظهر",
         onBack = { viewModel.goBack() },
+        showBottomNav = false,
         scrollable = true
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {

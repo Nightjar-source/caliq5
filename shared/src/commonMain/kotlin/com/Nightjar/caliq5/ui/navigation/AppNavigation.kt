@@ -201,25 +201,38 @@ fun AppNavigation(
                 Screen.MONTHLY_AVERAGE,
                 Screen.TERM2_CALCULATION
             )
-            AnimatedVisibility(
-                visible = isMainTab && !isNavHidden && !isWideScreen && !isImeVisible,
-                enter = slideInVertically(
-                    initialOffsetY = { it },
-                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
-                ) + fadeIn(animationSpec = tween(300)),
-                exit = slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
-                ) + fadeOut(animationSpec = tween(250)),
-                modifier = Modifier.align(Alignment.BottomCenter)
+            // Persistent Bottom Container: AdMob Banner + Animated Bottom Navigation
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .animateContentSize(
+                        animationSpec = spring(
+                            dampingRatio = 0.78f,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .navigationBarsPadding(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                // Persistent AdMob Adaptive Banner across all main & sub-screens
+                // Sits above CaliqBottomNav in phone portrait. When bottom nav slides down, banner smoothly glides down to bottom!
+                if (!isImeVisible && resultState == null) {
                     adBanner()
+                }
+
+                // Dynamic Adaptive Bottom Navigation (Phone Portrait)
+                AnimatedVisibility(
+                    visible = isMainTab && !isNavHidden && !isWideScreen,
+                    enter = slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                    ) + fadeIn(animationSpec = tween(300)),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                    ) + fadeOut(animationSpec = tween(250)),
+                ) {
                     CaliqBottomNav(
                         currentScreen = currentScreen,
                         isMenuOpen = showSideMenu,
@@ -257,6 +270,7 @@ fun AppNavigation(
                     content = result,
                     onClose = { viewModel.hideResult() },
                     onExportPdf = { viewModel.exportToPdf(viewModel.resultState.value ?: result) },
+                    adBanner = adBanner,
                 )
             }
         }

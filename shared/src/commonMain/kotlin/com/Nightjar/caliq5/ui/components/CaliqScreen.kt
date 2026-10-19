@@ -33,7 +33,7 @@ fun CaliqScreen(
             val isWide = maxWidth >= 600.dp
             val isWideOrLandscape = maxWidth > 600.dp || maxHeight < 500.dp
             val topBarHeight = if (isWideOrLandscape) 42.dp else 48.dp
-            val dynamicBottomPadding = if (!showBottomNav) 24.dp else if (isWide) 60.dp else 140.dp
+            val dynamicBottomPadding = if (!showBottomNav) 72.dp else if (isWide) 72.dp else 140.dp
 
             if (scrollable) {
                 Column(
