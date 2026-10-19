@@ -60,6 +60,9 @@ class MainActivity : ComponentActivity() {
             App(
                 deepLinkUri = deepLinkUri.value,
                 isRestoredFromProcessDeath = savedInstanceState != null,
+                adBanner = {
+                    com.Nightjar.caliq5.ads.CaliqAdaptiveBanner()
+                },
                 onDeepLinkConsumed = { deepLinkUri.value = null },
                 onSplashFinishedAction = {
                     // Request notification permission for Android 13+ (API 33+) after splash finishes

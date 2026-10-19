@@ -78,11 +78,11 @@ fun Modifier.interactive3DTilt(
                 }
             }
         }
-        .zIndex(10f)
+        .zIndex(if (rotX != 0f || rotY != 0f) 60f else 30f)
         .graphicsLayer {
             rotationX = rotX
             rotationY = rotY
-            cameraDistance = 16f * density
+            cameraDistance = 20f * density
             clip = false
         }
 }
@@ -288,13 +288,16 @@ fun FeatureExplanationCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 6.dp, vertical = 4.dp),
+            .zIndex(20f)
+            .graphicsLayer { clip = false }
+            .padding(horizontal = 6.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
+                .zIndex(20f)
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
                 .neuralAmbientGlow(
                     cornerRadius = 28.dp,
@@ -302,12 +305,12 @@ fun FeatureExplanationCard(
                     tintColor = primaryColor,
                     hasSaltMotes = true
                 )
-                .clip(shape)
-                .background(surfaceColor.copy(alpha = 0.20f))
+                .background(surfaceColor.copy(alpha = 0.20f), shape = shape)
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = gradientColors
-                    )
+                    ),
+                    shape = shape
                 )
                 .expressive3DCurvature(cornerRadius = 28.dp, shape = shape, tintColor = primaryColor)
                 .padding(horizontal = 16.dp, vertical = 14.dp)
@@ -403,13 +406,16 @@ fun MainGradeBox(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 6.dp, vertical = 4.dp),
+            .zIndex(30f)
+            .graphicsLayer { clip = false }
+            .padding(horizontal = 6.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
                 .widthIn(max = 680.dp)
                 .fillMaxWidth()
+                .zIndex(30f)
                 .interactive3DTilt(maxTiltDegrees = 6.5f)
                 .neuralAmbientGlow(
                     cornerRadius = 28.dp,
@@ -417,11 +423,11 @@ fun MainGradeBox(
                     tintColor = gradientColors?.firstOrNull() ?: primaryColor,
                     hasSaltMotes = true
                 )
-                .clip(boxShape)
                 .background(
                     brush = Brush.linearGradient(
                         colors = gradientColors ?: listOf(primaryColor, secondaryGradientColor)
-                    )
+                    ),
+                    shape = boxShape
                 )
                 .expressive3DCurvature(cornerRadius = 28.dp, shape = boxShape, tintColor = gradientColors?.firstOrNull() ?: primaryColor)
         ) {

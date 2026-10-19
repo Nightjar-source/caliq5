@@ -17,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -76,6 +78,7 @@ fun StudentProfileResultContent(state: ResultDisplayState.StudentProfileResult) 
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .graphicsLayer { clip = false }
             .animateContentSize(
                 animationSpec = androidx.compose.animation.core.tween(
                     durationMillis = 300,
@@ -92,7 +95,13 @@ fun StudentProfileResultContent(state: ResultDisplayState.StudentProfileResult) 
                 else -> null
             }
 
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .zIndex(30f)
+                    .graphicsLayer { clip = false },
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
                 com.Nightjar.caliq5.ui.components.MainGradeBox(
                     title = "معدل السعي السنوي العام (${s.name})",
                     grade = "${formatDecimalGrade(overallAverage)}%",

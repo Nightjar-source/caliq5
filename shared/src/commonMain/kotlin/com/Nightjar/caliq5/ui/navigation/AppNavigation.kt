@@ -71,6 +71,7 @@ import com.Nightjar.caliq5.viewmodel.AppViewModel
 fun AppNavigation(
     viewModel: AppViewModel,
     isTablet: Boolean = false,
+    adBanner: @Composable () -> Unit = {},
 ) {
     val currentScreen by viewModel.currentScreen.collectAsState()
     val showSideMenu by viewModel.showSideMenu.collectAsState()
@@ -94,11 +95,10 @@ fun AppNavigation(
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val windowInfo = LocalWindowInfo.current
         val density = LocalDensity.current
-        val size = with(density) {
-            DpSize(windowInfo.containerSize.width.toDp(), windowInfo.containerSize.height.toDp())
-        }
-        val isLandscape = size.height < 500.dp && size.width > size.height
-        val isWideScreen = (adaptiveWindowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT) || isLandscape || size.width >= 600.dp || isTabletop
+        val containerWidth = if (maxWidth > 0.dp) maxWidth else with(density) { windowInfo.containerSize.width.toDp() }.coerceAtLeast(1.dp)
+        val containerHeight = if (maxHeight > 0.dp) maxHeight else with(density) { windowInfo.containerSize.height.toDp() }.coerceAtLeast(1.dp)
+        val isLandscape = containerHeight < 500.dp && containerWidth > containerHeight
+        val isWideScreen = (adaptiveWindowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT) || isLandscape || containerWidth >= 600.dp || isTabletop
         val targetRailWidth = when (adaptiveWindowSizeClass.windowWidthSizeClass) {
             WindowWidthSizeClass.EXPANDED -> 72.dp
             WindowWidthSizeClass.MEDIUM -> 64.dp
@@ -118,13 +118,19 @@ fun AppNavigation(
         val safeEnd = safeDrawing.calculateEndPadding(layoutDirection)
         val isNavHidden by viewModel.isNavHidden.collectAsState()
 
+        val topSafeInset = WindowInsets.statusBars
+            .union(WindowInsets.captionBar)
+            .union(WindowInsets.displayCutout)
+            .asPaddingValues()
+            .calculateTopPadding()
+
         val contentStartPad by animateDpAsState(
-            targetValue = if (isWideScreen) safeStart + 16.dp else 0.dp,
+            targetValue = if (isWideScreen) (safeStart + 16.dp).coerceAtLeast(0.dp) else 0.dp,
             animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
             label = "content_start_pad"
         )
         val contentEndPad by animateDpAsState(
-            targetValue = if (isWideScreen) safeEnd + railWidth + 24.dp else 0.dp,
+            targetValue = if (isWideScreen) (safeEnd + railWidth + 24.dp).coerceAtLeast(0.dp) else 0.dp,
             animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
             label = "content_end_pad"
         )
@@ -134,32 +140,34 @@ fun AppNavigation(
                 currentScreen = currentScreen,
                 viewModel = viewModel,
                 contentPadding = PaddingValues(
-                    start = contentStartPad,
-                    end = contentEndPad
+                    start = contentStartPad.coerceAtLeast(0.dp),
+                    end = contentEndPad.coerceAtLeast(0.dp)
                 ),
                 isWideScreen = isWideScreen
             )
 
             // Dynamic Adaptive Navigation Rail (Wide / Landscape / Foldable / Chromebook / DeX)
+            val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
+            val railSlideOffset: (Int) -> Int = { width -> if (isRtl) -width else width }
             AnimatedVisibility(
                 visible = isWideScreen && !isNavHidden,
                 enter = slideInHorizontally(
-                    initialOffsetX = { it },
+                    initialOffsetX = railSlideOffset,
                     animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
                 ) + fadeIn(animationSpec = tween(300)),
                 exit = slideOutHorizontally(
-                    targetOffsetX = { -it },
+                    targetOffsetX = railSlideOffset,
                     animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
                 ) + fadeOut(animationSpec = tween(250)),
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                val verticalPad = if (size.height < 500.dp) 8.dp else 24.dp
+                val verticalPad = if (containerHeight < 500.dp) 8.dp else 24.dp
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .statusBarsPadding()
+                        .padding(top = topSafeInset + verticalPad, bottom = verticalPad)
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
-                        .padding(end = 12.dp, top = verticalPad, bottom = verticalPad),
+                        .padding(end = 12.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     CaliqNavigationRail(
@@ -172,6 +180,19 @@ fun AppNavigation(
                 }
             }
 
+            // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively at bottom center)
+            val isImeVisible = WindowInsets.ime.getBottom(density) > 0
+            if (isWideScreen && !isImeVisible) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .navigationBarsPadding()
+                        .padding(bottom = 4.dp)
+                ) {
+                    adBanner()
+                }
+            }
+
             // Dynamic Adaptive Bottom Navigation (Phone Portrait)
             val isMainTab = currentScreen in listOf(
                 Screen.EXEMPTION_SELECT,
@@ -180,7 +201,6 @@ fun AppNavigation(
                 Screen.MONTHLY_AVERAGE,
                 Screen.TERM2_CALCULATION
             )
-            val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             AnimatedVisibility(
                 visible = isMainTab && !isNavHidden && !isWideScreen && !isImeVisible,
                 enter = slideInVertically(
@@ -193,15 +213,22 @@ fun AppNavigation(
                 ) + fadeOut(animationSpec = tween(250)),
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                CaliqBottomNav(
-                    currentScreen = currentScreen,
-                    isMenuOpen = showSideMenu,
-                    onScreenSelected = { viewModel.navigateTo(it) },
-                    onMenuClick = { viewModel.openMenu() },
+                Column(
                     modifier = Modifier
-                        .navigationBarsPadding()
-                        .padding(bottom = 20.dp, start = 12.dp, end = 12.dp),
-                )
+                        .fillMaxWidth()
+                        .navigationBarsPadding(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    adBanner()
+                    CaliqBottomNav(
+                        currentScreen = currentScreen,
+                        isMenuOpen = showSideMenu,
+                        onScreenSelected = { viewModel.navigateTo(it) },
+                        onMenuClick = { viewModel.openMenu() },
+                        modifier = Modifier
+                            .padding(top = 4.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                    )
+                }
             }
         }
 
@@ -443,6 +470,12 @@ private fun MainContent(
         val layoutDirection = LocalLayoutDirection.current
         val topBarStartPadding = if (isWideScreen) contentPadding.calculateStartPadding(layoutDirection) else 0.dp
         val topBarEndPadding = if (isWideScreen) contentPadding.calculateEndPadding(layoutDirection) else 0.dp
+        val containerWidth = maxWidth
+        val topSafeInset = WindowInsets.statusBars
+            .union(WindowInsets.captionBar)
+            .union(WindowInsets.displayCutout)
+            .asPaddingValues()
+            .calculateTopPadding()
 
         val resultState by viewModel.resultState.collectAsState()
 
@@ -459,7 +492,7 @@ private fun MainContent(
         val topCapsuleHeight = if (isWideOrLandscape) 36.dp else 42.dp
         val iconBtnSize = if (isWideOrLandscape) 36.dp else 40.dp
         val iconInnerSize = if (isWideOrLandscape) 18.dp else 22.dp
-        val titleSideClearance = if (isWideOrLandscape) 56.dp else 64.dp
+        val titleSideClearance = if (containerWidth < 340.dp) 44.dp else if (isWideOrLandscape) 56.dp else 64.dp
 
         // 1. Separate Floating Circular Back Button at Start Edge with Material Touch Morphing Effect
         AnimatedVisibility(
@@ -468,8 +501,7 @@ private fun MainContent(
             exit = fadeOut(tween(180)) + scaleOut(targetScale = 0.75f, animationSpec = tween(180)),
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .statusBarsPadding()
-                .padding(top = topBarTopPad)
+                .padding(top = topSafeInset + topBarTopPad)
                 .padding(start = topBarStartPadding + 16.dp)
         ) {
             CaliqIconButton(
@@ -517,14 +549,13 @@ private fun MainContent(
             exit = fadeOut(tween(150)),
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(top = topBarTopPad)
+                .padding(top = topSafeInset + topBarTopPad)
                 .padding(start = titleCapsuleStartPad, end = titleCapsuleEndPad)
         ) {
             Surface(
                 modifier = Modifier
                     .height(topCapsuleHeight)
-                    .widthIn(min = 130.dp, max = 460.dp)
+                    .widthIn(min = minOf(110.dp, containerWidth * 0.45f), max = 460.dp)
                     .animateContentSize(
                         animationSpec = spring(
                             dampingRatio = 0.72f,
@@ -620,217 +651,226 @@ fun CaliqBottomNav(
 
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val themePrimary = MaterialTheme.colorScheme.primary
-    val barHeight = 54.dp
-    val squircleSize = 48.dp
 
-    // Neutral flat liquid indicator color (Material 3 Expressive flat pill that never clashes with icons or bar)
-    val indicatorColor = if (isDark) {
-        Color(0xFF334155).copy(alpha = 0.90f)
-    } else {
-        Color(0xFFF1F5F9).copy(alpha = 0.95f)
-    }
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val navTotalWidth = maxWidth
+        val isUltraCompact = navTotalWidth < 280.dp
+        val isCompact = navTotalWidth < 340.dp
+        val barHeight = if (isUltraCompact) 46.dp else if (isCompact) 50.dp else 54.dp
+        val squircleSize = if (isUltraCompact) 38.dp else if (isCompact) 42.dp else 48.dp
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(barHeight)
-            .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // 1. الكبسولة العضوية الحبيبية الرئيسية الشفافة (Original 25% frosted glass from backup)
-        BoxWithConstraints(
+        // Neutral flat liquid indicator color (Material 3 Expressive flat pill that never clashes with icons or bar)
+        val indicatorColor = if (isDark) {
+            Color(0xFF334155).copy(alpha = 0.90f)
+        } else {
+            Color(0xFFF1F5F9).copy(alpha = 0.95f)
+        }
+
+        Row(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .height(barHeight)
+                .padding(horizontal = if (isUltraCompact) 4.dp else 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(if (isUltraCompact) 4.dp else 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            val totalWidth = maxWidth
-            val tabWidth = totalWidth / 4f
-            val tabWidthPx = with(LocalDensity.current) { tabWidth.toPx() }
-            val pillWidth = (tabWidth - 6.dp).coerceAtMost(62.dp)
-            val innerPillHeight = 42.dp
-
-            var dragOffset by remember { mutableStateOf<Float?>(null) }
-            var lastValidIndex by remember { mutableIntStateOf(if (selectedIndex in 0..3) selectedIndex else 0) }
-            if (selectedIndex in 0..3) {
-                lastValidIndex = selectedIndex
-            }
-
-            val displayIndex = if (dragOffset != null) {
-                ((dragOffset!! / tabWidthPx).toInt()).coerceIn(0, 3)
-            } else {
-                lastValidIndex
-            }
-
-            val layoutDirection = LocalLayoutDirection.current
-            val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
-
-            val targetX = if (dragOffset != null) {
-                val offsetDp = with(LocalDensity.current) { (dragOffset!! - (pillWidth.toPx() / 2f)).toDp() }
-                val minX = (tabWidth - pillWidth) / 2f
-                val maxX = (tabWidth * 3) + (tabWidth - pillWidth) / 2f
-                offsetDp.coerceIn(minOf(minX, maxX), maxOf(minX, maxX))
-            } else {
-                (tabWidth * displayIndex) + (tabWidth - pillWidth) / 2f
-            }
-
-            // Authentic M3 Expressive liquid fluid spring motion (zero vertical squash, purely horizontal)
-            val animX by animateDpAsState(
-                targetValue = targetX,
-                animationSpec = spring(
-                    dampingRatio = 0.65f, // Liquid fluid elasticity
-                    stiffness = 300f      // Responsive fluid movement
-                ),
-                label = "bottom_nav_pill_x"
-            )
-
-            val animScale by animateFloatAsState(
-                targetValue = if (selectedIndex in 0..3 || dragOffset != null) 1f else 0f,
-                animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
-                label = "bottom_nav_pill_scale"
-            )
-
-            // Dynamic liquid fluid stretch and squash (تمدد وانكماش سائل ديناميكي طبيعي)
-            val moveDeltaX = kotlin.math.abs(animX.value - targetX.value).dp
-            val stretchX = (moveDeltaX * 0.25f).coerceAtMost(12.dp)
-            val dynamicPillWidth = pillWidth + stretchX
-            val dynamicPillHeight = (innerPillHeight - (stretchX * 0.20f)).coerceAtLeast(36.dp)
-            val dynamicPillX = animX - (stretchX / 2f)
-
-            val navShape = CircleShape
-
-            Box(
+            // 1. الكبسولة العضوية الحبيبية الرئيسية الشفافة (Original 25% frosted glass from backup)
+            BoxWithConstraints(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .frostedOrganicCapsule(
-                        shape = navShape,
-                        cornerRadius = 32.dp,
-                        tintColor = themePrimary,
-                        alpha = 0.25f
-                    )
+                    .weight(1f)
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.Center
             ) {
-                if (animScale > 0.001f) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .offset(x = dynamicPillX)
-                            .size(width = dynamicPillWidth, height = dynamicPillHeight)
-                            .graphicsLayer {
-                                alpha = animScale.coerceIn(0f, 1f)
-                                scaleX = 0.9f + 0.1f * animScale
-                                scaleY = 0.9f + 0.1f * animScale
-                                clip = false
-                            }
-                            .background(
-                                color = indicatorColor,
-                                shape = CircleShape
-                            )
-                    )
-                }
-            }
+                val totalWidth = maxWidth
+                val tabWidth = totalWidth / 4f
+                val tabWidthPx = with(LocalDensity.current) { tabWidth.toPx() }
+                val safeTabWidthPx = tabWidthPx.coerceAtLeast(1f)
+                val pillWidth = (tabWidth - 4.dp).coerceIn(18.dp, 62.dp)
+                val innerPillHeight = if (isUltraCompact) 32.dp else if (isCompact) 36.dp else 42.dp
 
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(layoutDirection) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                val change = event.changes.firstOrNull()
-                                if (change != null) {
-                                    if (change.pressed) {
-                                        val rawX = change.position.x
-                                        val directionalX = if (isRtl) size.width.toFloat() - rawX else rawX
-                                        dragOffset = directionalX.coerceIn(0f, size.width.toFloat())
-                                    } else {
-                                        if (dragOffset != null) {
-                                            val idx = (dragOffset!! / tabWidthPx).toInt().coerceIn(0, 3)
-                                            onScreenSelected(bottomNavItems[idx].screen)
-                                            dragOffset = null
+                var dragOffset by remember { mutableStateOf<Float?>(null) }
+                var lastValidIndex by remember { mutableIntStateOf(if (selectedIndex in 0..3) selectedIndex else 0) }
+                if (selectedIndex in 0..3) {
+                    lastValidIndex = selectedIndex
+                }
+
+                val displayIndex = if (dragOffset != null) {
+                    ((dragOffset!! / safeTabWidthPx).toInt()).coerceIn(0, 3)
+                } else {
+                    lastValidIndex
+                }
+
+                val layoutDirection = LocalLayoutDirection.current
+                val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
+
+                val targetX = if (dragOffset != null) {
+                    val offsetDp = with(LocalDensity.current) { (dragOffset!! - (pillWidth.toPx() / 2f)).toDp() }
+                    val minX = (tabWidth - pillWidth) / 2f
+                    val maxX = (tabWidth * 3) + (tabWidth - pillWidth) / 2f
+                    offsetDp.coerceIn(minOf(minX, maxX), maxOf(minX, maxX))
+                } else {
+                    (tabWidth * displayIndex) + (tabWidth - pillWidth) / 2f
+                }
+
+                // Authentic M3 Expressive liquid fluid spring motion (zero vertical squash, purely horizontal)
+                val animX by animateDpAsState(
+                    targetValue = targetX,
+                    animationSpec = spring(
+                        dampingRatio = 0.65f, // Liquid fluid elasticity
+                        stiffness = 300f      // Responsive fluid movement
+                    ),
+                    label = "bottom_nav_pill_x"
+                )
+
+                val animScale by animateFloatAsState(
+                    targetValue = if (selectedIndex in 0..3 || dragOffset != null) 1f else 0f,
+                    animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
+                    label = "bottom_nav_pill_scale"
+                )
+
+                // Dynamic liquid fluid stretch and squash (تمدد وانكماش سائل ديناميكي طبيعي)
+                val moveDeltaX = kotlin.math.abs(animX.value - targetX.value).dp
+                val stretchX = (moveDeltaX * 0.25f).coerceAtMost(10.dp)
+                val dynamicPillWidth = (pillWidth + stretchX).coerceAtLeast(16.dp)
+                val dynamicPillHeight = (innerPillHeight - (stretchX * 0.20f)).coerceAtLeast(24.dp)
+                val dynamicPillX = animX - (stretchX / 2f)
+
+                val navShape = CircleShape
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .frostedOrganicCapsule(
+                            shape = navShape,
+                            cornerRadius = 32.dp,
+                            tintColor = themePrimary,
+                            alpha = 0.25f
+                        )
+                ) {
+                    if (animScale > 0.001f) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .offset(x = dynamicPillX)
+                                .size(width = dynamicPillWidth, height = dynamicPillHeight)
+                                .graphicsLayer {
+                                    alpha = animScale.coerceIn(0f, 1f)
+                                    scaleX = 0.9f + 0.1f * animScale
+                                    scaleY = 0.9f + 0.1f * animScale
+                                    clip = false
+                                }
+                                .background(
+                                    color = indicatorColor,
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(layoutDirection) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    val change = event.changes.firstOrNull()
+                                    if (change != null) {
+                                        if (change.pressed) {
+                                            val rawX = change.position.x
+                                            val directionalX = if (isRtl) size.width.toFloat() - rawX else rawX
+                                            dragOffset = directionalX.coerceIn(0f, size.width.toFloat())
+                                        } else {
+                                            if (dragOffset != null) {
+                                                val idx = (dragOffset!! / safeTabWidthPx).toInt().coerceIn(0, 3)
+                                                onScreenSelected(bottomNavItems[idx].screen)
+                                                dragOffset = null
+                                            }
                                         }
                                     }
                                 }
                             }
+                        },
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    bottomNavItems.take(4).forEachIndexed { _, item ->
+                        val isSelected = (!isMenuOpen && currentScreen == item.screen) ||
+                                (!isMenuOpen && currentScreen == Screen.EXEMPTION_INPUT && item.screen == Screen.EXEMPTION_SELECT)
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CaliqNavItem(
+                                item = item,
+                                isSelected = isSelected,
+                                isUltraCompact = isUltraCompact,
+                                isCompact = isCompact
+                            )
                         }
-                    },
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                bottomNavItems.take(4).forEachIndexed { _, item ->
-                    val isSelected = (!isMenuOpen && currentScreen == item.screen) ||
-                            (!isMenuOpen && currentScreen == Screen.EXEMPTION_INPUT && item.screen == Screen.EXEMPTION_SELECT)
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CaliqNavItem(
-                            item = item,
-                            isSelected = isSelected
-                        )
                     }
                 }
             }
-        }
 
-        // 2. زر القائمة المربع المنفصل الزجاجي العضوي (Companion Floating Action Squircle)
-        val fabShape = RoundedCornerShape(18.dp)
-        val isFabActive = isMenuOpen || showSideMenuPill(currentScreen)
-        val fabIndicatorScale by animateFloatAsState(
-            targetValue = if (isFabActive) 1f else 0f,
-            animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
-            label = "fab_indicator_scale"
-        )
-        val fabIconColor by animateColorAsState(
-            targetValue = if (isFabActive) {
-                themePrimary
-            } else {
-                if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1E293B).copy(alpha = 0.85f)
-            },
-            animationSpec = tween(200),
-            label = "fab_icon_color"
-        )
+            // 2. زر القائمة المربع المنفصل الزجاجي العضوي (Companion Floating Action Squircle)
+            val fabShape = RoundedCornerShape(if (isUltraCompact) 14.dp else 18.dp)
+            val isFabActive = isMenuOpen || showSideMenuPill(currentScreen)
+            val fabIndicatorScale by animateFloatAsState(
+                targetValue = if (isFabActive) 1f else 0f,
+                animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
+                label = "fab_indicator_scale"
+            )
+            val fabIconColor by animateColorAsState(
+                targetValue = if (isFabActive) {
+                    themePrimary
+                } else {
+                    if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1E293B).copy(alpha = 0.85f)
+                },
+                animationSpec = tween(200),
+                label = "fab_icon_color"
+            )
 
-        Box(
-            modifier = Modifier
-                .size(squircleSize)
-                .frostedOrganicCapsule(
-                    shape = fabShape,
-                    cornerRadius = 18.dp,
-                    tintColor = themePrimary,
-                    alpha = 0.25f
-                )
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onMenuClick
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            if (fabIndicatorScale > 0.01f) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(4.dp)
-                        .graphicsLayer {
-                            alpha = fabIndicatorScale
-                            scaleX = 0.85f + 0.15f * fabIndicatorScale
-                            scaleY = 0.85f + 0.15f * fabIndicatorScale
-                        }
-                        .background(
-                            color = indicatorColor,
-                            shape = RoundedCornerShape(14.dp)
-                        )
+            Box(
+                modifier = Modifier
+                    .size(squircleSize)
+                    .frostedOrganicCapsule(
+                        shape = fabShape,
+                        cornerRadius = if (isUltraCompact) 14.dp else 18.dp,
+                        tintColor = themePrimary,
+                        alpha = 0.25f
+                    )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onMenuClick
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (fabIndicatorScale > 0.01f) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(3.dp)
+                            .graphicsLayer {
+                                alpha = fabIndicatorScale
+                                scaleX = 0.85f + 0.15f * fabIndicatorScale
+                                scaleY = 0.85f + 0.15f * fabIndicatorScale
+                            }
+                            .background(
+                                color = indicatorColor,
+                                shape = RoundedCornerShape(if (isUltraCompact) 11.dp else 14.dp)
+                            )
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "القائمة",
+                    tint = fabIconColor,
+                    modifier = Modifier.size(if (isUltraCompact) 18.dp else if (isCompact) 20.dp else 22.dp)
                 )
             }
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "القائمة",
-                tint = fabIconColor,
-                modifier = Modifier.size(22.dp)
-            )
         }
     }
 }
@@ -838,7 +878,9 @@ fun CaliqBottomNav(
 @Composable
 fun CaliqNavItem(
     item: NavItem,
-    isSelected: Boolean
+    isSelected: Boolean,
+    isUltraCompact: Boolean = false,
+    isCompact: Boolean = false
 ) {
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val activeColor = MaterialTheme.colorScheme.primary
@@ -864,30 +906,34 @@ fun CaliqNavItem(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
+        val iconSize = if (isUltraCompact) 18.dp else if (isCompact) 20.dp else 22.dp
         Box(
             modifier = Modifier
-                .size(width = 50.dp, height = 30.dp),
+                .size(width = if (isCompact) 36.dp else 50.dp, height = if (isCompact) 26.dp else 30.dp),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = item.icon,
                 contentDescription = item.label,
                 tint = iconColor,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(iconSize)
             )
         }
-        Spacer(Modifier.height(2.dp))
-        Text(
-            text = item.label,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                color = labelColor,
-                fontSize = 10.sp,
-                textAlign = TextAlign.Center
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = 1
-        )
+        if (!isUltraCompact) {
+            Spacer(Modifier.height(if (isCompact) 1.dp else 2.dp))
+            Text(
+                text = item.label,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                    color = labelColor,
+                    fontSize = if (isCompact) 8.5.sp else 10.sp,
+                    textAlign = TextAlign.Center
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = 1,
+                softWrap = false
+            )
+        }
     }
 }
 
@@ -937,8 +983,9 @@ fun CaliqNavigationRail(
             val totalHeight = maxHeight
             val tabHeight = totalHeight / 4f
             val tabHeightPx = with(LocalDensity.current) { tabHeight.toPx() }
-            val pillWidth = (railWidth - 12.dp).coerceAtMost(56.dp)
-            val pillHeight = (tabHeight - 6.dp).coerceAtMost(56.dp)
+            val safeTabHeightPx = tabHeightPx.coerceAtLeast(1f)
+            val pillWidth = (railWidth - 12.dp).coerceIn(18.dp, 56.dp)
+            val pillHeight = (tabHeight - 6.dp).coerceIn(18.dp, 56.dp)
 
             var dragOffset by remember { mutableStateOf<Float?>(null) }
             var lastValidIndex by remember { mutableIntStateOf(if (selectedIndex in 0..3) selectedIndex else 0) }
@@ -947,7 +994,7 @@ fun CaliqNavigationRail(
             }
 
             val displayIndex = if (dragOffset != null) {
-                ((dragOffset!! / tabHeightPx).toInt()).coerceIn(0, 3)
+                ((dragOffset!! / safeTabHeightPx).toInt()).coerceIn(0, 3)
             } else {
                 lastValidIndex
             }
@@ -978,9 +1025,9 @@ fun CaliqNavigationRail(
 
             // Dynamic liquid fluid stretch and squash (تمدد وانكماش سائل ديناميكي طبيعي)
             val moveDeltaY = kotlin.math.abs(animY.value - targetY.value).dp
-            val stretchY = (moveDeltaY * 0.25f).coerceAtMost(12.dp)
-            val dynamicPillHeight = pillHeight + stretchY
-            val dynamicPillWidth = (pillWidth - (stretchY * 0.20f)).coerceAtLeast(38.dp)
+            val stretchY = (moveDeltaY * 0.25f).coerceAtMost(10.dp)
+            val dynamicPillHeight = (pillHeight + stretchY).coerceAtLeast(16.dp)
+            val dynamicPillWidth = (pillWidth - (stretchY * 0.20f)).coerceAtLeast(16.dp)
             val dynamicPillY = animY - (stretchY / 2f)
 
             val railShape = RoundedCornerShape(32.dp)
@@ -1029,7 +1076,7 @@ fun CaliqNavigationRail(
                                         dragOffset = rawY.coerceIn(0f, size.height.toFloat())
                                     } else {
                                         if (dragOffset != null) {
-                                            val idx = (dragOffset!! / tabHeightPx).toInt().coerceIn(0, 3)
+                                            val idx = (dragOffset!! / safeTabHeightPx).toInt().coerceIn(0, 3)
                                             onScreenSelected(bottomNavItems[idx].screen)
                                             dragOffset = null
                                         }

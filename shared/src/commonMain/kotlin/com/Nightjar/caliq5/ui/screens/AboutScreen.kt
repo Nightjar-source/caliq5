@@ -169,7 +169,7 @@ fun AboutScreen(viewModel: AppViewModel) {
             item {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
                 Surface(
-                    onClick = { uriHandler.openUri("https://t.me/DevAboudi") },
+                    onClick = { uriHandler.openUri("https://t.me/iraqitrb?direct") },
                     modifier = Modifier.fillMaxWidth().popInOnInitialLoad(4),
                     shape = RoundedCornerShape(20.dp),
                     color = MaterialTheme.colorScheme.surface,

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -88,6 +89,12 @@ fun ResultOverlay(
             )
             val titleSideClearance = if (isWideOrLandscape) 68.dp else 72.dp
 
+            val topSafeInset = WindowInsets.statusBars
+                .union(WindowInsets.captionBar)
+                .union(WindowInsets.displayCutout)
+                .asPaddingValues()
+                .calculateTopPadding()
+
             // Background surface
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -103,11 +110,13 @@ fun ResultOverlay(
                     .navigationBarsPadding()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp)
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp),
+                    .padding(top = topSafeInset + 65.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .graphicsLayer { clip = false },
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -135,8 +144,7 @@ fun ResultOverlay(
                 ),
                 modifier = Modifier
                     .align(Alignment.TopStart)
-                    .statusBarsPadding()
-                    .padding(top = topPad, start = startEdgePad)
+                    .padding(top = topSafeInset + topPad, start = startEdgePad)
                     .size(iconBtnSize)
             ) {
                 Icon(
@@ -150,8 +158,7 @@ fun ResultOverlay(
             Surface(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .statusBarsPadding()
-                    .padding(top = topPad)
+                    .padding(top = topSafeInset + topPad)
                     .padding(horizontal = titleSideClearance)
                     .height(topCapsuleHeight)
                     .widthIn(min = 130.dp, max = 460.dp)

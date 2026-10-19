@@ -2,13 +2,25 @@ package com.Nightjar.caliq5.ads
 
 import android.app.Activity
 import android.content.Context
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.Nightjar.caliq5.BuildConfig
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -81,27 +93,45 @@ object CaliqAdsManager {
 fun CaliqAdaptiveBanner(
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        AndroidView(
-            modifier = Modifier.fillMaxWidth(),
-            factory = { context ->
-                val adView = AdView(context)
-                adView.adUnitId = BuildConfig.ADMOB_BANNER_ID
-                
-                // Adaptive banner width
-                val displayMetrics = context.resources.displayMetrics
-                val widthPixels = displayMetrics.widthPixels.toFloat()
-                val density = displayMetrics.density
-                val adWidth = (widthPixels / density).toInt()
+    var isAdLoaded by remember { mutableStateOf(false) }
 
-                adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth))
-                val adRequest = AdRequest.Builder().build()
-                adView.loadAd(adRequest)
-                adView
-            }
-        )
+    AnimatedVisibility(
+        visible = isAdLoaded,
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
+    ) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            AndroidView(
+                modifier = Modifier.fillMaxWidth(),
+                factory = { context ->
+                    val adView = AdView(context)
+                    adView.adUnitId = BuildConfig.ADMOB_BANNER_ID
+
+                    // Adaptive banner width
+                    val displayMetrics = context.resources.displayMetrics
+                    val widthPixels = displayMetrics.widthPixels.toFloat()
+                    val density = displayMetrics.density
+                    val adWidth = (widthPixels / density).toInt()
+
+                    adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth))
+                    adView.adListener = object : AdListener() {
+                        override fun onAdLoaded() {
+                            isAdLoaded = true
+                        }
+                        override fun onAdFailedToLoad(error: LoadAdError) {
+                            isAdLoaded = false
+                        }
+                    }
+                    val adRequest = AdRequest.Builder().build()
+                    adView.loadAd(adRequest)
+                    adView
+                }
+            )
+        }
     }
 }

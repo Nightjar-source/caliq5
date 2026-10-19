@@ -33,7 +33,7 @@ fun CaliqScreen(
             val isWide = maxWidth >= 600.dp
             val isWideOrLandscape = maxWidth > 600.dp || maxHeight < 500.dp
             val topBarHeight = if (isWideOrLandscape) 42.dp else 48.dp
-            val bottomPadding = if (isWide) 32.dp else 100.dp
+            val dynamicBottomPadding = if (!showBottomNav) 24.dp else if (isWide) 60.dp else 140.dp
 
             if (scrollable) {
                 Column(
@@ -52,7 +52,8 @@ fun CaliqScreen(
                     Spacer(modifier = Modifier.windowInsetsTopHeight(topSafeInsets))
                     Spacer(modifier = Modifier.height(topBarHeight + 14.dp))
                     content()
-                    Spacer(modifier = Modifier.fillMaxWidth(1f).height(bottomPadding).windowInsetsPadding(WindowInsets.navigationBars))
+                    Spacer(modifier = Modifier.height(dynamicBottomPadding))
+                    Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
                 }
             } else {
                 Column(

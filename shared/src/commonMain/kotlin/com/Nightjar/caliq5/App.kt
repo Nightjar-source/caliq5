@@ -28,6 +28,7 @@ import com.Nightjar.caliq5.viewmodel.AppViewModel
 fun App(
     deepLinkUri: String? = null,
     isRestoredFromProcessDeath: Boolean = false,
+    adBanner: @Composable () -> Unit = {},
     onSplashFinishedAction: (() -> Unit)? = null,
     onDeepLinkConsumed: (() -> Unit)? = null
 ) {
@@ -86,7 +87,7 @@ fun App(
                         }
                     )
                 } else {
-                    AppNavigation(viewModel = viewModel)
+                    AppNavigation(viewModel = viewModel, adBanner = adBanner)
                 }
             }
         }
