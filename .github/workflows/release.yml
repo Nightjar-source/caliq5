@@ -43,6 +43,15 @@ jobs:
           else
             echo "::warning::KEYSTORE_BASE64 secret is not set!"
           fi
+          if [ -n "${{ secrets.ADMOB_APP_ID }}" ]; then
+            echo "ADMOB_APP_ID=${{ secrets.ADMOB_APP_ID }}" >> local.properties
+          fi
+          if [ -n "${{ secrets.ADMOB_BANNER_ID }}" ]; then
+            echo "ADMOB_BANNER_ID=${{ secrets.ADMOB_BANNER_ID }}" >> local.properties
+          fi
+          if [ -n "${{ secrets.ADMOB_INTERSTITIAL_ID }}" ]; then
+            echo "ADMOB_INTERSTITIAL_ID=${{ secrets.ADMOB_INTERSTITIAL_ID }}" >> local.properties
+          fi
 
       - name: Build Release APK
         run: ./gradlew :androidApp:assembleRelease --no-daemon --stacktrace
