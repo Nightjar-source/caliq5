@@ -17,8 +17,12 @@ android {
         applicationId = "com.Nightjar.caliq5"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 51406
-        versionName = "5.14.6"
+        versionCode = 51407
+        versionName = "5.14.7"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     packaging {
@@ -34,6 +38,16 @@ android {
     val keystorePropertiesFile = rootProject.file("local.properties")
     if (keystorePropertiesFile.exists()) {
         FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
+    }
+
+    val admobAppId = keystoreProperties.getProperty("ADMOB_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713"
+    val admobBannerId = keystoreProperties.getProperty("ADMOB_BANNER_ID") ?: "ca-app-pub-3940256099942544/6300978111"
+    val admobInterstitialId = keystoreProperties.getProperty("ADMOB_INTERSTITIAL_ID") ?: "ca-app-pub-3940256099942544/1033173712"
+
+    defaultConfig {
+        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
+        buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerId\"")
+        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialId\"")
     }
 
     signingConfigs {
@@ -93,4 +107,5 @@ dependencies {
     implementation("androidx.glance:glance-appwidget:1.1.0")
     implementation("androidx.glance:glance-material3:1.1.0")
     implementation(libs.androidx.profileinstaller) // Baseline Profile installer for Android 7-9
+    implementation("com.google.android.gms:play-services-ads:23.6.0")
 }

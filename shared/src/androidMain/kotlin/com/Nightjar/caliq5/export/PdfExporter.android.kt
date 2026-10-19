@@ -517,8 +517,8 @@ actual object PdfExporter {
                     drawText(canvas, "الصف الدراسي: ${s.className}", pageWidth - 30f, y, 14f, Color.GRAY, false, Paint.Align.RIGHT, defaultTypeface)
                     y += 40f
                     
-                    val cols = listOf("المادة", "معدل ف1", "نصف السنة", "معدل ف2", "السعي", "النهائي", "المحصلة")
-                    val colWidths = listOf(105f, 65f, 65f, 65f, 60f, 65f, 75f)
+                    val cols = listOf("المادة", "معدل ف1", "نصف السنة", "معدل ف2", "السعي", "النهائي", "الدرجة النهائية")
+                    val colWidths = listOf(105f, 72f, 68f, 72f, 60f, 60f, 88f)
                     
                     val predefinedList = if (s.className == "صف آخر (مخصص)") emptyList() else com.Nightjar.caliq5.data.ClassData.getSubjects(s.className)
                     val nonSkippedSubjects = s.subjects.filter { (name, r) ->
@@ -624,8 +624,8 @@ actual object PdfExporter {
                             }
                             val vals = listOf(t1Str, subRecord.midVal, t2Str, saeiStr, finalStr, resStr)
                             
-                            val t1Sub = if (subRecord.t1Mode == TermMode.MONTHLY && subRecord.t1Months.isNotEmpty()) "(${subRecord.t1Months.joinToString(",")})" else ""
-                            val t2Sub = if (subRecord.t2Mode == TermMode.MONTHLY && subRecord.t2Months.isNotEmpty()) "(${subRecord.t2Months.joinToString(",")})" else ""
+                            val t1Sub = if (subRecord.t1Mode == TermMode.MONTHLY && subRecord.t1Months.isNotEmpty()) "أشهر ف1: ${subRecord.t1Months.joinToString("، ")}" else ""
+                            val t2Sub = if (subRecord.t2Mode == TermMode.MONTHLY && subRecord.t2Months.isNotEmpty()) "أشهر ف2: ${subRecord.t2Months.joinToString("، ")}" else ""
                             val roundingNote = when {
                                 saeiRaw == null -> ""
                                 saeiRaw >= 74.6 && saeiRaw < 75.0 -> "(${com.Nightjar.caliq5.ui.components.formatDecimalGrade(saeiRaw)}) تم جبر الكسر"

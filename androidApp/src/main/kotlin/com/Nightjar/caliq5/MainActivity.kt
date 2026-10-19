@@ -8,6 +8,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.Nightjar.caliq5.App
 
 import androidx.activity.SystemBarStyle
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private var deepLinkUri = androidx.compose.runtime.mutableStateOf<String?>(null)
@@ -42,6 +43,14 @@ class MainActivity : ComponentActivity() {
         try {
             startService(android.content.Intent(this, CaliqCleanupService::class.java))
         } catch (_: Throwable) {}
+
+        // Initialize Google Mobile Ads SDK asynchronously
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            try {
+                com.google.android.gms.ads.MobileAds.initialize(this@MainActivity) {}
+                com.Nightjar.caliq5.ads.CaliqAdsManager.loadInterstitial(this@MainActivity)
+            } catch (_: Throwable) {}
+        }
 
         setContent {
             androidx.compose.runtime.LaunchedEffect(Unit) {

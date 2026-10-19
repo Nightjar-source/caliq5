@@ -100,9 +100,9 @@ fun AppNavigation(
         val isLandscape = size.height < 500.dp && size.width > size.height
         val isWideScreen = (adaptiveWindowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT) || isLandscape || size.width >= 600.dp || isTabletop
         val targetRailWidth = when (adaptiveWindowSizeClass.windowWidthSizeClass) {
-            WindowWidthSizeClass.EXPANDED -> 80.dp
-            WindowWidthSizeClass.MEDIUM -> 72.dp
-            else -> if (isLandscape) 72.dp else 80.dp
+            WindowWidthSizeClass.EXPANDED -> 72.dp
+            WindowWidthSizeClass.MEDIUM -> 64.dp
+            else -> if (isLandscape) 56.dp else 64.dp
         }
         val railWidth by animateDpAsState(
             targetValue = targetRailWidth,
@@ -148,7 +148,7 @@ fun AppNavigation(
                     animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
                 ) + fadeIn(animationSpec = tween(300)),
                 exit = slideOutHorizontally(
-                    targetOffsetX = { it },
+                    targetOffsetX = { -it },
                     animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
                 ) + fadeOut(animationSpec = tween(250)),
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -670,7 +670,7 @@ fun CaliqBottomNav(
                 val offsetDp = with(LocalDensity.current) { (dragOffset!! - (pillWidth.toPx() / 2f)).toDp() }
                 val minX = (tabWidth - pillWidth) / 2f
                 val maxX = (tabWidth * 3) + (tabWidth - pillWidth) / 2f
-                offsetDp.coerceIn(minX, maxX)
+                offsetDp.coerceIn(minOf(minX, maxX), maxOf(minX, maxX))
             } else {
                 (tabWidth * displayIndex) + (tabWidth - pillWidth) / 2f
             }
@@ -956,7 +956,7 @@ fun CaliqNavigationRail(
                 val offsetDp = with(LocalDensity.current) { (dragOffset!! - (pillHeight.toPx() / 2f)).toDp() }
                 val minY = (tabHeight - pillHeight) / 2f
                 val maxY = (tabHeight * 3) + (tabHeight - pillHeight) / 2f
-                offsetDp.coerceIn(minY, maxY)
+                offsetDp.coerceIn(minOf(minY, maxY), maxOf(minY, maxY))
             } else {
                 (tabHeight * displayIndex) + (tabHeight - pillHeight) / 2f
             }

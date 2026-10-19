@@ -32,6 +32,7 @@
         android:resizeableActivity="true"
         android:theme="@style/Theme.Caliq.Splash">
 
+        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="${ADMOB_APP_ID}" />
         <meta-data android:name="com.samsung.android.keepalive.density" android:value="true" />
         <meta-data android:name="android.supports_size_changes" android:value="true" />
         <meta-data android:name="android.allow_multiple_resumed_activities" android:value="true" />
