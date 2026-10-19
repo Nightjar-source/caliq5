@@ -331,11 +331,6 @@ fun StudentProfileResultContent(state: ResultDisplayState.StudentProfileResult) 
                                     fontWeight = FontWeight.Bold,
                                     color = if (isExempt) com.Nightjar.caliq5.theme.successColor else MaterialTheme.colorScheme.onSurface
                                 )
-                                if (isSkipped) {
-                                    Surface(color = MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.small) {
-                                        Text("لا تشملني", modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), fontSize = 10.sp, color = MaterialTheme.colorScheme.outline)
-                                    }
-                                }
                             }
                             
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -351,7 +346,7 @@ fun StudentProfileResultContent(state: ResultDisplayState.StudentProfileResult) 
                                     }
                                 }
                                 Text(
-                                    text = if (isSkipped) "اختيارية" else saeiRounded?.let { "${formatDecimalGrade(it)}%" } ?: "غير مكتمل",
+                                    text = if (isSkipped) "لا تشملني" else saeiRounded?.let { "${formatDecimalGrade(it)}%" } ?: "غير مكتمل",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 15.sp,
                                     color = if (isExempt) com.Nightjar.caliq5.theme.successColor else MaterialTheme.colorScheme.onSurface

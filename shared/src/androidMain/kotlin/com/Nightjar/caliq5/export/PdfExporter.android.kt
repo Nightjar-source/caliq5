@@ -125,9 +125,55 @@ actual object PdfExporter {
             }
             calculateTotalPages()
 
+            var iconBitmap: android.graphics.Bitmap? = null
+            try {
+                val splashResId = context.resources.getIdentifier("splash_icon", "drawable", context.packageName)
+                if (splashResId != 0) {
+                    try {
+                        val options = android.graphics.BitmapFactory.Options().apply {
+                            inPreferredConfig = android.graphics.Bitmap.Config.ARGB_8888
+                        }
+                        iconBitmap = android.graphics.BitmapFactory.decodeResource(context.resources, splashResId, options)
+                    } catch (e: Exception) {}
+                }
+                if (iconBitmap == null) {
+                    var drawable: android.graphics.drawable.Drawable? = null
+                    try {
+                        drawable = context.packageManager.getApplicationIcon(context.packageName)
+                    } catch (e: Exception) {}
+                    if (drawable == null) {
+                        val appIconId = context.resources.getIdentifier("ic_launcher", "mipmap", context.packageName)
+                        if (appIconId != 0) {
+                            drawable = androidx.core.content.ContextCompat.getDrawable(context, appIconId)
+                        }
+                    }
+                    if (drawable != null) {
+                        val iconSizePx = 512
+                        val bmp = android.graphics.Bitmap.createBitmap(iconSizePx, iconSizePx, android.graphics.Bitmap.Config.ARGB_8888)
+                        val iconCanvas = android.graphics.Canvas(bmp)
+                        drawable.setBounds(0, 0, iconSizePx, iconSizePx)
+                        drawable.draw(iconCanvas)
+                        iconBitmap = bmp
+                    }
+                }
+            } catch (e: Exception) {}
+
             var currentPage = document.startPage(pageInfo)
             var canvas = currentPage.canvas
             var pageNumber = 1
+
+            fun drawWatermark(c: Canvas) {
+                if (iconBitmap != null) {
+                    val wmSize = minOf(pageWidth.toFloat(), pageHeight.toFloat()) * 0.48f
+                    val wmLeft = (pageWidth - wmSize) / 2f
+                    val wmTop = (pageHeight - wmSize) / 2f
+                    val wmRect = android.graphics.RectF(wmLeft, wmTop, wmLeft + wmSize, wmTop + wmSize)
+                    val wmPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG).apply {
+                        alpha = 18 // <= 10% opacity (~7%), subtle and elegant watermark
+                    }
+                    c.drawBitmap(iconBitmap, null, wmRect, wmPaint)
+                }
+            }
 
             fun drawPageFooter(c: Canvas, num: Int) {
                 val footerY = pageHeight - 60f
@@ -153,6 +199,7 @@ actual object PdfExporter {
                 currentPage = document.startPage(pageInfo)
                 canvas = currentPage.canvas
                 canvas.drawColor(Color.WHITE)
+                drawWatermark(canvas)
                 drawText(canvas, "تطبيق الاعفاء والسعي - تابع لـ $docTitle", pageWidth - 30f, 40f, 10f, Color.GRAY, false, Paint.Align.RIGHT, defaultTypeface)
                 val settings = appSettings
                 
@@ -204,52 +251,14 @@ actual object PdfExporter {
             val tableRowColor = Color.WHITE
             
             canvas.drawColor(Color.WHITE)
+            drawWatermark(canvas)
             
-            try {
-                var iconBitmap: android.graphics.Bitmap? = null
-                
-                // Try decoding direct high-res splash_icon drawable
-                val splashResId = context.resources.getIdentifier("splash_icon", "drawable", context.packageName)
-                if (splashResId != 0) {
-                    try {
-                        val options = android.graphics.BitmapFactory.Options().apply {
-                            inPreferredConfig = android.graphics.Bitmap.Config.ARGB_8888
-                        }
-                        iconBitmap = android.graphics.BitmapFactory.decodeResource(context.resources, splashResId, options)
-                    } catch (e: Exception) {}
-                }
-                
-                // Fallback to system ApplicationIcon at 512x512 HD
-                if (iconBitmap == null) {
-                    var drawable: android.graphics.drawable.Drawable? = null
-                    try {
-                        drawable = context.packageManager.getApplicationIcon(context.packageName)
-                    } catch (e: Exception) {}
-                    
-                    if (drawable == null) {
-                        val appIconId = context.resources.getIdentifier("ic_launcher", "mipmap", context.packageName)
-                        if (appIconId != 0) {
-                            drawable = androidx.core.content.ContextCompat.getDrawable(context, appIconId)
-                        }
-                    }
-                    
-                    if (drawable != null) {
-                        val iconSizePx = 512
-                        val bmp = android.graphics.Bitmap.createBitmap(iconSizePx, iconSizePx, android.graphics.Bitmap.Config.ARGB_8888)
-                        val iconCanvas = android.graphics.Canvas(bmp)
-                        drawable.setBounds(0, 0, iconSizePx, iconSizePx)
-                        drawable.draw(iconCanvas)
-                        iconBitmap = bmp
-                    }
-                }
-
-                if (iconBitmap != null) {
-                    // Draw pure original app icon at highest sharpness without artificial frames
-                    val destRect = android.graphics.RectF(pageWidth - 80f, 32f, pageWidth - 80f + 54f, 32f + 54f)
-                    val drawPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG or Paint.DITHER_FLAG)
-                    canvas.drawBitmap(iconBitmap, null, destRect, drawPaint)
-                }
-            } catch (e: Exception) {}
+            if (iconBitmap != null) {
+                // Draw pure original app icon at highest sharpness without artificial frames
+                val destRect = android.graphics.RectF(pageWidth - 80f, 32f, pageWidth - 80f + 54f, 32f + 54f)
+                val drawPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG or Paint.DITHER_FLAG)
+                canvas.drawBitmap(iconBitmap, null, destRect, drawPaint)
+            }
 
             
             // Header
@@ -293,6 +302,15 @@ actual object PdfExporter {
                     isAntiAlias = true
                 }
                 c.drawRoundRect(boxX, y, boxX + boxWidth, y + boxHeight, 28f, 28f, gradientPaint)
+                
+                // Subtle clean border for sharp definition
+                val boxBorderPaint = Paint().apply {
+                    color = Color.argb(55, 255, 255, 255)
+                    style = Paint.Style.STROKE
+                    strokeWidth = 1.2f
+                    isAntiAlias = true
+                }
+                c.drawRoundRect(boxX, y, boxX + boxWidth, y + boxHeight, 28f, 28f, boxBorderPaint)
                 
                 drawText(c, label, pageWidth / 2f, y + 35f, 16f, Color.WHITE, true, Paint.Align.CENTER, defaultTypeface)
                 drawText(c, grade, pageWidth / 2f, y + 75f, gradeTextSize, Color.WHITE, true, Paint.Align.CENTER, defaultTypeface)
@@ -569,7 +587,7 @@ actual object PdfExporter {
                         }
 
                         if (isSkipped) {
-                            val vals = listOf("لا تشملني", "-", "-", "اختيارية", "-", "-")
+                            val vals = listOf("لا تشملني", "-", "-", "لا تشملني", "-", "-")
                             val subVals = listOf("", "", "", "", "", "")
                             y = drawTableRow(canvas, pageWidth, y, subName, vals, subVals, colWidths, Color.parseColor("#F5F5F5"), defaultTypeface)
                         } else {
@@ -698,8 +716,15 @@ actual object PdfExporter {
     }
 
     private fun drawTableHeader(canvas: Canvas, pageWidth: Int, y: Float, cols: List<String>, widths: List<Float>, color: Int, typeface: Typeface?) {
-        val paint = Paint().apply { this.color = color; style = Paint.Style.FILL }
+        val paint = Paint().apply { this.color = color; style = Paint.Style.FILL; isAntiAlias = true }
         canvas.drawRoundRect(30f, y - 20f, pageWidth - 30f, y + 15f, 8f, 8f, paint)
+        val headerBorderPaint = Paint().apply {
+            this.color = Color.parseColor("#CBD5E1")
+            this.style = Paint.Style.STROKE
+            this.strokeWidth = 1f
+            this.isAntiAlias = true
+        }
+        canvas.drawRoundRect(30f, y - 20f, pageWidth - 30f, y + 15f, 8f, 8f, headerBorderPaint)
         var x = pageWidth - 35f
         for(i in cols.indices) {
             drawText(canvas, cols[i], x - widths[i]/2, y + 2f, 11f, Color.parseColor("#21005D"), true, Paint.Align.CENTER, typeface)
@@ -711,8 +736,15 @@ actual object PdfExporter {
         val hasSubVals = subVals != null && subVals.any { it.isNotEmpty() }
         val boxHeight = if (hasSubVals) 34f else 24f
         
-        val paint = Paint().apply { this.color = color; style = Paint.Style.FILL }
+        val paint = Paint().apply { this.color = color; style = Paint.Style.FILL; isAntiAlias = true }
         canvas.drawRoundRect(30f, y - 16f, pageWidth - 30f, y + boxHeight, 8f, 8f, paint)
+        val rowBorderPaint = Paint().apply {
+            this.color = Color.parseColor("#E2E8F0")
+            this.style = Paint.Style.STROKE
+            this.strokeWidth = 0.8f
+            this.isAntiAlias = true
+        }
+        canvas.drawRoundRect(30f, y - 16f, pageWidth - 30f, y + boxHeight, 8f, 8f, rowBorderPaint)
         var x = pageWidth - 35f
         
         val textY = if (hasSubVals) y - 1f else y + 5f
@@ -764,6 +796,13 @@ actual object PdfExporter {
         
         // Soft rounded card with radius 28f exactly matching result screen cards
         canvas.drawRoundRect(30f, y, pageWidth - 30f, y + height, 28f, 28f, Paint().apply { this.color = bgColor; isAntiAlias = true })
+        val cardBorderPaint = Paint().apply {
+            this.color = Color.parseColor("#E2E8F0")
+            this.style = Paint.Style.STROKE
+            this.strokeWidth = 1.2f
+            this.isAntiAlias = true
+        }
+        canvas.drawRoundRect(30f, y, pageWidth - 30f, y + height, 28f, 28f, cardBorderPaint)
         drawText(canvas, title, pageWidth - 45f, y + 26f, 14f, color, true, Paint.Align.RIGHT, typeface)
         var ly = y + 58f
         for(line in wrappedLines) {

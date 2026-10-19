@@ -68,8 +68,24 @@ fun ResultOverlay(
             val safeStart = safeDrawing.calculateStartPadding(layoutDirection)
             val safeEnd = safeDrawing.calculateEndPadding(layoutDirection)
 
-            val startEdgePad = if (isWideScreen) safeStart + 16.dp else 16.dp
-            val endEdgePad = if (isWideScreen) safeEnd + 16.dp else 16.dp
+            val targetStartEdgePad = if (isWideScreen) safeStart + 32.dp else 16.dp
+            val targetEndEdgePad = if (isWideScreen) safeEnd + 32.dp else 16.dp
+            val startEdgePad by androidx.compose.animation.core.animateDpAsState(
+                targetValue = targetStartEdgePad,
+                animationSpec = androidx.compose.animation.core.spring(
+                    dampingRatio = 0.75f,
+                    stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
+                ),
+                label = "result_start_pad"
+            )
+            val endEdgePad by androidx.compose.animation.core.animateDpAsState(
+                targetValue = targetEndEdgePad,
+                animationSpec = androidx.compose.animation.core.spring(
+                    dampingRatio = 0.75f,
+                    stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
+                ),
+                label = "result_end_pad"
+            )
             val titleSideClearance = if (isWideOrLandscape) 68.dp else 72.dp
 
             // Background surface

@@ -28,7 +28,8 @@ import com.Nightjar.caliq5.viewmodel.AppViewModel
 fun App(
     deepLinkUri: String? = null,
     isRestoredFromProcessDeath: Boolean = false,
-    onSplashFinishedAction: (() -> Unit)? = null
+    onSplashFinishedAction: (() -> Unit)? = null,
+    onDeepLinkConsumed: (() -> Unit)? = null
 ) {
     val viewModel: AppViewModel = viewModel()
     
@@ -36,22 +37,27 @@ fun App(
         viewModel.initLaunchState(isRestoredFromProcessDeath)
     }
     
-    var lastHandledUri by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf<String?>(null) }
-    
     LaunchedEffect(deepLinkUri) {
-        if (deepLinkUri != null && deepLinkUri != lastHandledUri) {
-            lastHandledUri = deepLinkUri
+        if (deepLinkUri != null) {
             val cleanUri = deepLinkUri.substringBefore("?")
-            when {
-                cleanUri.equals("caliq://exemption", ignoreCase = true) -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.EXEMPTION_SELECT)
-                cleanUri.equals("caliq://annual", ignoreCase = true) -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.ANNUAL_AVERAGE)
-                cleanUri.equals("caliq://monthly", ignoreCase = true) -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.MONTHLY_AVERAGE)
-                cleanUri.equals("caliq://term2", ignoreCase = true) -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.TERM2_CALCULATION)
-                cleanUri.equals("caliq://grades", ignoreCase = true) -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.MY_GRADES)
-                cleanUri.equals("caliq://statistics", ignoreCase = true) -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.STATISTICS)
-                cleanUri.equals("caliq://appearance", ignoreCase = true) -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.APPEARANCE)
-                cleanUri.equals("caliq://about", ignoreCase = true) -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.ABOUT)
+            val route = cleanUri
+                .removePrefix("caliq://")
+                .removePrefix("https://caliq.app/")
+                .removePrefix("app/")
+                .trim('/')
+                .lowercase()
+
+            when (route) {
+                "exemption" -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.EXEMPTION_SELECT)
+                "annual" -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.ANNUAL_AVERAGE)
+                "monthly" -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.MONTHLY_AVERAGE)
+                "term2" -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.TERM2_CALCULATION)
+                "grades" -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.MY_GRADES)
+                "statistics" -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.STATISTICS)
+                "appearance" -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.APPEARANCE)
+                "about" -> viewModel.resetToDeepLink(com.Nightjar.caliq5.data.Screen.ABOUT)
             }
+            onDeepLinkConsumed?.invoke()
         }
     }
 

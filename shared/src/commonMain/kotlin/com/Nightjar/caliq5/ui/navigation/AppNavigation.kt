@@ -99,11 +99,16 @@ fun AppNavigation(
         }
         val isLandscape = size.height < 500.dp && size.width > size.height
         val isWideScreen = (adaptiveWindowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT) || isLandscape || size.width >= 600.dp || isTabletop
-        val railWidth = when (adaptiveWindowSizeClass.windowWidthSizeClass) {
+        val targetRailWidth = when (adaptiveWindowSizeClass.windowWidthSizeClass) {
             WindowWidthSizeClass.EXPANDED -> 80.dp
             WindowWidthSizeClass.MEDIUM -> 72.dp
             else -> if (isLandscape) 72.dp else 80.dp
         }
+        val railWidth by animateDpAsState(
+            targetValue = targetRailWidth,
+            animationSpec = spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessMediumLow),
+            label = "rail_width_anim"
+        )
 
         MathBackground(modifier = Modifier.fillMaxSize())
 
@@ -113,22 +118,44 @@ fun AppNavigation(
         val safeEnd = safeDrawing.calculateEndPadding(layoutDirection)
         val isNavHidden by viewModel.isNavHidden.collectAsState()
 
+        val contentStartPad by animateDpAsState(
+            targetValue = if (isWideScreen) safeStart + 16.dp else 0.dp,
+            animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
+            label = "content_start_pad"
+        )
+        val contentEndPad by animateDpAsState(
+            targetValue = if (isWideScreen) safeEnd + railWidth + 24.dp else 0.dp,
+            animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
+            label = "content_end_pad"
+        )
+
         Box(modifier = Modifier.fillMaxSize()) {
             MainContent(
                 currentScreen = currentScreen,
                 viewModel = viewModel,
                 contentPadding = PaddingValues(
-                    start = if (isWideScreen) safeStart + 16.dp else 0.dp,
-                    end = if (isWideScreen) safeEnd + railWidth + 24.dp else 0.dp
+                    start = contentStartPad,
+                    end = contentEndPad
                 ),
                 isWideScreen = isWideScreen
             )
 
-            if (isWideScreen) {
+            // Dynamic Adaptive Navigation Rail (Wide / Landscape / Foldable / Chromebook / DeX)
+            AnimatedVisibility(
+                visible = isWideScreen && !isNavHidden,
+                enter = slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(250)),
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
                 val verticalPad = if (size.height < 500.dp) 8.dp else 24.dp
                 Box(
                     modifier = Modifier
-                        .align(Alignment.CenterEnd)
                         .fillMaxHeight()
                         .statusBarsPadding()
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
@@ -143,37 +170,38 @@ fun AppNavigation(
                         railWidth = railWidth
                     )
                 }
-            } else {
-                val isMainTab = currentScreen in listOf(
-                    Screen.EXEMPTION_SELECT,
-                    Screen.EXEMPTION_INPUT,
-                    Screen.ANNUAL_AVERAGE,
-                    Screen.MONTHLY_AVERAGE,
-                    Screen.TERM2_CALCULATION
+            }
+
+            // Dynamic Adaptive Bottom Navigation (Phone Portrait)
+            val isMainTab = currentScreen in listOf(
+                Screen.EXEMPTION_SELECT,
+                Screen.EXEMPTION_INPUT,
+                Screen.ANNUAL_AVERAGE,
+                Screen.MONTHLY_AVERAGE,
+                Screen.TERM2_CALCULATION
+            )
+            val isImeVisible = WindowInsets.ime.getBottom(density) > 0
+            AnimatedVisibility(
+                visible = isMainTab && !isNavHidden && !isWideScreen && !isImeVisible,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(250)),
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
+                CaliqBottomNav(
+                    currentScreen = currentScreen,
+                    isMenuOpen = showSideMenu,
+                    onScreenSelected = { viewModel.navigateTo(it) },
+                    onMenuClick = { viewModel.openMenu() },
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .padding(bottom = 20.dp, start = 12.dp, end = 12.dp),
                 )
-                val isImeVisible = WindowInsets.ime.getBottom(density) > 0
-                AnimatedVisibility(
-                    visible = isMainTab && !isNavHidden && !isWideScreen && !isImeVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it },
-                        animationSpec = tween(400, easing = FastOutSlowInEasing)
-                    ) + fadeIn(animationSpec = tween(400)),
-                    exit = slideOutVertically(
-                        targetOffsetY = { it },
-                        animationSpec = tween(400, easing = FastOutSlowInEasing)
-                    ) + fadeOut(animationSpec = tween(400)),
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                ) {
-                    CaliqBottomNav(
-                        currentScreen = currentScreen,
-                        isMenuOpen = showSideMenu,
-                        onScreenSelected = { viewModel.navigateTo(it) },
-                        onMenuClick = { viewModel.openMenu() },
-                        modifier = Modifier
-                            .navigationBarsPadding()
-                            .padding(bottom = 20.dp, start = 12.dp, end = 12.dp),
-                    )
-                }
             }
         }
 
@@ -1037,9 +1065,10 @@ fun CaliqNavigationRail(
             }
         }
 
-        // 2. زر القائمة المربع المنفصل الزجاجي العضوي المطابق للصورة تماماً (Floating Action Squircle)
-        val fabShape = RoundedCornerShape(18.dp)
-        val railSquircleSize = 50.dp
+        // 2. زر القائمة المربع المنفصل الزجاجي العضوي المطابق لشريط التنقل (Floating Action Squircle)
+        val menuBtnSize = (railWidth - 8.dp)
+        val menuCornerRadius = (menuBtnSize * 0.42f).coerceIn(24.dp, 30.dp)
+        val fabShape = RoundedCornerShape(menuCornerRadius)
         val isFabActive = isMenuOpen || showSideMenuPill(currentScreen)
         val fabIndicatorScale by animateFloatAsState(
             targetValue = if (isFabActive) 1f else 0f,
@@ -1058,10 +1087,10 @@ fun CaliqNavigationRail(
 
         Box(
             modifier = Modifier
-                .size(railSquircleSize)
+                .size(menuBtnSize)
                 .frostedOrganicCapsule(
                     shape = fabShape,
-                    cornerRadius = 18.dp,
+                    cornerRadius = menuCornerRadius,
                     tintColor = themePrimary,
                     alpha = 0.25f
                 )
@@ -1084,7 +1113,7 @@ fun CaliqNavigationRail(
                         }
                         .background(
                             color = indicatorColor,
-                            shape = RoundedCornerShape(14.dp)
+                            shape = RoundedCornerShape(menuCornerRadius - 4.dp)
                         )
                 )
             }

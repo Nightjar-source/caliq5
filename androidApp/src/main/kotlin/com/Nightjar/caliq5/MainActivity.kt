@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
             App(
                 deepLinkUri = deepLinkUri.value,
                 isRestoredFromProcessDeath = savedInstanceState != null,
+                onDeepLinkConsumed = { deepLinkUri.value = null },
                 onSplashFinishedAction = {
                     // Request notification permission for Android 13+ (API 33+) after splash finishes
                     if (android.os.Build.VERSION.SDK_INT >= 33) {

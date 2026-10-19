@@ -66,23 +66,41 @@ class CaliqWidget : GlanceAppWidget() {
             }
         }
 
-        val primaryColorObj = try {
-            Color(android.graphics.Color.parseColor(settings.primaryColor))
-        } catch (e: Exception) {
-            Color(0xFF6750A4)
+        val primaryColorObj = if (settings.useMaterialYou && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            try {
+                val colorRes = if (isDark) android.R.color.system_accent1_200 else android.R.color.system_accent1_600
+                val argb = androidx.core.content.ContextCompat.getColor(context, colorRes)
+                Color(argb)
+            } catch (e: Throwable) {
+                try {
+                    val themeHex = settings.primaryColor
+                    val effectiveHex = if (themeHex.equals("#800020", ignoreCase = true) || themeHex.equals("#9E1B3E", ignoreCase = true)) "#d41145" else themeHex
+                    Color(android.graphics.Color.parseColor(effectiveHex))
+                } catch (_: Throwable) {
+                    Color(0xFF6750A4)
+                }
+            }
+        } else {
+            try {
+                val themeHex = settings.primaryColor
+                val effectiveHex = if (themeHex.equals("#800020", ignoreCase = true) || themeHex.equals("#9E1B3E", ignoreCase = true)) "#d41145" else themeHex
+                Color(android.graphics.Color.parseColor(effectiveHex))
+            } catch (e: Exception) {
+                Color(0xFF6750A4)
+            }
         }
 
-        // Material 3 Translucent Dynamic Background (Samsung One UI & Google Pixel style)
+        // Material 3 Translucent Dynamic Background (Samsung One UI, Xiaomi HyperOS & Google Pixel style)
         val widgetBg = if (isDark) {
-            if (settings.pureBlackMode) Color.Black.copy(alpha = 0.90f) else Color(0xFF1E1C22).copy(alpha = 0.88f)
+            if (settings.pureBlackMode) Color.Black.copy(alpha = 0.92f) else Color(0xFF1B1A22).copy(alpha = 0.88f)
         } else {
-            if (settings.pureWhiteMode) Color.White.copy(alpha = 0.94f) else Color(0xFFF9F7FA).copy(alpha = 0.90f)
+            if (settings.pureWhiteMode) Color.White.copy(alpha = 0.95f) else Color(0xFFFAF8FC).copy(alpha = 0.90f)
         }
 
         val buttonContainerColor = if (isDark) {
-            primaryColorObj.copy(alpha = 0.22f)
+            primaryColorObj.copy(alpha = 0.20f)
         } else {
-            primaryColorObj.copy(alpha = 0.14f)
+            primaryColorObj.copy(alpha = 0.12f)
         }
 
         val iconColor = primaryColorObj
@@ -118,6 +136,7 @@ class CaliqWidget : GlanceAppWidget() {
             ) {
                 visibleActions.forEach { action ->
                     VerticalWidgetButton(
+                        context = context,
                         action = action,
                         containerColor = buttonContainerColor,
                         iconColor = iconColor,
@@ -151,6 +170,7 @@ class CaliqWidget : GlanceAppWidget() {
             ) {
                 visibleActions.forEach { action ->
                     HorizontalWidgetButton(
+                        context = context,
                         action = action,
                         containerColor = buttonContainerColor,
                         iconColor = iconColor,
@@ -166,6 +186,7 @@ class CaliqWidget : GlanceAppWidget() {
 
     @Composable
     private fun RowScope.HorizontalWidgetButton(
+        context: Context,
         action: WidgetAction,
         containerColor: Color,
         iconColor: Color,
@@ -175,7 +196,8 @@ class CaliqWidget : GlanceAppWidget() {
         boxSize: Dp
     ) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(action.deepLink)).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            setClass(context, com.Nightjar.caliq5.MainActivity::class.java)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
         Column(
@@ -221,6 +243,7 @@ class CaliqWidget : GlanceAppWidget() {
 
     @Composable
     private fun ColumnScope.VerticalWidgetButton(
+        context: Context,
         action: WidgetAction,
         containerColor: Color,
         iconColor: Color,
@@ -230,7 +253,8 @@ class CaliqWidget : GlanceAppWidget() {
         boxSize: Dp
     ) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(action.deepLink)).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            setClass(context, com.Nightjar.caliq5.MainActivity::class.java)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
         Box(

@@ -255,6 +255,9 @@ class AppViewModel : ViewModel() {
     }
 
     fun resetToDeepLink(screen: Screen) {
+        hideResult()
+        closeMenu()
+        _editingStudentMode.value = null
         savePreference("last_active_screen", screen.name, immediate = true)
         _backStack.value = if (screen == Screen.EXEMPTION_SELECT) {
             listOf(Screen.EXEMPTION_SELECT)
