@@ -30,7 +30,11 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
 
     CaliqScreen(title = "الاعفاء العام والفردي", scrollable = false) {
         val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        val topStatusPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+        val topStatusPadding = WindowInsets.statusBars
+            .union(WindowInsets.captionBar)
+            .union(WindowInsets.displayCutout)
+            .asPaddingValues()
+            .calculateTopPadding()
 
         LazyVerticalGrid(
             state = gridState,

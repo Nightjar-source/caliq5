@@ -97,8 +97,8 @@ fun AppNavigation(
         val density = LocalDensity.current
         val containerWidth = if (maxWidth > 0.dp) maxWidth else with(density) { windowInfo.containerSize.width.toDp() }.coerceAtLeast(1.dp)
         val containerHeight = if (maxHeight > 0.dp) maxHeight else with(density) { windowInfo.containerSize.height.toDp() }.coerceAtLeast(1.dp)
-        val isLandscape = containerHeight < 500.dp && containerWidth > containerHeight
-        val isWideScreen = (adaptiveWindowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT) || isLandscape || containerWidth >= 600.dp || isTabletop
+        val isLandscape = containerWidth > containerHeight && containerHeight < 500.dp
+        val isWideScreen = ((containerWidth >= 600.dp && containerWidth >= containerHeight) || containerWidth >= 720.dp || isLandscape || isTabletop)
         val targetRailWidth = when (adaptiveWindowSizeClass.windowWidthSizeClass) {
             WindowWidthSizeClass.EXPANDED -> 72.dp
             WindowWidthSizeClass.MEDIUM -> 64.dp
@@ -150,7 +150,7 @@ fun AppNavigation(
             val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
             val railSlideOffset: (Int) -> Int = { width -> if (isRtl) -width else width }
             AnimatedVisibility(
-                visible = isWideScreen && !isNavHidden,
+                visible = isWideScreen,
                 enter = slideInHorizontally(
                     initialOffsetX = railSlideOffset,
                     animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
@@ -206,7 +206,7 @@ fun AppNavigation(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .navigationBarsPadding()
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
                     .animateContentSize(
                         animationSpec = spring(
                             dampingRatio = 0.78f,
@@ -502,11 +502,12 @@ private fun MainContent(
         val showTopBack = !isMainScreen || editingStudentMode != null || resultState != null
 
         // Material 3 Expressive adaptive dimensions (ultra-compact in landscape/tablets, sleek in portrait)
-        val topBarTopPad = if (isWideOrLandscape) 4.dp else 8.dp
-        val topCapsuleHeight = if (isWideOrLandscape) 36.dp else 42.dp
-        val iconBtnSize = if (isWideOrLandscape) 36.dp else 40.dp
-        val iconInnerSize = if (isWideOrLandscape) 18.dp else 22.dp
-        val titleSideClearance = if (containerWidth < 340.dp) 44.dp else if (isWideOrLandscape) 56.dp else 64.dp
+        val isUltraCompact = containerWidth < 280.dp
+        val topBarTopPad = if (isUltraCompact) 2.dp else if (isWideOrLandscape) 4.dp else 8.dp
+        val topCapsuleHeight = if (isUltraCompact) 30.dp else if (isWideOrLandscape) 36.dp else 42.dp
+        val iconBtnSize = if (isUltraCompact) 30.dp else if (isWideOrLandscape) 36.dp else 40.dp
+        val iconInnerSize = if (isUltraCompact) 15.dp else if (isWideOrLandscape) 18.dp else 22.dp
+        val titleSideClearance = if (isUltraCompact) 36.dp else if (containerWidth < 340.dp) 44.dp else if (isWideOrLandscape) 56.dp else 64.dp
 
         // 1. Separate Floating Circular Back Button at Start Edge with Material Touch Morphing Effect
         AnimatedVisibility(

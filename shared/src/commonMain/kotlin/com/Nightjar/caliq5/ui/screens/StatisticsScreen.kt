@@ -35,6 +35,12 @@ fun StatisticsScreen(viewModel: AppViewModel) {
     val coroutineScope = rememberCoroutineScope()
 
     CaliqScreen(title = "السجل", onBack = { viewModel.goBack() }, scrollable = false) {
+        val topSafeInset = WindowInsets.statusBars
+            .union(WindowInsets.captionBar)
+            .union(WindowInsets.displayCutout)
+            .asPaddingValues()
+            .calculateTopPadding()
+
         if (itemToDelete != null) {
             com.Nightjar.caliq5.ui.components.DeleteConfirmDialog(
                 onConfirm = {
@@ -53,7 +59,7 @@ fun StatisticsScreen(viewModel: AppViewModel) {
         
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
-            contentPadding = PaddingValues(bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 65.dp),
+            contentPadding = PaddingValues(bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = topSafeInset + 65.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)

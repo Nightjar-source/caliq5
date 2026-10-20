@@ -80,7 +80,6 @@ fun MathBackground(
 
     val symbols = rememberFloatingSymbols(count = 16)
     val textMeasurer = rememberTextMeasurer()
-
     val isHighPerf = com.Nightjar.caliq5.utils.rememberIsHighPerformanceDevice()
     var masterTime by remember { mutableStateOf(0f) }
     
@@ -90,6 +89,7 @@ fun MathBackground(
 
     androidx.compose.runtime.LaunchedEffect(isHighPerf, isAppVisible) {
         if (!isAppVisible) return@LaunchedEffect
+        kotlinx.coroutines.delay(350) // Smooth initial startup frame
         var previousFrame = androidx.compose.runtime.withFrameMillis { it }
         while (true) {
             val currentFrame = androidx.compose.runtime.withFrameMillis { it }

@@ -27,6 +27,16 @@ class CaliqCleanupService : Service() {
             try {
                 cleanDirectoryContents(context.cacheDir)
                 cleanDirectoryContents(context.externalCacheDir)
+                try { cleanDirectoryContents(context.codeCacheDir) } catch (_: Throwable) {}
+                try {
+                    val dataDir = context.applicationInfo.dataDir
+                    val webviewCache = java.io.File(dataDir, "app_webview/Default/HTTP Cache")
+                    if (webviewCache.exists()) webviewCache.deleteRecursively()
+                    val webviewServiceWorker = java.io.File(dataDir, "app_webview/Default/Service Worker/CacheStorage")
+                    if (webviewServiceWorker.exists()) webviewServiceWorker.deleteRecursively()
+                    val webviewGeneralCache = java.io.File(dataDir, "app_webview/Cache")
+                    if (webviewGeneralCache.exists()) webviewGeneralCache.deleteRecursively()
+                } catch (_: Throwable) {}
                 val userCache = java.io.File(context.filesDir, "cache")
                 if (userCache.exists()) cleanDirectoryContents(userCache)
                 val userTemp = java.io.File(context.filesDir, "temp")

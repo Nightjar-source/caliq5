@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:orientation="horizontal"
+    android:padding="6dp"
+    android:background="@drawable/widget_preview_bg"
+    android:gravity="center">
+
+    <!-- 1. Exemption -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/widget_preview_item_bg"
+        android:layout_marginEnd="4dp">
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_widget_school"
+            android:tint="#2563EB" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="الإعفاء"
+            android:textSize="10sp"
+            android:textColor="#334155"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 2. Grades Record -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/widget_preview_item_bg"
+        android:layout_marginEnd="4dp">
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_widget_grades"
+            android:tint="#059669" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="درجاتي"
+            android:textSize="10sp"
+            android:textColor="#334155"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 3. Annual Average -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/widget_preview_item_bg"
+        android:layout_marginEnd="4dp">
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_widget_functions"
+            android:tint="#D97706" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="السعي"
+            android:textSize="10sp"
+            android:textColor="#334155"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 4. Monthly Average -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/widget_preview_item_bg">
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_widget_calendar"
+            android:tint="#7C3AED" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="الفصلي"
+            android:textSize="10sp"
+            android:textColor="#334155"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

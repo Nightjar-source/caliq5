@@ -18,7 +18,7 @@
     <shortcut
         android:shortcutId="shortcut_exemption"
         android:enabled="true"
-        android:icon="@drawable/ic_widget_school"
+        android:icon="@drawable/ic_shortcut_school"
         android:shortcutShortLabel="@string/shortcut_exemption_short"
         android:shortcutLongLabel="@string/shortcut_exemption_long">
         <intent
@@ -33,7 +33,7 @@
     <shortcut
         android:shortcutId="shortcut_grades"
         android:enabled="true"
-        android:icon="@drawable/ic_widget_grades"
+        android:icon="@drawable/ic_shortcut_grades"
         android:shortcutShortLabel="@string/shortcut_grades_short"
         android:shortcutLongLabel="@string/shortcut_grades_long">
         <intent
@@ -48,7 +48,7 @@
     <shortcut
         android:shortcutId="shortcut_annual"
         android:enabled="true"
-        android:icon="@drawable/ic_widget_functions"
+        android:icon="@drawable/ic_shortcut_functions"
         android:shortcutShortLabel="@string/shortcut_annual_short"
         android:shortcutLongLabel="@string/shortcut_annual_long">
         <intent
@@ -63,7 +63,7 @@
     <shortcut
         android:shortcutId="shortcut_monthly"
         android:enabled="true"
-        android:icon="@drawable/ic_widget_calendar"
+        android:icon="@drawable/ic_shortcut_calendar"
         android:shortcutShortLabel="@string/shortcut_monthly_short"
         android:shortcutLongLabel="@string/shortcut_monthly_long">
         <intent

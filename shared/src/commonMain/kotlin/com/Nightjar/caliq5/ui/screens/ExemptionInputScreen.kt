@@ -88,6 +88,11 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
         Box(modifier = Modifier.fillMaxSize()) {
             val density = androidx.compose.ui.platform.LocalDensity.current
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
+            val topSafeInset = WindowInsets.statusBars
+                .union(WindowInsets.captionBar)
+                .union(WindowInsets.displayCutout)
+                .asPaddingValues()
+                .calculateTopPadding()
             val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             val dynamicBottomPadding by androidx.compose.animation.core.animateDpAsState(
                 targetValue = if (isImeVisible) 20.dp else (120.dp + bottomNavPadding),
@@ -103,7 +108,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                     .imePadding()
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(
-                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 115.dp,
+                    top = topSafeInset + 115.dp,
                     bottom = dynamicBottomPadding
                 ),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -263,7 +268,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 modifier = Modifier
                     .widthIn(max = 420.dp)
                     .fillMaxWidth()
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 52.dp)
+                    .padding(top = topSafeInset + 52.dp)
                     .padding(horizontal = 16.dp, vertical = 2.dp)
                     .align(Alignment.TopCenter)
             ) {

@@ -166,6 +166,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+        override fun onStop() {
+        super.onStop()
+        try {
+            CaliqCleanupService.purgeAppCache(applicationContext)
+        } catch (_: Throwable) {}
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         try {

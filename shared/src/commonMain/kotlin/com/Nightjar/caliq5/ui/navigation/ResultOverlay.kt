@@ -60,10 +60,11 @@ fun ResultOverlay(
             val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
             val isWideOrLandscape = maxWidth > 600.dp || maxHeight < 500.dp
             val isWideScreen = maxWidth >= 600.dp
-            val topPad = if (isWideOrLandscape) 4.dp else 8.dp
-            val topCapsuleHeight = if (isWideOrLandscape) 36.dp else 42.dp
-            val iconBtnSize = if (isWideOrLandscape) 36.dp else 40.dp
-            val iconInnerSize = if (isWideOrLandscape) 18.dp else 22.dp
+            val isUltraCompact = maxWidth < 280.dp
+            val topPad = if (isUltraCompact) 2.dp else if (isWideOrLandscape) 4.dp else 8.dp
+            val topCapsuleHeight = if (isUltraCompact) 30.dp else if (isWideOrLandscape) 36.dp else 42.dp
+            val iconBtnSize = if (isUltraCompact) 30.dp else if (isWideOrLandscape) 36.dp else 40.dp
+            val iconInnerSize = if (isUltraCompact) 15.dp else if (isWideOrLandscape) 18.dp else 22.dp
 
             val layoutDirection = LocalLayoutDirection.current
             val safeDrawing = WindowInsets.safeDrawing.asPaddingValues()
@@ -224,8 +225,7 @@ fun ResultOverlay(
                 ),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .statusBarsPadding()
-                    .padding(top = topPad, end = endEdgePad)
+                    .padding(top = topSafeInset + topPad, end = endEdgePad)
                     .size(iconBtnSize)
             ) {
                 Icon(
