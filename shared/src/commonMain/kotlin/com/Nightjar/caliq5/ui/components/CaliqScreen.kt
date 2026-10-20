@@ -31,9 +31,9 @@ fun CaliqScreen(
         val outerModifier = Modifier.fillMaxSize().elasticOverscroll()
         BoxWithConstraints(modifier = outerModifier) {
             val isWide = maxWidth >= 600.dp
-            val isWideOrLandscape = maxWidth > 600.dp || maxHeight < 500.dp
+            val isWideOrLandscape = maxWidth >= 600.dp
             val topBarHeight = if (isWideOrLandscape) 42.dp else 48.dp
-            val dynamicBottomPadding = if (!showBottomNav) 72.dp else if (isWide) 72.dp else 140.dp
+            val dynamicBottomPadding = if (!showBottomNav) 85.dp else if (isWide) 85.dp else 150.dp
 
             if (scrollable) {
                 Column(
@@ -41,6 +41,7 @@ fun CaliqScreen(
                         .align(Alignment.TopCenter)
                         .fillMaxSize()
                         .imePadding()
+                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
                         .verticalScroll(scrollState)
                         .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,

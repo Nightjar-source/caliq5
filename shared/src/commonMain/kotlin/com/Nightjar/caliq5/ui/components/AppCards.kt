@@ -285,14 +285,24 @@ fun FeatureExplanationCard(
         )
     }
 
-    Box(
+        BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
             .zIndex(20f)
             .graphicsLayer { clip = false }
-            .padding(horizontal = 6.dp, vertical = 6.dp),
+            .padding(horizontal = 4.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center
     ) {
+        val isVeryNarrow = maxWidth < 220.dp
+        val isNarrow = maxWidth < 300.dp
+        val outerHorizPad = if (isVeryNarrow) 8.dp else if (isNarrow) 10.dp else 16.dp
+        val outerVertPad = if (isVeryNarrow) 8.dp else if (isNarrow) 10.dp else 14.dp
+        val iconBoxSize = if (isVeryNarrow) 28.dp else if (isNarrow) 34.dp else 44.dp
+        val iconInnerSize = if (isVeryNarrow) 16.dp else if (isNarrow) 18.dp else 24.dp
+        val spacing = if (isVeryNarrow) 6.dp else if (isNarrow) 10.dp else 14.dp
+        val cardTextSize = if (isVeryNarrow) 11.5.sp else if (isNarrow) 13.sp else 14.sp
+        val cardLineHeight = if (isVeryNarrow) 16.sp else if (isNarrow) 19.sp else 22.sp
+
         Box(
             modifier = Modifier
                 .widthIn(max = 680.dp)
@@ -313,32 +323,32 @@ fun FeatureExplanationCard(
                     shape = shape
                 )
                 .expressive3DCurvature(cornerRadius = 28.dp, shape = shape, tintColor = primaryColor)
-                .padding(horizontal = 16.dp, vertical = 14.dp)
+                .padding(horizontal = outerHorizPad, vertical = outerVertPad)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
+                horizontalArrangement = Arrangement.spacedBy(spacing)
             ) {
                 Surface(
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(if (isNarrow) 10.dp else 14.dp),
                     color = if (isDark) MaterialTheme.colorScheme.surface.copy(alpha = 0.90f) else MaterialTheme.colorScheme.surface,
                     shadowElevation = 0.dp,
-                    modifier = Modifier.size(44.dp)
+                    modifier = Modifier.size(iconBoxSize)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = iconVector,
                             contentDescription = null,
                             tint = primaryColor,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(iconInnerSize)
                         )
                     }
                 }
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .defaultMinSize(minHeight = 44.dp),
+                        .defaultMinSize(minHeight = if (isNarrow) 30.dp else 44.dp),
                     verticalArrangement = Arrangement.Center
                 ) {
                     if (title.isNotEmpty()) {
@@ -346,12 +356,13 @@ fun FeatureExplanationCard(
                             title,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleMedium.copy(
-                                shadow = cardTitleShadow
+                                shadow = cardTitleShadow,
+                                fontSize = if (isVeryNarrow) 12.sp else if (isNarrow) 13.5.sp else 15.sp
                             ),
                             color = cardTitleColor,
                             textAlign = TextAlign.Justify
                         )
-                        Spacer(Modifier.height(4.dp))
+                        Spacer(Modifier.height(if (isNarrow) 2.dp else 4.dp))
                     }
                     AnimatedContent(
                         targetState = displayText,
@@ -369,7 +380,8 @@ fun FeatureExplanationCard(
                         Text(
                             text = targetText,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                lineHeight = 22.sp,
+                                lineHeight = cardLineHeight,
+                                fontSize = cardTextSize,
                                 fontWeight = FontWeight.SemiBold,
                                 color = cardTextColor,
                                 shadow = cardTextShadow

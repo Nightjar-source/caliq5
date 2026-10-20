@@ -52,13 +52,14 @@ fun CaliqSideMenu(
 ) {
     ModalDrawerSheet(
         modifier = Modifier
-            .width(300.dp)
+            .widthIn(min = 250.dp, max = 300.dp)
+            .fillMaxWidth(0.82f)
             .fillMaxHeight(),
         drawerShape = RoundedCornerShape(topEnd = 28.dp, bottomEnd = 28.dp),
         drawerContainerColor = MaterialTheme.colorScheme.surface,
         drawerContentColor = MaterialTheme.colorScheme.onSurface,
         drawerTonalElevation = 0.dp,
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Start + WindowInsetsSides.End + WindowInsetsSides.Vertical)
+        windowInsets = WindowInsets(0, 0, 0, 0)
     ) {
         SideMenuHeader()
 
@@ -104,7 +105,7 @@ fun CaliqSideMenu(
                     },
                     selected = false,
                     onClick = { onNavigate(item.screen) },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding).windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
                     shape = RoundedCornerShape(28.dp),
                     colors = NavigationDrawerItemDefaults.colors(
                         unselectedContainerColor = Color.Transparent,
@@ -113,6 +114,7 @@ fun CaliqSideMenu(
                     )
                 )
             }
+            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars).height(12.dp))
         }
     }
 }
