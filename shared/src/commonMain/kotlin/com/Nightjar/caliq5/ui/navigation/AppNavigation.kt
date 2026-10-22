@@ -203,7 +203,7 @@ fun AppNavigation(
                 Screen.MONTHLY_AVERAGE,
                 Screen.TERM2_CALCULATION
             )
-            val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen && !isImeVisible
+            val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen
             val bannerBottomPadding by animateDpAsState(
                 targetValue = if (isBottomNavVisible) 4.dp else 12.dp,
                 animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
