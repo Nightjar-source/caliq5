@@ -130,6 +130,9 @@ fun CaliqAdaptiveBanner(
                     val adRequest = AdRequest.Builder().build()
                     adView.loadAd(adRequest)
                     adView
+                },
+                onRelease = { adView ->
+                    adView.destroy()
                 }
             )
         }

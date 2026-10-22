@@ -17,8 +17,8 @@ android {
         applicationId = "com.Nightjar.caliq5"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 51415
-        versionName = "5.14.15"
+        versionCode = 51416
+        versionName = "5.14.16"
     }
 
     buildFeatures {
@@ -108,4 +108,8 @@ dependencies {
     implementation("androidx.glance:glance-material3:1.1.0")
     implementation(libs.androidx.profileinstaller) // Baseline Profile installer for Android 7-9
     implementation("com.google.android.gms:play-services-ads:23.6.0")
+}
+
+composeCompiler {
+    enableStrongSkippingMode = true
 }
