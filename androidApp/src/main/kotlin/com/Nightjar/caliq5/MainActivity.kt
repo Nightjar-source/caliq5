@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
             try {
                 com.google.android.gms.ads.MobileAds.initialize(this@MainActivity) {}
                 com.Nightjar.caliq5.ads.CaliqAdsManager.loadInterstitial(this@MainActivity)
-                com.Nightjar.caliq5.widget.CaliqWidget().updateAll(this@MainActivity)
+                com.Nightjar.caliq5.widget.updateAppWidget()
             } catch (_: Throwable) {}
         }
 
@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
         super.onConfigurationChanged(newConfig)
         kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
             try {
-                com.Nightjar.caliq5.widget.CaliqWidget().updateAll(this@MainActivity)
+                com.Nightjar.caliq5.widget.updateAppWidget()
             } catch (_: Throwable) {}
         }
     }

@@ -17,8 +17,8 @@ android {
         applicationId = "com.Nightjar.caliq5"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 51416
-        versionName = "5.14.16"
+        versionCode = 51417
+        versionName = "5.14.17"
     }
 
     buildFeatures {
@@ -110,6 +110,3 @@ dependencies {
     implementation("com.google.android.gms:play-services-ads:23.6.0")
 }
 
-composeCompiler {
-    enableStrongSkippingMode = true
-}

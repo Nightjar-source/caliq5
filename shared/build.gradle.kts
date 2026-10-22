@@ -61,6 +61,3 @@ compose.resources {
 
 
 
-composeCompiler {
-    enableStrongSkippingMode = true
-}
