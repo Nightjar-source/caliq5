@@ -17,6 +17,8 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.updateAll
+import kotlinx.coroutines.launch
 import androidx.glance.color.ColorProvider
 import androidx.glance.layout.*
 import androidx.glance.text.FontWeight
@@ -29,6 +31,15 @@ import com.Nightjar.caliq5.viewmodel.DataRepository
 
 class CaliqWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = CaliqWidget()
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            try {
+                glanceAppWidget.updateAll(context)
+            } catch (_: Throwable) {}
+        }
+    }
 }
 
 class CaliqWidget : GlanceAppWidget() {

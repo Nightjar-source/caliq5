@@ -92,7 +92,7 @@ fun AppNavigation(
     val adaptiveWindowSizeClass = adaptiveInfo.windowSizeClass
     val isTabletop = adaptiveInfo.windowPosture.isTabletop
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize().requiredSizeIn(minWidth = 240.dp, minHeight = 300.dp)) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val windowInfo = LocalWindowInfo.current
         val density = LocalDensity.current
         val containerWidth = if (maxWidth > 0.dp) maxWidth else with(density) { windowInfo.containerSize.width.toDp() }.coerceAtLeast(1.dp)

@@ -44,11 +44,12 @@ class MainActivity : ComponentActivity() {
             startService(android.content.Intent(this, CaliqCleanupService::class.java))
         } catch (_: Throwable) {}
 
-        // Initialize Google Mobile Ads SDK asynchronously
+        // Initialize Google Mobile Ads SDK & sync widget theme asynchronously
         kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
             try {
                 com.google.android.gms.ads.MobileAds.initialize(this@MainActivity) {}
                 com.Nightjar.caliq5.ads.CaliqAdsManager.loadInterstitial(this@MainActivity)
+                com.Nightjar.caliq5.widget.CaliqWidget().updateAll(this@MainActivity)
             } catch (_: Throwable) {}
         }
 
@@ -74,6 +75,15 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             )
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            try {
+                com.Nightjar.caliq5.widget.CaliqWidget().updateAll(this@MainActivity)
+            } catch (_: Throwable) {}
         }
     }
 
