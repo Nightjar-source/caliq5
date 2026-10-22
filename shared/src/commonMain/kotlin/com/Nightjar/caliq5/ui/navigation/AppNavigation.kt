@@ -186,7 +186,10 @@ fun AppNavigation(
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
+                        .windowInsetsPadding(
+                            WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
+                                .union(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+                        )
                         .padding(bottom = 4.dp)
                 ) {
                     adBanner()
@@ -200,7 +203,7 @@ fun AppNavigation(
                 Screen.MONTHLY_AVERAGE,
                 Screen.TERM2_CALCULATION
             )
-            val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen
+            val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen && !isImeVisible
             val bannerBottomPadding by animateDpAsState(
                 targetValue = if (isBottomNavVisible) 4.dp else 12.dp,
                 animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
@@ -212,7 +215,10 @@ fun AppNavigation(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal))
+                    .windowInsetsPadding(
+                        WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
+                            .union(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+                    )
                     .animateContentSize(
                         animationSpec = spring(
                             dampingRatio = 0.78f,
@@ -246,7 +252,7 @@ fun AppNavigation(
 
                 // Dynamic Adaptive Bottom Navigation (Phone Portrait)
                 AnimatedVisibility(
-                    visible = isMainTab && !isNavHidden && !isWideScreen,
+                    visible = isBottomNavVisible,
                     enter = slideInVertically(
                         initialOffsetY = { it },
                         animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)

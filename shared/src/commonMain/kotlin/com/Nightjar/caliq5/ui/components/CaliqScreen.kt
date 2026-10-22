@@ -33,7 +33,9 @@ fun CaliqScreen(
             val isWide = maxWidth >= 600.dp
             val isWideOrLandscape = maxWidth >= 600.dp
             val topBarHeight = if (isWideOrLandscape) 42.dp else 48.dp
-            val dynamicBottomPadding = if (!showBottomNav) 85.dp else if (isWide) 85.dp else 150.dp
+            val density = androidx.compose.ui.platform.LocalDensity.current
+            val isImeVisible = WindowInsets.ime.getBottom(density) > 0
+            val dynamicBottomPadding = if (isImeVisible) 20.dp else if (!showBottomNav) 85.dp else if (isWide) 85.dp else 150.dp
 
             if (scrollable) {
                 Column(
