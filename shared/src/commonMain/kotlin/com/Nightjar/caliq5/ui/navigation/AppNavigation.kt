@@ -180,16 +180,18 @@ fun AppNavigation(
                 }
             }
 
+            // Safe Bottom Insets excluding Virtual Keyboard (IME) to prevent any jitter, jumps or overlap with system navigation bars
+            val safeBottomInsets = WindowInsets.safeDrawing
+                .exclude(WindowInsets.ime)
+                .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
+
             // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively at bottom center)
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             if (isWideScreen && !isImeVisible) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .windowInsetsPadding(
-                            WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
-                                .union(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
-                        )
+                        .windowInsetsPadding(safeBottomInsets)
                         .padding(bottom = 4.dp)
                 ) {
                     adBanner()
@@ -204,73 +206,61 @@ fun AppNavigation(
                 Screen.TERM2_CALCULATION
             )
             val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen
-            val bannerBottomPadding by animateDpAsState(
-                targetValue = if (isBottomNavVisible) 4.dp else 12.dp,
+
+            // Decoupled phone banner vertical offset: sits cleanly above CaliqBottomNav when visible, slides to bottom when hidden
+            val phoneBannerBottomOffset by animateDpAsState(
+                targetValue = if (isBottomNavVisible) 68.dp else 8.dp,
                 animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
-                label = "banner_bottom_pad"
+                label = "phone_banner_bottom_offset"
             )
 
-            // Persistent Bottom Container: AdMob Banner + Animated Bottom Navigation
-            Column(
+            // Persistent AdMob Adaptive Banner across all main & sub-screens (Phone Portrait)
+            // Independent of bottom nav container to guarantee ZERO jumping/re-measurement jitter
+            AnimatedVisibility(
+                visible = !isImeVisible && resultState == null && !isWideScreen,
+                enter = fadeIn(tween(250)),
+                exit = fadeOut(tween(150)),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .windowInsetsPadding(
-                        WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
-                            .union(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
-                    )
-                    .animateContentSize(
-                        animationSpec = spring(
-                            dampingRatio = 0.78f,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .windowInsetsPadding(safeBottomInsets)
+                    .padding(bottom = phoneBannerBottomOffset)
             ) {
-                // Persistent AdMob Adaptive Banner across all main & sub-screens
-                // Sits above CaliqBottomNav in phone portrait. When bottom nav slides down, banner smoothly glides down to bottom!
-                AnimatedVisibility(
-                    visible = !isImeVisible && resultState == null && !isWideScreen,
-                    enter = fadeIn(tween(350)) + expandVertically(
-                        animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
-                        expandFrom = Alignment.Bottom
-                    ),
-                    exit = fadeOut(tween(200)) + shrinkVertically(
-                        animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
-                        shrinkTowards = Alignment.Bottom
-                    )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 8.dp, end = 8.dp, top = 2.dp, bottom = bannerBottomPadding),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        adBanner()
-                    }
+                    adBanner()
                 }
+            }
 
-                // Dynamic Adaptive Bottom Navigation (Phone Portrait)
-                AnimatedVisibility(
-                    visible = isBottomNavVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it },
-                        animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
-                    ) + fadeIn(animationSpec = tween(300)),
-                    exit = slideOutVertically(
-                        targetOffsetY = { it },
-                        animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
-                    ) + fadeOut(animationSpec = tween(250)),
-                ) {
-                    CaliqBottomNav(
-                        currentScreen = currentScreen,
-                        isMenuOpen = showSideMenu,
-                        onScreenSelected = { viewModel.navigateTo(it) },
-                        onMenuClick = { viewModel.openMenu() },
-                        modifier = Modifier
-                            .padding(top = 4.dp, bottom = 12.dp, start = 8.dp, end = 8.dp),
-                    )
-                }
+            // Dynamic Adaptive Bottom Navigation (Phone Portrait)
+            // Pinned securely to BottomCenter with safeBottomInsets, remaining completely anchored under keyboard with zero jitter
+            AnimatedVisibility(
+                visible = isBottomNavVisible,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(250)),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .windowInsetsPadding(safeBottomInsets)
+            ) {
+                CaliqBottomNav(
+                    currentScreen = currentScreen,
+                    isMenuOpen = showSideMenu,
+                    onScreenSelected = { viewModel.navigateTo(it) },
+                    onMenuClick = { viewModel.openMenu() },
+                    modifier = Modifier
+                        .padding(top = 4.dp, bottom = 12.dp, start = 8.dp, end = 8.dp),
+                )
             }
         }
 
