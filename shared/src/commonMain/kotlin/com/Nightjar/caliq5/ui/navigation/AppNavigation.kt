@@ -181,9 +181,7 @@ fun AppNavigation(
             }
 
             // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively at bottom center)
-            val isImeVisible by remember {
-                derivedStateOf { WindowInsets.ime.getBottom(density) > 0 }
-            }
+            val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             if (isWideScreen && !isImeVisible) {
                 Box(
                     modifier = Modifier
