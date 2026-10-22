@@ -103,7 +103,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             
             LazyVerticalGrid(
                 state = lazyGridState,
-                columns = GridCells.Adaptive(minSize = 290.dp),
+                columns = GridCells.Adaptive(minSize = 340.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .imePadding()

@@ -97,19 +97,19 @@ fun ResultOverlay(
                 .asPaddingValues()
                 .calculateTopPadding()
 
-            // Background surface
+            // Background surface with pure Edge-to-Edge bleed across entire window
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background.copy(alpha = 0.98f),
             ) {}
 
-            // Scrollable Content - Centered with max width for optimal readability on ultra-wide screens
+            // Scrollable Content - Pure Edge-to-Edge with safeDrawing insets applied strictly to inner content
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .widthIn(max = 680.dp)
                     .fillMaxWidth()
-                    .navigationBarsPadding()
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp)
                     .padding(top = topSafeInset + 65.dp),

@@ -50,7 +50,7 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
         
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = gridState,
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
+            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp),
             modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 12.dp),
             contentPadding = PaddingValues(top = topSafeInset + 90.dp, bottom = dynamicBottomPadding, start = 4.dp, end = 4.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),

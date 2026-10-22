@@ -231,7 +231,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
             CaliqScreen(title = "درجاتي (السجل الشامل)", onBack = { viewModel.goBack() }, scrollable = false) {
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                 state = listGridState,
-                columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 260.dp),
+                columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp),
                 modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 150.dp + bottomSafeInset),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -282,7 +282,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(end = 8.dp)) {
                                     ExpressiveActionButton(
                                         onClick = { 
                                             val latest = students.find { it.id == student.id } ?: student
@@ -608,7 +608,7 @@ fun StudentEditView(
         Box(modifier = Modifier.fillMaxSize()) {
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = editGridState,
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 260.dp),
+            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp),
             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
             contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 150.dp + bottomSafeInset),
             verticalArrangement = Arrangement.spacedBy(16.dp),

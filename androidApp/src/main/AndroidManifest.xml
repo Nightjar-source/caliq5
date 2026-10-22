@@ -51,11 +51,12 @@
             android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize|density|uiMode|keyboard|navigation|layoutDirection">
             
+            <!-- Official Googlebook OS, Android Desktop Windowing & ChromeOS Layout Bounds (developer.android.com 386dp x 352dp standard) -->
             <layout
-                android:defaultWidth="320dp"
-                android:defaultHeight="480dp"
-                android:minWidth="100dp"
-                android:minHeight="100dp"
+                android:defaultWidth="480dp"
+                android:defaultHeight="640dp"
+                android:minWidth="386dp"
+                android:minHeight="352dp"
                 android:gravity="center" />
 
             <!-- Samsung One UI, Xiaomi HyperOS/MIUI & Android Multi-Window and Freeform Pop-up Window Support -->

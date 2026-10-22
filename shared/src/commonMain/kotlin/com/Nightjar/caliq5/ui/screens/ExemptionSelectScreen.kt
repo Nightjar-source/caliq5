@@ -38,7 +38,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
 
         LazyVerticalGrid(
             state = gridState,
-            columns = GridCells.Adaptive(minSize = 140.dp),
+            columns = GridCells.Adaptive(minSize = 160.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 14.dp),

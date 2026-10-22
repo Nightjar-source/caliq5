@@ -58,7 +58,7 @@ fun StatisticsScreen(viewModel: AppViewModel) {
         }
         
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
+            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp),
             contentPadding = PaddingValues(bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = topSafeInset + 65.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),

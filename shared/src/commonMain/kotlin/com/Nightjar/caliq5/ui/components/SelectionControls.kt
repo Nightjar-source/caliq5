@@ -546,6 +546,8 @@ fun CaliqPrimaryButton(
 
         modifier = modifier
 
+            .heightIn(min = 42.dp)
+
             .instantExpressivePress(enabled = enabled) { isInstantPressed.value = it }
 
             .scale(scale)
@@ -564,7 +566,7 @@ fun CaliqPrimaryButton(
 
         shape = animatedShape,
 
-        contentPadding = PaddingValues(vertical = 15.dp, horizontal = 24.dp)
+        contentPadding = PaddingValues(vertical = 10.dp, horizontal = 16.dp)
 
     ) {
 

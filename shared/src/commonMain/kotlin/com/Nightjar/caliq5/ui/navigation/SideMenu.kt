@@ -52,8 +52,7 @@ fun CaliqSideMenu(
 ) {
     ModalDrawerSheet(
         modifier = Modifier
-            .widthIn(min = 250.dp, max = 300.dp)
-            .fillMaxWidth(0.82f)
+            .width(300.dp)
             .fillMaxHeight(),
         drawerShape = RoundedCornerShape(topEnd = 28.dp, bottomEnd = 28.dp),
         drawerContainerColor = MaterialTheme.colorScheme.surface,
@@ -114,7 +113,8 @@ fun CaliqSideMenu(
                     )
                 )
             }
-            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars).height(12.dp))
+            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
