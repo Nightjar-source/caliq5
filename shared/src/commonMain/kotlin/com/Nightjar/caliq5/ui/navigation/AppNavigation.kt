@@ -452,24 +452,36 @@ private fun MainContent(
         AnimatedContent(
             targetState = currentScreen,
             transitionSpec = {
-                val direction = if (isNavigatingBack) -1 else 1
-                val fluidEasing = androidx.compose.animation.core.CubicBezierEasing(0.16f, 1f, 0.3f, 1f)
-                val slideSpec = androidx.compose.animation.core.tween<androidx.compose.ui.unit.IntOffset>(
-                    durationMillis = 380,
-                    easing = fluidEasing
+                val mainTabs = listOf(
+                    Screen.EXEMPTION_SELECT,
+                    Screen.ANNUAL_AVERAGE,
+                    Screen.MONTHLY_AVERAGE,
+                    Screen.TERM2_CALCULATION
                 )
-                val fadeSpec = androidx.compose.animation.core.tween<Float>(
-                    durationMillis = 280,
-                    easing = androidx.compose.animation.core.LinearOutSlowInEasing
+                val fromIdx = mainTabs.indexOf(initialState)
+                val toIdx = mainTabs.indexOf(targetState)
+                val direction = when {
+                    fromIdx != -1 && toIdx != -1 -> if (toIdx < fromIdx) -1 else 1
+                    isNavigatingBack -> -1
+                    else -> 1
+                }
+
+                val springSlideSpec = spring<androidx.compose.ui.unit.IntOffset>(
+                    dampingRatio = 0.82f,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+                val fadeSpec = tween<Float>(
+                    durationMillis = 240,
+                    easing = LinearOutSlowInEasing
                 )
 
                 (slideInHorizontally(
                     initialOffsetX = { fullWidth -> fullWidth * direction },
-                    animationSpec = slideSpec
+                    animationSpec = springSlideSpec
                 ) + fadeIn(animationSpec = fadeSpec)).togetherWith(
                     slideOutHorizontally(
                         targetOffsetX = { fullWidth -> -fullWidth * direction },
-                        animationSpec = slideSpec
+                        animationSpec = springSlideSpec
                     ) + fadeOut(animationSpec = fadeSpec)
                 )
             },

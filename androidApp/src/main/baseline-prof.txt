@@ -90,3 +90,7 @@ Landroidx/lifecycle/**;
 HSPLandroidx/lifecycle/**;->**(**)**
 Lkotlinx/coroutines/**;
 HSPLkotlinx/coroutines/**;->**(**)**
+Landroidx/activity/compose/**;
+HSPLandroidx/activity/compose/**;->**(**)**
+Landroidx/profileinstaller/**;
+HSPLandroidx/profileinstaller/**;->**(**)**
