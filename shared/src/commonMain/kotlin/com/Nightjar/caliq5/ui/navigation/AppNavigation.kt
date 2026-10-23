@@ -205,7 +205,7 @@ fun AppNavigation(
                 Screen.MONTHLY_AVERAGE,
                 Screen.TERM2_CALCULATION
             )
-            val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen
+            val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen && resultState == null
 
             // Decoupled phone banner vertical offset: sits cleanly above CaliqBottomNav when visible, slides to bottom when hidden
             val phoneBannerBottomOffset by animateDpAsState(

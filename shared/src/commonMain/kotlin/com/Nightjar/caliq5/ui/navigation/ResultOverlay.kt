@@ -132,7 +132,8 @@ fun ResultOverlay(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(72.dp))
+                val bottomSafePadding = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding()
+                Spacer(modifier = Modifier.height(95.dp + bottomSafePadding))
             }
 
                         // Unified Floating Top Bar (Close Button, Title Capsule, PDF Button) with Zero Overlap Guarantee
