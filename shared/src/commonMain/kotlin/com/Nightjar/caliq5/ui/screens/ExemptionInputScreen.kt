@@ -96,7 +96,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 .calculateTopPadding()
             val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             val dynamicBottomPadding by androidx.compose.animation.core.animateDpAsState(
-                targetValue = if (isImeVisible) 20.dp else if (isWide) (85.dp + bottomNavPadding) else (135.dp + bottomNavPadding),
+                targetValue = if (isImeVisible) 20.dp else if (isWide) (85.dp + bottomNavPadding) else (160.dp + bottomNavPadding),
                 animationSpec = spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow),
                 label = "gridBottomPadding"
             )

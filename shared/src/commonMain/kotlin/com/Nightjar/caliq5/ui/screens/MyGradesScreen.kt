@@ -233,7 +233,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                 state = listGridState,
                 columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp),
                 modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 150.dp + bottomSafeInset),
+                contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 160.dp + bottomSafeInset),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -610,7 +610,7 @@ fun StudentEditView(
             state = editGridState,
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp),
             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 150.dp + bottomSafeInset),
+            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 160.dp + bottomSafeInset),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
