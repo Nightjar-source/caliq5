@@ -27,7 +27,7 @@ fun WidgetScreen(viewModel: AppViewModel) {
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 120.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = topSafeInset + 65.dp),
+            contentPadding = PaddingValues(bottom = 145.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = topSafeInset + 65.dp),
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
         ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {

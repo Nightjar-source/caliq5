@@ -31,7 +31,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
         val density = androidx.compose.ui.platform.LocalDensity.current
         val isImeVisible = WindowInsets.ime.getBottom(density) > 0
         val dynamicBottomPadding by androidx.compose.animation.core.animateDpAsState(
-            targetValue = if (isImeVisible) 20.dp else (120.dp + bottomNavPadding),
+            targetValue = if (isImeVisible) 20.dp else (160.dp + bottomNavPadding),
             animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),
             label = "annualBottomPadding"
         )

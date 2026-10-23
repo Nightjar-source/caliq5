@@ -43,7 +43,7 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
         val density = androidx.compose.ui.platform.LocalDensity.current
         val isImeVisible = WindowInsets.ime.getBottom(density) > 0
         val dynamicBottomPadding by androidx.compose.animation.core.animateDpAsState(
-            targetValue = if (isImeVisible) 20.dp else (120.dp + bottomNavPadding),
+            targetValue = if (isImeVisible) 20.dp else (160.dp + bottomNavPadding),
             animationSpec = spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessMediumLow),
             label = "monthlyBottomPadding"
         )

@@ -44,7 +44,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                 .padding(horizontal = 14.dp),
             contentPadding = PaddingValues(
                 top = topStatusPadding + 65.dp,
-                bottom = 120.dp + bottomNavPadding,
+                bottom = 160.dp + bottomNavPadding,
                 start = 2.dp,
                 end = 2.dp
             ),

@@ -47,7 +47,7 @@ fun AboutScreen(viewModel: AppViewModel) {
             columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 120.dp + bottomSafeInset),
+            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
         ) {
             // App Icon & Animated Shimmer Title
