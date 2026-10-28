@@ -987,234 +987,262 @@ fun CaliqNavigationRail(
     modifier: Modifier = Modifier,
     railWidth: Dp = 72.dp,
 ) {
-    val selectedIndex = when {
-        currentScreen == Screen.EXEMPTION_SELECT || currentScreen == Screen.EXEMPTION_INPUT -> 0
-        currentScreen == Screen.ANNUAL_AVERAGE -> 1
-        currentScreen == Screen.MONTHLY_AVERAGE -> 2
-        currentScreen == Screen.TERM2_CALCULATION -> 3
-        else -> -1
-    }
+    BoxWithConstraints(modifier = modifier) {
+        val availableHeight = maxHeight
+        // Dynamic adaptive items based on vertical space (الشاشات الكبيرة والمطويات والتابلت)
+        // >= 680.dp: All 7 items (الإعفاء، السعي، الفصلي، فصل 2، درجاتي، السجل، الأخبار)
+        // >= 560.dp: 6 items (إضافة درجاتي والسجل)
+        // >= 440.dp: 5 items (إضافة درجاتي)
+        // < 440.dp: 4 standard items
+        val railItems = remember(availableHeight) {
+            val base = bottomNavItems.take(4).toMutableList()
+            if (availableHeight >= 440.dp) {
+                base.add(NavItem(Screen.MY_GRADES, "درجاتي", Icons.Default.AutoStories))
+            }
+            if (availableHeight >= 560.dp) {
+                base.add(NavItem(Screen.STATISTICS, "السجل", Icons.Default.QueryStats))
+            }
+            if (availableHeight >= 680.dp) {
+                base.add(NavItem(Screen.NEWS, "الأخبار", Icons.Default.Newspaper))
+            }
+            base.toList()
+        }
 
-    val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-    val themePrimary = MaterialTheme.colorScheme.primary
+        val selectedIndex = railItems.indexOfFirst {
+            it.screen == currentScreen ||
+            (currentScreen == Screen.EXEMPTION_INPUT && it.screen == Screen.EXEMPTION_SELECT)
+        }
 
-    // Neutral flat liquid indicator color (Material 3 Expressive flat pill that never clashes with icons or bar)
-    val indicatorColor = if (isDark) {
-        Color(0xFF334155).copy(alpha = 0.90f)
-    } else {
-        Color(0xFFF1F5F9).copy(alpha = 0.95f)
-    }
+        val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
+        val themePrimary = MaterialTheme.colorScheme.primary
 
-    Column(
-        modifier = modifier
-            .heightIn(max = 460.dp)
-            .fillMaxHeight()
-            .width(railWidth)
-            .padding(vertical = 10.dp, horizontal = 2.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // 1. الكبسولة العضوية الحبيبية العمودية الرئيسية (تحتوي على التبويبات الـ 4 مع مؤشر زجاجي سائل)
-        BoxWithConstraints(
+        val indicatorColor = if (isDark) {
+            Color(0xFF334155).copy(alpha = 0.90f)
+        } else {
+            Color(0xFFF1F5F9).copy(alpha = 0.95f)
+        }
+
+        val itemCount = railItems.size
+        val maxRailHeight = when {
+            itemCount >= 7 -> 620.dp
+            itemCount == 6 -> 540.dp
+            itemCount == 5 -> 470.dp
+            else -> 420.dp
+        }
+
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
+                .heightIn(max = maxRailHeight)
+                .fillMaxHeight()
+                .width(railWidth)
+                .padding(vertical = 8.dp, horizontal = 2.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val totalHeight = maxHeight
-            val tabHeight = totalHeight / 4f
-            val tabHeightPx = with(LocalDensity.current) { tabHeight.toPx() }
-            val safeTabHeightPx = tabHeightPx.coerceAtLeast(1f)
-            val pillWidth = (railWidth - 12.dp).coerceIn(18.dp, 56.dp)
-            val pillHeight = (tabHeight - 6.dp).coerceIn(18.dp, 56.dp)
-
-            var dragOffset by remember { mutableStateOf<Float?>(null) }
-            var lastValidIndex by remember { mutableIntStateOf(if (selectedIndex in 0..3) selectedIndex else 0) }
-            if (selectedIndex in 0..3) {
-                lastValidIndex = selectedIndex
-            }
-
-            val displayIndex = if (dragOffset != null) {
-                ((dragOffset!! / safeTabHeightPx).toInt()).coerceIn(0, 3)
-            } else {
-                lastValidIndex
-            }
-
-            val targetY = if (dragOffset != null) {
-                val offsetDp = with(LocalDensity.current) { (dragOffset!! - (pillHeight.toPx() / 2f)).toDp() }
-                val minY = (tabHeight - pillHeight) / 2f
-                val maxY = (tabHeight * 3) + (tabHeight - pillHeight) / 2f
-                offsetDp.coerceIn(minOf(minY, maxY), maxOf(minY, maxY))
-            } else {
-                (tabHeight * displayIndex) + (tabHeight - pillHeight) / 2f
-            }
-
-            val animY by animateDpAsState(
-                targetValue = targetY,
-                animationSpec = spring(
-                    dampingRatio = 0.65f,
-                    stiffness = 300f
-                ),
-                label = "rail_pill_y"
-            )
-
-            val animScale by animateFloatAsState(
-                targetValue = if (selectedIndex in 0..3 || dragOffset != null) 1f else 0f,
-                animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
-                label = "rail_pill_scale"
-            )
-
-            // Dynamic liquid fluid stretch and squash (تمدد وانكماش سائل ديناميكي طبيعي)
-            val moveDeltaY = kotlin.math.abs(animY.value - targetY.value).dp
-            val stretchY = (moveDeltaY * 0.25f).coerceAtMost(10.dp)
-            val dynamicPillHeight = (pillHeight + stretchY).coerceAtLeast(16.dp)
-            val dynamicPillWidth = (pillWidth - (stretchY * 0.20f)).coerceAtLeast(16.dp)
-            val dynamicPillY = animY - (stretchY / 2f)
-
-            val railShape = RoundedCornerShape(32.dp)
-
-            Box(
+            // 1. الكبسولة العضوية الحبيبية العمودية الرئيسية مع التبويبات المتكيفة ديناميكياً
+            BoxWithConstraints(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .frostedOrganicCapsule(
-                        shape = railShape,
-                        cornerRadius = 32.dp,
-                        tintColor = themePrimary,
-                        alpha = 0.25f
-                    )
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                if (animScale > 0.001f) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .offset(y = dynamicPillY)
-                            .size(width = dynamicPillWidth, height = dynamicPillHeight)
-                            .graphicsLayer {
-                                alpha = animScale.coerceIn(0f, 1f)
-                                scaleX = 0.9f + 0.1f * animScale
-                                scaleY = 0.9f + 0.1f * animScale
-                                clip = false
-                            }
-                            .background(
-                                color = indicatorColor,
-                                shape = CircleShape
-                            )
-                    )
-                }
-            }
+                val totalHeight = maxHeight
+                val tabHeight = totalHeight / itemCount.toFloat()
+                val tabHeightPx = with(LocalDensity.current) { tabHeight.toPx() }
+                val safeTabHeightPx = tabHeightPx.coerceAtLeast(1f)
+                val pillWidth = (railWidth - 12.dp).coerceIn(18.dp, 56.dp)
+                val pillHeight = (tabHeight - 4.dp).coerceIn(16.dp, 54.dp)
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                val change = event.changes.firstOrNull()
-                                if (change != null) {
-                                    if (change.pressed) {
-                                        val rawY = change.position.y
-                                        dragOffset = rawY.coerceIn(0f, size.height.toFloat())
-                                    } else {
-                                        if (dragOffset != null) {
-                                            val idx = (dragOffset!! / safeTabHeightPx).toInt().coerceIn(0, 3)
-                                            onScreenSelected(bottomNavItems[idx].screen)
-                                            dragOffset = null
+                var dragOffset by remember { mutableStateOf<Float?>(null) }
+                var lastValidIndex by remember { mutableIntStateOf(if (selectedIndex in 0 until itemCount) selectedIndex else 0) }
+                if (selectedIndex in 0 until itemCount) {
+                    lastValidIndex = selectedIndex
+                }
+
+                val displayIndex = if (dragOffset != null) {
+                    ((dragOffset!! / safeTabHeightPx).toInt()).coerceIn(0, itemCount - 1)
+                } else {
+                    lastValidIndex.coerceIn(0, itemCount - 1)
+                }
+
+                val targetY = if (dragOffset != null) {
+                    val offsetDp = with(LocalDensity.current) { (dragOffset!! - (pillHeight.toPx() / 2f)).toDp() }
+                    val minY = (tabHeight - pillHeight) / 2f
+                    val maxY = (tabHeight * (itemCount - 1)) + (tabHeight - pillHeight) / 2f
+                    offsetDp.coerceIn(minOf(minY, maxY), maxOf(minY, maxY))
+                } else {
+                    (tabHeight * displayIndex) + (tabHeight - pillHeight) / 2f
+                }
+
+                val animY by animateDpAsState(
+                    targetValue = targetY,
+                    animationSpec = spring(
+                        dampingRatio = 0.65f,
+                        stiffness = 300f
+                    ),
+                    label = "rail_pill_y"
+                )
+
+                val animScale by animateFloatAsState(
+                    targetValue = if (selectedIndex in 0 until itemCount || dragOffset != null) 1f else 0f,
+                    animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
+                    label = "rail_pill_scale"
+                )
+
+                // Dynamic liquid fluid stretch and squash
+                val moveDeltaY = kotlin.math.abs(animY.value - targetY.value).dp
+                val stretchY = (moveDeltaY * 0.22f).coerceAtMost(8.dp)
+                val dynamicPillHeight = (pillHeight + stretchY).coerceAtLeast(14.dp)
+                val dynamicPillWidth = (pillWidth - (stretchY * 0.18f)).coerceAtLeast(14.dp)
+                val dynamicPillY = animY - (stretchY / 2f)
+
+                val railShape = RoundedCornerShape(32.dp)
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .frostedOrganicCapsule(
+                            shape = railShape,
+                            cornerRadius = 32.dp,
+                            tintColor = themePrimary,
+                            alpha = 0.25f
+                        )
+                ) {
+                    if (animScale > 0.001f) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .offset(y = dynamicPillY)
+                                .size(width = dynamicPillWidth, height = dynamicPillHeight)
+                                .graphicsLayer {
+                                    alpha = animScale.coerceIn(0f, 1f)
+                                    scaleX = 0.9f + 0.1f * animScale
+                                    scaleY = 0.9f + 0.1f * animScale
+                                    clip = false
+                                }
+                                .background(
+                                    color = indicatorColor,
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(itemCount) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    val change = event.changes.firstOrNull()
+                                    if (change != null) {
+                                        if (change.pressed) {
+                                            val rawY = change.position.y
+                                            dragOffset = rawY.coerceIn(0f, size.height.toFloat())
+                                        } else {
+                                            if (dragOffset != null) {
+                                                val idx = (dragOffset!! / safeTabHeightPx).toInt().coerceIn(0, itemCount - 1)
+                                                onScreenSelected(railItems[idx].screen)
+                                                dragOffset = null
+                                            }
                                         }
                                     }
                                 }
                             }
+                        },
+                    verticalArrangement = Arrangement.SpaceAround,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    val isDense = itemCount >= 6
+                    railItems.forEachIndexed { _, item ->
+                        val isSelected = (!isMenuOpen && currentScreen == item.screen) ||
+                                (!isMenuOpen && currentScreen == Screen.EXEMPTION_INPUT && item.screen == Screen.EXEMPTION_SELECT)
+                        
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = { onScreenSelected(item.screen) }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CaliqNavItem(
+                                item = item,
+                                isSelected = isSelected,
+                                isCompact = isDense,
+                                isUltraCompact = itemCount >= 7 && availableHeight < 600.dp
+                            )
                         }
-                    },
-                verticalArrangement = Arrangement.SpaceAround,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                bottomNavItems.take(4).forEachIndexed { _, item ->
-                    val isSelected = (!isMenuOpen && currentScreen == item.screen) ||
-                            (!isMenuOpen && currentScreen == Screen.EXEMPTION_INPUT && item.screen == Screen.EXEMPTION_SELECT)
-                    
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = { onScreenSelected(item.screen) }
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CaliqNavItem(
-                            item = item,
-                            isSelected = isSelected
-                        )
                     }
                 }
             }
-        }
 
-        // 2. زر القائمة المربع المنفصل الزجاجي العضوي المطابق لشريط التنقل (Floating Action Squircle)
-        val menuBtnSize = (railWidth - 8.dp)
-        val menuCornerRadius = (menuBtnSize * 0.42f).coerceIn(24.dp, 30.dp)
-        val fabShape = RoundedCornerShape(menuCornerRadius)
-        val isFabActive = isMenuOpen || showSideMenuPill(currentScreen)
-        val fabIndicatorScale by animateFloatAsState(
-            targetValue = if (isFabActive) 1f else 0f,
-            animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
-            label = "rail_fab_indicator_scale"
-        )
-        val fabIconColor by animateColorAsState(
-            targetValue = if (isFabActive) {
-                themePrimary
-            } else {
-                if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1E293B).copy(alpha = 0.85f)
-            },
-            animationSpec = tween(200),
-            label = "rail_fab_icon_color"
-        )
+            // 2. زر القائمة المربع المنفصل الزجاجي العضوي المطابق لشريط التنقل
+            val menuBtnSize = (railWidth - 8.dp)
+            val menuCornerRadius = (menuBtnSize * 0.42f).coerceIn(24.dp, 30.dp)
+            val fabShape = RoundedCornerShape(menuCornerRadius)
+            val isFabActive = isMenuOpen || (showSideMenuPill(currentScreen) && currentScreen !in railItems.map { it.screen })
+            val fabIndicatorScale by animateFloatAsState(
+                targetValue = if (isFabActive) 1f else 0f,
+                animationSpec = spring(dampingRatio = 0.65f, stiffness = 320f),
+                label = "rail_fab_indicator_scale"
+            )
+            val fabIconColor by animateColorAsState(
+                targetValue = if (isFabActive) {
+                    themePrimary
+                } else {
+                    if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1E293B).copy(alpha = 0.85f)
+                },
+                animationSpec = tween(200),
+                label = "rail_fab_icon_color"
+            )
 
-        Box(
-            modifier = Modifier
-                .size(menuBtnSize)
-                .frostedOrganicCapsule(
-                    shape = fabShape,
-                    cornerRadius = menuCornerRadius,
-                    tintColor = themePrimary,
-                    alpha = 0.25f
-                )
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onMenuClick
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            if (fabIndicatorScale > 0.01f) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(4.dp)
-                        .graphicsLayer {
-                            alpha = fabIndicatorScale
-                            scaleX = 0.85f + 0.15f * fabIndicatorScale
-                            scaleY = 0.85f + 0.15f * fabIndicatorScale
-                        }
-                        .background(
-                            color = indicatorColor,
-                            shape = RoundedCornerShape(menuCornerRadius - 4.dp)
-                        )
+            Box(
+                modifier = Modifier
+                    .size(menuBtnSize)
+                    .frostedOrganicCapsule(
+                        shape = fabShape,
+                        cornerRadius = menuCornerRadius,
+                        tintColor = themePrimary,
+                        alpha = 0.25f
+                    )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onMenuClick
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (fabIndicatorScale > 0.01f) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(4.dp)
+                            .graphicsLayer {
+                                alpha = fabIndicatorScale
+                                scaleX = 0.85f + 0.15f * fabIndicatorScale
+                                scaleY = 0.85f + 0.15f * fabIndicatorScale
+                            }
+                            .background(
+                                color = indicatorColor,
+                                shape = RoundedCornerShape((menuCornerRadius - 4.dp).coerceAtLeast(14.dp))
+                            )
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "القائمة",
+                    tint = fabIconColor,
+                    modifier = Modifier.size(24.dp)
                 )
             }
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "القائمة",
-                tint = fabIconColor,
-                modifier = Modifier.size(24.dp)
-            )
         }
     }
 }
-
 fun showSideMenuPill(screen: Screen): Boolean {
     return screen in listOf(
         Screen.MY_GRADES,
