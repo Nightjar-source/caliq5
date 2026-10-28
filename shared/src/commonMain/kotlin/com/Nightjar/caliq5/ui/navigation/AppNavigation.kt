@@ -448,9 +448,10 @@ private fun MainContent(
         val topBarHeight = if (isWideOrLandscape) 38.dp else 48.dp
 
         val isNavigatingBack by viewModel.isNavigatingBack.collectAsState()
+        val navTrigger by viewModel.navigationTrigger.collectAsState()
 
         AnimatedContent(
-            targetState = currentScreen,
+            targetState = currentScreen to navTrigger,
             transitionSpec = {
                 val mainTabs = listOf(
                     Screen.EXEMPTION_SELECT,
@@ -458,9 +459,11 @@ private fun MainContent(
                     Screen.MONTHLY_AVERAGE,
                     Screen.TERM2_CALCULATION
                 )
-                val fromIdx = mainTabs.indexOf(initialState)
-                val toIdx = mainTabs.indexOf(targetState)
+                val fromIdx = mainTabs.indexOf(initialState.first)
+                val toIdx = mainTabs.indexOf(targetState.first)
+                val isSameScreen = initialState.first == targetState.first
                 val direction = when {
+                    isSameScreen -> 1
                     fromIdx != -1 && toIdx != -1 -> if (toIdx < fromIdx) -1 else 1
                     isNavigatingBack -> -1
                     else -> 1
@@ -487,7 +490,7 @@ private fun MainContent(
             },
             label = "screen_transition",
             modifier = Modifier.fillMaxSize()
-        ) { screen ->
+        ) { (screen, _) ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()

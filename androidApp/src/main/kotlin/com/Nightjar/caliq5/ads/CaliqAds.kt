@@ -116,7 +116,8 @@ fun CaliqAdaptiveBanner(
                     val displayMetrics = context.resources.displayMetrics
                     val widthPixels = displayMetrics.widthPixels.toFloat()
                     val density = displayMetrics.density
-                    val adWidth = (widthPixels / density).toInt()
+                    val rawWidth = (widthPixels / density).toInt()
+                    val adWidth = rawWidth.coerceAtMost(728)
 
                     adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth))
                     adView.adListener = object : AdListener() {

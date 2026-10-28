@@ -52,7 +52,7 @@ fun CaliqSideMenu(
 ) {
     ModalDrawerSheet(
         modifier = Modifier
-            .width(300.dp)
+            .widthIn(min = 320.dp, max = 380.dp).fillMaxWidth(0.85f)
             .fillMaxHeight(),
         drawerShape = RoundedCornerShape(topEnd = 28.dp, bottomEnd = 28.dp),
         drawerContainerColor = MaterialTheme.colorScheme.surface,
@@ -93,14 +93,7 @@ fun CaliqSideMenu(
                         )
                     },
                     label = {
-                        Text(
-                            text = item.label,
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            ),
-                            textAlign = TextAlign.Start
-                        )
+                        Text(text = item.label, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface), textAlign = TextAlign.Start, maxLines = 1, softWrap = false)
                     },
                     selected = false,
                     onClick = { onNavigate(item.screen) },

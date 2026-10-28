@@ -190,7 +190,11 @@ class AppViewModel : ViewModel() {
     private val _isNavigatingBack = MutableStateFlow(false)
     val isNavigatingBack: StateFlow<Boolean> = _isNavigatingBack.asStateFlow()
     
+    private val _navigationTrigger = MutableStateFlow(0L)
+    val navigationTrigger: StateFlow<Long> = _navigationTrigger.asStateFlow()
+
     fun navigateTo(screen: Screen) {
+        _navigationTrigger.value++
         savePreference("last_active_screen", screen.name, immediate = true)
         if (screen == Screen.EXEMPTION_SELECT) {
             _backStack.value = listOf(Screen.EXEMPTION_SELECT)

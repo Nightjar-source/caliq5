@@ -125,9 +125,10 @@ fun SmallGradeInput(
     }
     
     val dynamicFontSize = when {
-        value.length > 8 -> 14.sp
-        value.length > 5 -> 15.sp
-        else -> 16.sp
+        value.length > 7 -> 13.sp
+        value.length > 5 -> 14.5.sp
+        value.length > 3 -> 16.sp
+        else -> 17.5.sp
     }
     
     var tfv by remember(value) {
@@ -138,7 +139,7 @@ fun SmallGradeInput(
         modifier = modifier
             .background(containerColor, shape)
             .border(1.dp, borderColor, shape)
-            .padding(vertical = 12.dp, horizontal = 6.dp),
+            .padding(vertical = 12.dp, horizontal = 4.dp),
         contentAlignment = Alignment.Center
     ) {
         val selectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
@@ -234,7 +235,7 @@ fun CaliqOutlinedInput(
     Box(
         modifier = modifier
             .background(containerColor, shape)
-            .padding(vertical = 12.dp, horizontal = 6.dp),
+            .padding(vertical = 12.dp, horizontal = 4.dp),
         contentAlignment = Alignment.Center
     ) {
         val selectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(

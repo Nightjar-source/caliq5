@@ -38,7 +38,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
 
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = gridState,
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp),
+            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 220.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
