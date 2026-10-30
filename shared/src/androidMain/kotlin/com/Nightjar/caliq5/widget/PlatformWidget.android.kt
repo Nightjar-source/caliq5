@@ -1,3 +1,4 @@
+import kotlinx.coroutines.launch
 package com.Nightjar.caliq5.widget
 
 import android.appwidget.AppWidgetManager
@@ -28,14 +29,25 @@ actual fun isAppWidgetPinned(): Boolean {
 
 actual fun updateAppWidget() {
     val context = CaliqApplication.appContext
-    val appWidgetManager = AppWidgetManager.getInstance(context)
-    val myProvider = ComponentName(context, "com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
-    val ids = appWidgetManager.getAppWidgetIds(myProvider)
-    if (ids != null && ids.isNotEmpty()) {
-        val intent = Intent(context, Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")).apply {
-            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+    kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+        try {
+            val widgetClass = Class.forName("com.Nightjar.caliq5.widget.CaliqWidget")
+            val instance = widgetClass.getDeclaredConstructor().newInstance()
+            val updateAllMethod = widgetClass.getMethod("updateAll", android.content.Context::class.java)
+            updateAllMethod.invoke(instance, context)
+        } catch (_: Throwable) {
+            try {
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val myProvider = ComponentName(context, "com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
+                val ids = appWidgetManager.getAppWidgetIds(myProvider)
+                if (ids != null && ids.isNotEmpty()) {
+                    val intent = Intent(context, Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")).apply {
+                        action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+                    }
+                    context.sendBroadcast(intent)
+                }
+            } catch (_: Throwable) {}
         }
-        context.sendBroadcast(intent)
     }
 }

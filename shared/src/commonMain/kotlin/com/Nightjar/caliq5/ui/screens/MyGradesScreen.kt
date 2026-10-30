@@ -629,10 +629,18 @@ fun StudentEditView(
         .calculateBottomPadding()
 
     CaliqScreen(title = if (student == null) "إضافة سجل درجاتي (السجل الشامل)" else "تعديل سجل درجاتي (السجل الشامل)", onBack = { if (hasUnsavedChanges) showUnsavedDialog = true else onCancel() }, scrollable = false) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val isLandscape = maxWidth > maxHeight
+            val isPhoneLandscape = isLandscape && maxWidth < 840.dp
+            val gridColumns = when {
+                isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
+                else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+            }
+
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = editGridState,
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 220.dp),
+            columns = gridColumns,
             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
             contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 160.dp + bottomSafeInset),
             verticalArrangement = Arrangement.spacedBy(16.dp),
