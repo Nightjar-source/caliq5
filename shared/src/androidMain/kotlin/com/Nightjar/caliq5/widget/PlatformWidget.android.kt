@@ -1,4 +1,3 @@
-import kotlinx.coroutines.launch
 package com.Nightjar.caliq5.widget
 
 import android.appwidget.AppWidgetManager
@@ -6,6 +5,7 @@ import android.content.Intent
 import android.content.ComponentName
 import android.os.Build
 import com.Nightjar.caliq5.CaliqApplication
+import kotlinx.coroutines.launch
 
 actual fun pinAppWidget() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
