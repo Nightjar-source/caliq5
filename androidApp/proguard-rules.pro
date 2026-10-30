@@ -20,6 +20,8 @@
 # 3. Glance AppWidget & WorkManager
 -keep class * extends androidx.glance.appwidget.GlanceAppWidgetReceiver
 -keep class * extends androidx.glance.appwidget.GlanceAppWidget
+-keep class com.Nightjar.caliq5.widget.** { *; }
+-keepclassmembers class com.Nightjar.caliq5.widget.** { *; }
 -keep class androidx.work.** { *; }
 -keep class * extends androidx.work.ListenableWorker { *; }
 -keep class * extends androidx.room.RoomDatabase { *; }

@@ -25,6 +25,8 @@ expect object DataRepository {
     suspend fun savePreference(key: String, value: String)
     suspend fun loadPreference(key: String): String?
 
+    var cachedSettings: AppSettings?
+
     suspend fun saveSettings(settings: AppSettings)
     suspend fun loadSettings(): AppSettings
 }

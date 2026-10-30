@@ -290,9 +290,10 @@ class AppViewModel : ViewModel() {
 
     fun updateSettings(newSettings: AppSettings) {
         _settings.value = newSettings
+        DataRepository.cachedSettings = newSettings
         viewModelScope.launch {
             DataRepository.saveSettings(newSettings)
-        com.Nightjar.caliq5.widget.updateAppWidget()
+            com.Nightjar.caliq5.widget.updateAppWidget()
         }
     }
 

@@ -66,7 +66,7 @@ class CaliqWidget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val settings = try {
+        val settings = DataRepository.cachedSettings ?: try {
             DataRepository.loadSettings()
         } catch (e: Exception) {
             AppSettings()

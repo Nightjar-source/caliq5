@@ -17,8 +17,8 @@ android {
         applicationId = "com.Nightjar.caliq5"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 51429
-        versionName = "5.14.29"
+        versionCode = 51430
+        versionName = "5.14.30"
     }
 
     buildFeatures {

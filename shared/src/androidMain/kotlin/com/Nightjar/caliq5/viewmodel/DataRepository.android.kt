@@ -151,7 +151,11 @@ actual object DataRepository {
 
     private val SETTINGS_KEY = stringPreferencesKey("settings_v1")
 
+    @Volatile
+    actual var cachedSettings: AppSettings? = null
+
     actual suspend fun saveSettings(settings: AppSettings): Unit = withContext(Dispatchers.IO) {
+        cachedSettings = settings
         val payload = json.encodeToString(settings)
         context.dataStore.edit { prefs ->
             prefs[SETTINGS_KEY] = payload
@@ -160,10 +164,13 @@ actual object DataRepository {
     }
 
     actual suspend fun loadSettings(): AppSettings = withContext(Dispatchers.IO) {
+        cachedSettings?.let { return@withContext it }
         try {
             val prefs = context.dataStore.data.first()
             val raw = prefs[SETTINGS_KEY] ?: return@withContext AppSettings()
-            json.decodeFromString(raw)
+            val parsed = json.decodeFromString<AppSettings>(raw)
+            cachedSettings = parsed
+            parsed
         } catch (e: Exception) {
             AppSettings()
         }
