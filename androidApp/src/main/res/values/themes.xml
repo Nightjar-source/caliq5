@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Main app theme -->
-    <style name="Theme.Caliq" parent="android:Theme.Material.Light.NoActionBar">
+    <!-- Main app theme (Light) using pure Android framework Material theme -->
+    <style name="Theme.Caliq" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>

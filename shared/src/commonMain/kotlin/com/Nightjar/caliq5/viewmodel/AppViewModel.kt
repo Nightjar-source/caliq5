@@ -194,6 +194,10 @@ class AppViewModel : ViewModel() {
     val navigationTrigger: StateFlow<Long> = _navigationTrigger.asStateFlow()
 
     fun navigateTo(screen: Screen) {
+        if (_currentScreen.value == screen) {
+            // User requirement: Clicking the active tab is NO-OP (does not reload or re-open screen)
+            return
+        }
         _navigationTrigger.value++
         savePreference("last_active_screen", screen.name, immediate = true)
         if (screen == Screen.EXEMPTION_SELECT) {

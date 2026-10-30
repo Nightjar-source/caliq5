@@ -35,14 +35,23 @@ fun Term2Screen(viewModel: AppViewModel) {
             label = "term2BottomPadding"
         )
 
-        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-            state = gridState,
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 220.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
-            modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 16.dp)
-        ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val isLandscape = maxWidth > maxHeight
+            val isPhoneLandscape = isLandscape && maxWidth < 840.dp
+            val gridColumns = when {
+                isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
+                else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+            }
+
+            androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+                state = gridState,
+                columns = gridColumns,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
+                modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 16.dp)
+            ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                     FeatureExplanationCard(
@@ -52,8 +61,8 @@ fun Term2Screen(viewModel: AppViewModel) {
                 }
             }
 
-            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(1), contentAlignment = Alignment.Center) {
+            item(key = "t2_name", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Box(modifier = Modifier.fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)).popInOnInitialLoad(1), contentAlignment = Alignment.Center) {
                     GradeInputField(
                         label = "اسم المادة:",
                         value = subjectName,
@@ -66,8 +75,8 @@ fun Term2Screen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(2), contentAlignment = Alignment.Center) {
+            item(key = "t2_term1") {
+                Box(modifier = Modifier.fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)).popInOnInitialLoad(2), contentAlignment = Alignment.Center) {
                     GradeInputField(
                         label = "الفصل الأول:",
                         value = term1,
@@ -77,8 +86,8 @@ fun Term2Screen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(3), contentAlignment = Alignment.Center) {
+            item(key = "t2_midyear") {
+                Box(modifier = Modifier.fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)).popInOnInitialLoad(3), contentAlignment = Alignment.Center) {
                     GradeInputField(
                         label = "نصف السنة:",
                         value = midYear,
@@ -88,8 +97,8 @@ fun Term2Screen(viewModel: AppViewModel) {
                 }
             }
 
-            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp).popInOnInitialLoad(4), contentAlignment = Alignment.Center) {
+            item(key = "t2_btn", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Box(modifier = Modifier.fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)).padding(vertical = 16.dp).popInOnInitialLoad(4), contentAlignment = Alignment.Center) {
                     CaliqPrimaryButton(
                         onClick = { viewModel.calculateTerm2() },
                         text = "حساب الدرجة المطلوبة",
@@ -98,6 +107,7 @@ fun Term2Screen(viewModel: AppViewModel) {
                     )
                 }
             }
+        }
         }
     }
 }

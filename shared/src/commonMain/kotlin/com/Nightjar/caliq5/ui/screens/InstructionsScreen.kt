@@ -170,7 +170,7 @@ private fun ExpandableInstructionCard(
     initiallyExpanded: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(initiallyExpanded) }
+    var expanded by androidx.compose.runtime.saveable.rememberSaveable(title) { mutableStateOf(initiallyExpanded) }
 
     val arrowAngle by androidx.compose.animation.core.animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,

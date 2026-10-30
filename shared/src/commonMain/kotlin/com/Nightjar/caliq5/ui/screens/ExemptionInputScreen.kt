@@ -89,6 +89,13 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             val density = androidx.compose.ui.platform.LocalDensity.current
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             val isWide = maxWidth >= 600.dp
+            val isLandscape = maxWidth > maxHeight
+            val isPhoneLandscape = isLandscape && maxWidth < 840.dp
+            val gridColumns = when {
+                isPhoneLandscape -> GridCells.Fixed(2)
+                maxWidth >= 840.dp -> GridCells.Adaptive(minSize = 280.dp)
+                else -> GridCells.Fixed(1)
+            }
             val topSafeInset = WindowInsets.statusBars
                 .union(WindowInsets.captionBar)
                 .union(WindowInsets.displayCutout)
@@ -103,7 +110,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             
             LazyVerticalGrid(
                 state = lazyGridState,
-                columns = GridCells.Adaptive(minSize = 220.dp),
+                columns = gridColumns,
                 modifier = Modifier
                     .fillMaxSize()
                     .imePadding()

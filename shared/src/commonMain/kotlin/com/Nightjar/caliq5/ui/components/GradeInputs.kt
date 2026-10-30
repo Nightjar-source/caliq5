@@ -1,5 +1,7 @@
 package com.Nightjar.caliq5.ui.components
 
+import androidx.compose.animation.animateContentSize
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -75,7 +77,7 @@ fun GradeInputField(
         enabled = enabled,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         trailingIcon = if (showPercent) { { Text("%") } } else null,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f)),
         shape = shape,
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -137,6 +139,7 @@ fun SmallGradeInput(
 
     Box(
         modifier = modifier
+            .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f))
             .background(containerColor, shape)
             .border(1.dp, borderColor, shape)
             .padding(vertical = 12.dp, horizontal = 4.dp),
@@ -234,6 +237,7 @@ fun CaliqOutlinedInput(
 
     Box(
         modifier = modifier
+            .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f))
             .background(containerColor, shape)
             .padding(vertical = 12.dp, horizontal = 4.dp),
         contentAlignment = Alignment.Center

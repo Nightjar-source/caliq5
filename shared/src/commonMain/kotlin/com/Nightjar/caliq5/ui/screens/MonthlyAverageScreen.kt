@@ -48,14 +48,23 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
             label = "monthlyBottomPadding"
         )
         
-        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-            state = gridState,
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 220.dp),
-            modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 12.dp),
-            contentPadding = PaddingValues(top = topSafeInset + 90.dp, bottom = dynamicBottomPadding, start = 4.dp, end = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val isLandscape = maxWidth > maxHeight
+            val isPhoneLandscape = isLandscape && maxWidth < 840.dp
+            val gridColumns = when {
+                isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
+                else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+            }
+
+            androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+                state = gridState,
+                columns = gridColumns,
+                modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 12.dp),
+                contentPadding = PaddingValues(top = topSafeInset + 90.dp, bottom = dynamicBottomPadding, start = 4.dp, end = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                     FeatureExplanationCard(
@@ -162,6 +171,7 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
                     }
                 }
             }
+        }
         }
     }
 }

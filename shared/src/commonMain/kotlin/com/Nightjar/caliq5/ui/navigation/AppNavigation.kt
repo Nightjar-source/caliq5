@@ -82,8 +82,15 @@ fun AppNavigation(
 
     val editingStudentMode by viewModel.editingStudentMode.collectAsState()
 
-    // Back handler (unified across Android 8-17, iOS, Desktop, and Web)
-    com.Nightjar.caliq5.utils.BackHandler(enabled = showSideMenu || resultState != null || canGoBack || editingStudentMode != null || currentScreen != Screen.EXEMPTION_SELECT) {
+    // Dedicated high-priority BackHandler for Side Drawer: closes drawer immediately without touching screen stack
+    if (showSideMenu) {
+        com.Nightjar.caliq5.utils.BackHandler(enabled = true) {
+            viewModel.closeMenu()
+        }
+    }
+
+    // Main back navigation handling for app screens and results
+    com.Nightjar.caliq5.utils.BackHandler(enabled = !showSideMenu && (resultState != null || canGoBack || editingStudentMode != null || currentScreen != Screen.EXEMPTION_SELECT)) {
         viewModel.handleTopBarBack()
     }
 
@@ -451,7 +458,7 @@ private fun MainContent(
         val navTrigger by viewModel.navigationTrigger.collectAsState()
 
         AnimatedContent(
-            targetState = currentScreen to navTrigger,
+            targetState = currentScreen,
             transitionSpec = {
                 val mainTabs = listOf(
                     Screen.EXEMPTION_SELECT,
@@ -459,11 +466,9 @@ private fun MainContent(
                     Screen.MONTHLY_AVERAGE,
                     Screen.TERM2_CALCULATION
                 )
-                val fromIdx = mainTabs.indexOf(initialState.first)
-                val toIdx = mainTabs.indexOf(targetState.first)
-                val isSameScreen = initialState.first == targetState.first
+                val fromIdx = mainTabs.indexOf(initialState)
+                val toIdx = mainTabs.indexOf(targetState)
                 val direction = when {
-                    isSameScreen -> 1
                     fromIdx != -1 && toIdx != -1 -> if (toIdx < fromIdx) -1 else 1
                     isNavigatingBack -> -1
                     else -> 1
@@ -490,7 +495,7 @@ private fun MainContent(
             },
             label = "screen_transition",
             modifier = Modifier.fillMaxSize()
-        ) { (screen, _) ->
+        ) { screen ->
             Box(
                 modifier = Modifier
                     .fillMaxSize()
