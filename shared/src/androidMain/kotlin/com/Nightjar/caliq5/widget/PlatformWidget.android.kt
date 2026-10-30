@@ -31,10 +31,9 @@ actual fun updateAppWidget() {
     val context = CaliqApplication.appContext
     kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
         try {
-            val widgetClass = Class.forName("com.Nightjar.caliq5.widget.CaliqWidget")
-            val instance = widgetClass.getDeclaredConstructor().newInstance()
-            val updateAllMethod = widgetClass.getMethod("updateAll", android.content.Context::class.java)
-            updateAllMethod.invoke(instance, context)
+            val receiverClass = Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
+            val updateMethod = receiverClass.getMethod("updateWidget", android.content.Context::class.java)
+            updateMethod.invoke(null, context)
         } catch (_: Throwable) {
             try {
                 val appWidgetManager = AppWidgetManager.getInstance(context)

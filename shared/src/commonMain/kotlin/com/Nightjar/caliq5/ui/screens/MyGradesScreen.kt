@@ -232,19 +232,19 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                 .calculateBottomPadding()
 
             CaliqScreen(title = "درجاتي (السجل الشامل)", onBack = { viewModel.goBack() }, scrollable = false) {
-                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                     val isLandscape = maxWidth > maxHeight
-                    val isPhoneLandscape = isLandscape && maxWidth < 840.dp
+                    val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
                     val gridColumns = when {
                         isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                        maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
+                        maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
                         else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
                     }
 
                     androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                         state = listGridState,
                         columns = gridColumns,
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+                        modifier = Modifier.widthIn(min = 320.dp, max = 940.dp).fillMaxWidth().padding(horizontal = 8.dp),
                         contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 160.dp + bottomSafeInset),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -274,13 +274,14 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                 } else {
                     itemsIndexed(students, key = { _, it -> it.id }) { index, student ->
                         val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-                        val cardShape = RoundedCornerShape(24.dp)
+                        val cardShape = RoundedCornerShape(22.dp)
                         Surface(
                             modifier = Modifier
-                                .fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow))
+                                .fillMaxWidth()
+                                .animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow))
                                 .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f))
                                 .popInOnInitialLoad(index + 1)
-                                .padding(vertical = 4.dp),
+                                .padding(vertical = 5.dp),
                             shape = cardShape,
                             color = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.40f) else MaterialTheme.colorScheme.surface,
                             shadowElevation = 0.dp,
@@ -289,75 +290,151 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                 MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.30f else 0.45f)
                             )
                         ) {
+                            BoxWithConstraints(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp)) {
+                                val isCardCompact = maxWidth < 340.dp
+                                if (isCardCompact) {
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable(
+                                                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                                                    indication = null
+                                                ) { editingStudentId = student.id; showEditView = true },
+                                            horizontalAlignment = Alignment.End
+                                        ) {
+                                            Text(
+                                                text = student.name,
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    fontWeight = FontWeight.Bold,
+                                                ),
+                                                textAlign = TextAlign.End,
+                                                maxLines = 2,
+                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                            )
+                                            if (student.className.isNotBlank()) {
+                                                Spacer(Modifier.height(4.dp))
+                                                Text(
+                                                    text = student.className,
+                                                    style = MaterialTheme.typography.bodySmall.copy(
+                                                        color = MaterialTheme.colorScheme.secondary,
+                                                    ),
+                                                    textAlign = TextAlign.End,
+                                                    maxLines = 1,
+                                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
 
-                            Row(
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.wrapContentWidth()
-                                ) {
-                                    ExpressiveActionButton(
-                                        onClick = { 
-                                            val latest = students.find { it.id == student.id } ?: student
-                                            viewModel.showResult(ResultDisplayState.StudentProfileResult("درجات ${latest.name}", latest)) 
-                                        },
-                                        icon = Icons.Outlined.Visibility,
-                                        label = "معاينة",
-                                        tintColor = MaterialTheme.colorScheme.secondary
-                                    )
-                                    
-                                    ExpressiveActionButton(
-                                        onClick = { 
-                                            val latest = students.find { it.id == student.id } ?: student
-                                            viewModel.exportToPdf(ResultDisplayState.StudentProfileResult("درجات ${latest.name}", latest)) 
-                                        },
-                                        icon = Icons.Outlined.PictureAsPdf,
-                                        label = "طباعة",
-                                        tintColor = com.Nightjar.caliq5.theme.successColor
-                                    )
-                                    
-                                    ExpressiveActionButton(
-                                        onClick = { editingStudentId = student.id; showEditView = true },
-                                        icon = Icons.Outlined.Edit,
-                                        label = "تعديل",
-                                        tintColor = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            ExpressiveActionButton(
+                                                onClick = { 
+                                                    val latest = students.find { it.id == student.id } ?: student
+                                                    viewModel.showResult(ResultDisplayState.StudentProfileResult("درجات ${latest.name}", latest)) 
+                                                },
+                                                icon = Icons.Outlined.Visibility,
+                                                label = "معاينة",
+                                                tintColor = MaterialTheme.colorScheme.secondary
+                                            )
+                                            ExpressiveActionButton(
+                                                onClick = { 
+                                                    val latest = students.find { it.id == student.id } ?: student
+                                                    viewModel.exportToPdf(ResultDisplayState.StudentProfileResult("درجات ${latest.name}", latest)) 
+                                                },
+                                                icon = Icons.Outlined.PictureAsPdf,
+                                                label = "طباعة",
+                                                tintColor = com.Nightjar.caliq5.theme.successColor
+                                            )
+                                            ExpressiveActionButton(
+                                                onClick = { editingStudentId = student.id; showEditView = true },
+                                                icon = Icons.Outlined.Edit,
+                                                label = "تعديل",
+                                                tintColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.wrapContentWidth()
+                                        ) {
+                                            ExpressiveActionButton(
+                                                onClick = { 
+                                                    val latest = students.find { it.id == student.id } ?: student
+                                                    viewModel.showResult(ResultDisplayState.StudentProfileResult("درجات ${latest.name}", latest)) 
+                                                },
+                                                icon = Icons.Outlined.Visibility,
+                                                label = "معاينة",
+                                                tintColor = MaterialTheme.colorScheme.secondary
+                                            )
+                                            
+                                            ExpressiveActionButton(
+                                                onClick = { 
+                                                    val latest = students.find { it.id == student.id } ?: student
+                                                    viewModel.exportToPdf(ResultDisplayState.StudentProfileResult("درجات ${latest.name}", latest)) 
+                                                },
+                                                icon = Icons.Outlined.PictureAsPdf,
+                                                label = "طباعة",
+                                                tintColor = com.Nightjar.caliq5.theme.successColor
+                                            )
+                                            
+                                            ExpressiveActionButton(
+                                                onClick = { editingStudentId = student.id; showEditView = true },
+                                                icon = Icons.Outlined.Edit,
+                                                label = "تعديل",
+                                                tintColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
 
-                                Spacer(Modifier.width(10.dp))
+                                        Spacer(Modifier.width(14.dp))
 
-                                Column(
-                                    modifier = Modifier
-                                        .weight(1f, fill = false)
-                                        .clickable(
-                                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                                            indication = null
-                                        ) { editingStudentId = student.id; showEditView = true },
-                                    horizontalAlignment = Alignment.End
-                                ) {
-                                    Text(
-                                        text = student.name,
-                                        style = MaterialTheme.typography.titleMedium.copy(
-                                            color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Bold,
-                                        ),
-                                        textAlign = TextAlign.End,
-                                        maxLines = 1,
-                                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                    )
-                                    Text(
-                                        text = student.className,
-                                        style = MaterialTheme.typography.bodySmall.copy(
-                                            color = MaterialTheme.colorScheme.secondary,
-                                        ),
-                                        textAlign = TextAlign.End,
-                                        maxLines = 1,
-                                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                    )
+                                        Column(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .clickable(
+                                                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                                                    indication = null
+                                                ) { editingStudentId = student.id; showEditView = true },
+                                            horizontalAlignment = Alignment.End
+                                        ) {
+                                            Text(
+                                                text = student.name,
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    fontWeight = FontWeight.Bold,
+                                                ),
+                                                textAlign = TextAlign.End,
+                                                maxLines = 2,
+                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                            )
+                                            if (student.className.isNotBlank()) {
+                                                Spacer(Modifier.height(4.dp))
+                                                Text(
+                                                    text = student.className,
+                                                    style = MaterialTheme.typography.bodySmall.copy(
+                                                        color = MaterialTheme.colorScheme.secondary,
+                                                    ),
+                                                    textAlign = TextAlign.End,
+                                                    maxLines = 1,
+                                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -629,19 +706,19 @@ fun StudentEditView(
         .calculateBottomPadding()
 
     CaliqScreen(title = if (student == null) "إضافة سجل درجاتي (السجل الشامل)" else "تعديل سجل درجاتي (السجل الشامل)", onBack = { if (hasUnsavedChanges) showUnsavedDialog = true else onCancel() }, scrollable = false) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
-            val isPhoneLandscape = isLandscape && maxWidth < 840.dp
+            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = editGridState,
             columns = gridColumns,
-            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+            modifier = Modifier.widthIn(min = 320.dp, max = 940.dp).fillMaxWidth().padding(horizontal = 8.dp),
             contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 160.dp + bottomSafeInset),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)

@@ -116,33 +116,33 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
  * Replays smoothly on every navigation with an elegant, moist (Fluid) spring motion.
  */
 fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
-    var isLoaded by remember { mutableStateOf(false) }
+    val animatable = remember { androidx.compose.animation.core.Animatable(0f) }
     LaunchedEffect(Unit) {
-        if (!isLoaded) {
-            if (index > 0) {
-                kotlinx.coroutines.delay((index * 24L).coerceAtMost(160L))
-            }
-            isLoaded = true
+        if (index > 0) {
+            kotlinx.coroutines.delay((index * 32L).coerceAtMost(240L))
         }
+        animatable.animateTo(
+            targetValue = 1f,
+            animationSpec = androidx.compose.animation.core.spring(
+                dampingRatio = 0.80f,
+                stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
+            )
+        )
     }
-    val animProgress by animateFloatAsState(
-        targetValue = if (isLoaded) 1f else 0f,
-        animationSpec = spring(
-            dampingRatio = 0.80f,
-            stiffness = Spring.StiffnessMediumLow
-        ),
-        label = "fluidSlide_$index"
-    )
-    if (animProgress >= 1f) {
-        Modifier
-    } else {
-        this.graphicsLayer {
-            val progress = animProgress.coerceIn(0f, 1f)
-            this.alpha = progress
-            this.translationY = (1f - progress) * 20.dp.toPx()
-            this.scaleX = 0.97f + 0.03f * progress
-            this.scaleY = 0.97f + 0.03f * progress
-            this.clip = false
+    this.graphicsLayer {
+        val progress = animatable.value.coerceIn(0f, 1f)
+        if (progress < 1f) {
+            alpha = progress
+            translationY = (1f - progress) * 18.dp.toPx()
+            scaleX = 0.96f + 0.04f * progress
+            scaleY = 0.96f + 0.04f * progress
+            clip = false
+        } else {
+            alpha = 1f
+            translationY = 0f
+            scaleX = 1f
+            scaleY = 1f
+            clip = false
         }
     }
 }

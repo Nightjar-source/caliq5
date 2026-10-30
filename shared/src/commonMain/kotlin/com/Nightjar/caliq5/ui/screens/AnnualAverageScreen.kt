@@ -36,12 +36,12 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
             label = "annualBottomPadding"
         )
 
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
-            val isPhoneLandscape = isLandscape && maxWidth < 840.dp
+            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
@@ -51,7 +51,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
-                modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(min = 320.dp, max = 920.dp).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {

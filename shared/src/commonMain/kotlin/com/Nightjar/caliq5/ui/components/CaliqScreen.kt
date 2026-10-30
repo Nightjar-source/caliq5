@@ -41,7 +41,8 @@ fun CaliqScreen(
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .fillMaxSize()
+                        .widthIn(min = 320.dp, max = 840.dp)
+                        .fillMaxWidth()
                         .imePadding()
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
                         .verticalScroll(scrollState)
@@ -59,10 +60,11 @@ fun CaliqScreen(
                     Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
                 }
             } else {
-                Column(
+                Box(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.TopCenter
                 ) {
                     content()
                 }

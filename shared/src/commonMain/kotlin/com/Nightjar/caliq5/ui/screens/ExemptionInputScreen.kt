@@ -90,10 +90,10 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             val isWide = maxWidth >= 600.dp
             val isLandscape = maxWidth > maxHeight
-            val isPhoneLandscape = isLandscape && maxWidth < 840.dp
+            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> GridCells.Fixed(2)
-                maxWidth >= 840.dp -> GridCells.Adaptive(minSize = 280.dp)
+                maxWidth >= 840.dp -> GridCells.Adaptive(minSize = 340.dp)
                 else -> GridCells.Fixed(1)
             }
             val topSafeInset = WindowInsets.statusBars
@@ -112,7 +112,8 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 state = lazyGridState,
                 columns = gridColumns,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .widthIn(min = 320.dp, max = 940.dp)
+                    .fillMaxWidth()
                     .imePadding()
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(

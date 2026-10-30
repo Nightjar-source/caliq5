@@ -48,19 +48,19 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
             label = "monthlyBottomPadding"
         )
         
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
-            val isPhoneLandscape = isLandscape && maxWidth < 840.dp
+            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                 state = gridState,
                 columns = gridColumns,
-                modifier = Modifier.fillMaxSize().imePadding().padding(horizontal = 12.dp),
+                modifier = Modifier.widthIn(min = 320.dp, max = 920.dp).fillMaxWidth().imePadding().padding(horizontal = 12.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 90.dp, bottom = dynamicBottomPadding, start = 4.dp, end = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
