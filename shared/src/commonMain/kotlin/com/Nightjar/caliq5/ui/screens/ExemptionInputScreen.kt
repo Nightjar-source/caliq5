@@ -85,15 +85,18 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             }
         }
 
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val density = androidx.compose.ui.platform.LocalDensity.current
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             val isWide = maxWidth >= 600.dp
             val isLandscape = maxWidth > maxHeight
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
+            // Official Compose Adaptive Layout: Dynamic multi-column adaptation without locking to 2 columns
             val gridColumns = when {
                 isPhoneLandscape -> GridCells.Fixed(2)
-                maxWidth >= 840.dp -> GridCells.Adaptive(minSize = 340.dp)
+                maxWidth >= 1200.dp -> GridCells.Adaptive(minSize = 290.dp)
+                maxWidth >= 840.dp -> GridCells.Adaptive(minSize = 320.dp)
+                maxWidth >= 600.dp -> GridCells.Fixed(2)
                 else -> GridCells.Fixed(1)
             }
             val topSafeInset = WindowInsets.statusBars
@@ -108,11 +111,18 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 label = "gridBottomPadding"
             )
             
+            val containerMaxWidth = when {
+                maxWidth >= 1400.dp -> 1340.dp
+                maxWidth >= 1100.dp -> 1120.dp
+                maxWidth >= 840.dp -> 960.dp
+                else -> maxWidth
+            }
+
             LazyVerticalGrid(
                 state = lazyGridState,
                 columns = gridColumns,
                 modifier = Modifier
-                    .widthIn(min = 320.dp, max = 940.dp)
+                    .widthIn(min = 320.dp, max = containerMaxWidth)
                     .fillMaxWidth()
                     .imePadding()
                     .padding(horizontal = 16.dp),

@@ -237,14 +237,23 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                     val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
                     val gridColumns = when {
                         isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                        maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
+                        maxWidth >= 1200.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 290.dp)
+                        maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 310.dp)
+                        maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                         else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+                    }
+
+                    val containerMaxWidth = when {
+                        maxWidth >= 1400.dp -> 1340.dp
+                        maxWidth >= 1100.dp -> 1140.dp
+                        maxWidth >= 840.dp -> 960.dp
+                        else -> maxWidth
                     }
 
                     androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                         state = listGridState,
                         columns = gridColumns,
-                        modifier = Modifier.widthIn(min = 320.dp, max = 940.dp).fillMaxWidth().padding(horizontal = 8.dp),
+                        modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().padding(horizontal = 8.dp),
                         contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 160.dp + bottomSafeInset),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -272,24 +281,33 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                         }
                     }
                 } else {
-                    itemsIndexed(students, key = { _, it -> it.id }) { index, student ->
+                    itemsIndexed(
+                        students,
+                        key = { _, it -> it.id },
+                        span = { _, _ -> if (students.size == 1) androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) else androidx.compose.foundation.lazy.grid.GridItemSpan(1) }
+                    ) { index, student ->
                         val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
                         val cardShape = RoundedCornerShape(22.dp)
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow))
-                                .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f))
-                                .popInOnInitialLoad(index + 1)
-                                .padding(vertical = 5.dp),
-                            shape = cardShape,
-                            color = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.40f) else MaterialTheme.colorScheme.surface,
-                            shadowElevation = 0.dp,
-                            border = BorderStroke(
-                                1.dp,
-                                MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.30f else 0.45f)
-                            )
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
                         ) {
+                            Surface(
+                                modifier = Modifier
+                                    .then(if (students.size == 1) Modifier.widthIn(max = 680.dp) else Modifier)
+                                    .fillMaxWidth()
+                                    .animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow))
+                                    .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f))
+                                    .popInOnInitialLoad(index + 1)
+                                    .padding(vertical = 5.dp),
+                                shape = cardShape,
+                                color = if (isDark) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.40f) else MaterialTheme.colorScheme.surface,
+                                shadowElevation = 0.dp,
+                                border = BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.30f else 0.45f)
+                                )
+                            ) {
                             BoxWithConstraints(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp)) {
                                 val isCardCompact = maxWidth < 340.dp
                                 if (isCardCompact) {
@@ -438,6 +456,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                 }
                             }
                         }
+                    }
                     }
                 }
 
@@ -711,14 +730,23 @@ fun StudentEditView(
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
+                maxWidth >= 1200.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 290.dp)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 310.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+            }
+
+            val containerMaxWidth = when {
+                maxWidth >= 1400.dp -> 1340.dp
+                maxWidth >= 1100.dp -> 1140.dp
+                maxWidth >= 840.dp -> 960.dp
+                else -> maxWidth
             }
 
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = editGridState,
             columns = gridColumns,
-            modifier = Modifier.widthIn(min = 320.dp, max = 940.dp).fillMaxWidth().padding(horizontal = 8.dp),
+            modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().padding(horizontal = 8.dp),
             contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 160.dp + bottomSafeInset),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -1054,7 +1082,11 @@ Box(modifier = Modifier.fillMaxWidth()) {
 
                 val sortedEntries = if (isCustomClass) subjectsList.toList() else subjectsList.sortedBy { if (predefinedSubjects.contains(it.name)) predefinedSubjects.indexOf(it.name) else 999 }
                 
-                itemsIndexed(items = sortedEntries, key = { _, it -> it.id }) { index, entry ->
+                itemsIndexed(
+                    items = sortedEntries,
+                    key = { _, it -> it.id },
+                    span = { _, _ -> if (sortedEntries.size == 1) androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) else androidx.compose.foundation.lazy.grid.GridItemSpan(1) }
+                ) { index, entry ->
                     val isSubjectCustom = isCustomClass || !predefinedSubjects.contains(entry.name)
                     val isOptional = !isCustomClass && (com.Nightjar.caliq5.data.ClassData.getSubjects(selectedClassName).find { it.name == entry.name }?.optional == true)
                     val isSkipped = isOptional && entry.record.t1Val == "SKIPPED"

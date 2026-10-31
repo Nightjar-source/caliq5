@@ -27,14 +27,32 @@ fun NewsScreen(viewModel: AppViewModel) {
         .calculateBottomPadding()
 
     CaliqScreen(title = "آخر الأخبار", onBack = { viewModel.goBack() }, scrollable = false) {
-        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-            state = gridState,
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
-        ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            val isLandscape = maxWidth > maxHeight
+            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
+            val gridColumns = when {
+                isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 1200.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 290.dp)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 310.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+            }
+
+            val containerMaxWidth = when {
+                maxWidth >= 1400.dp -> 1340.dp
+                maxWidth >= 1100.dp -> 1140.dp
+                maxWidth >= 840.dp -> 960.dp
+                else -> maxWidth
+            }
+
+            androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+                state = gridState,
+                columns = gridColumns,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
+                modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+            ) {
             item(key = "news_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                     ResultCard {
@@ -91,8 +109,8 @@ fun NewsScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(2)) {
+            item(key = "news_item_0", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(2), contentAlignment = Alignment.Center) {
                     NewsItemCard(
                         title = "وزارة التربية تعلن ضوابط الإعفاء",
                         description = "أعلنت وزارة التربية عن التعليمات الجديدة الخاصة بالامتحانات والإعفاء العام والفردي...",
@@ -101,6 +119,7 @@ fun NewsScreen(viewModel: AppViewModel) {
                 }
             }
 
+        }
         }
     }
 }
@@ -126,7 +145,8 @@ private fun NewsItemCard(title: String, description: String, modifier: Modifier 
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
-                textAlign = TextAlign.Start,
+                textAlign = TextAlign.Justify,
+                modifier = Modifier.fillMaxWidth(),
                 lineHeight = 18.sp
             )
             CaliqButton(

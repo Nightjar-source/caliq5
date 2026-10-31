@@ -37,14 +37,32 @@ fun InstructionsScreen(viewModel: AppViewModel) {
         .calculateBottomPadding()
 
     CaliqScreen(title = "كيفية الاستخدام", onBack = { viewModel.goBack() }, scrollable = false) {
-        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
-        ) {
-            item(key = "instructions_header") {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            val isLandscape = maxWidth > maxHeight
+            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
+            val gridColumns = when {
+                isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 1200.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+            }
+
+            val containerMaxWidth = when {
+                maxWidth >= 1400.dp -> 1340.dp
+                maxWidth >= 1100.dp -> 1140.dp
+                maxWidth >= 840.dp -> 960.dp
+                else -> maxWidth
+            }
+
+            androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+                columns = gridColumns,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
+                modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+            ) {
+            item(key = "instructions_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                     ExpandableInstructionCard(
                         title = "ضوابط الإعفاء العام والفردي للعام 2024-2025",
@@ -149,17 +167,20 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item(key = "inst_disclaimer") {
+            item(key = "inst_disclaimer", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(6)) {
                     ExpandableInstructionCard(title = "🔹 إخلاء مسؤولية") {
                         Text(
                             "هذا التطبيق أداة تعليمية غير رسمية تستند إلى التعليمات الرسمية لوزارة التربية العراقية للتسهيل على الطلاب.",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp, lineHeight = 24.sp)
+                            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp, lineHeight = 24.sp),
+                            textAlign = TextAlign.Justify,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
             }
 
+        }
         }
     }
 }

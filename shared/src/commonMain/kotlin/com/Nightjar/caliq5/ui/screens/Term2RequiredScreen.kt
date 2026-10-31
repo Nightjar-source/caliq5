@@ -40,8 +40,17 @@ fun Term2Screen(viewModel: AppViewModel) {
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
+                maxWidth >= 1200.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 290.dp)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 310.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+            }
+
+            val containerMaxWidth = when {
+                maxWidth >= 1400.dp -> 1340.dp
+                maxWidth >= 1100.dp -> 1140.dp
+                maxWidth >= 840.dp -> 960.dp
+                else -> maxWidth
             }
 
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
@@ -50,7 +59,7 @@ fun Term2Screen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
-                modifier = Modifier.widthIn(min = 320.dp, max = 920.dp).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
