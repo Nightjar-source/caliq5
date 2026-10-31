@@ -1,6 +1,7 @@
 package com.Nightjar.caliq5.ui.navigation
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.animation.core.*
 import kotlinx.coroutines.launch
 
@@ -81,6 +82,16 @@ fun AppNavigation(
     val canGoBack by viewModel.canGoBack.collectAsState()
 
     val editingStudentMode by viewModel.editingStudentMode.collectAsState()
+
+    // Clear text field focus and hide virtual keyboard immediately when side drawer opens
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    val keyboardController = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+    LaunchedEffect(showSideMenu) {
+        if (showSideMenu) {
+            focusManager.clearFocus(force = true)
+            keyboardController?.hide()
+        }
+    }
 
     // Dedicated high-priority BackHandler for Side Drawer: closes drawer immediately without touching screen stack
     if (showSideMenu) {
@@ -301,48 +312,71 @@ fun AppNavigation(
             }
         }
 
-        // Side menu background dimming
+        // Side Menu Drawer Overlay with Dimming Scrim, Swipe-to-Close Gesture, and Tap-Outside Dismissal
         AnimatedVisibility(
             visible = showSideMenu,
-            enter = fadeIn(tween(350)),
-            exit = fadeOut(tween(350)),
+            enter = fadeIn(tween(280)),
+            exit = fadeOut(tween(240)),
+            modifier = Modifier.fillMaxSize().graphicsLayer { }.zIndex(1000f)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { viewModel.closeMenu() }
-                    )
-            )
-        }
-
-        // Side Menu Panel
-        AnimatedVisibility(
-            visible = showSideMenu,
-            enter = slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(durationMillis = 320, easing = CubicBezierEasing(0.16f, 1f, 0.3f, 1f))
-            ),
-            exit = slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(durationMillis = 260, easing = CubicBezierEasing(0.16f, 1f, 0.3f, 1f))
-            ),
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.CenterStart
+                    .pointerInput(layoutDirection) {
+                        detectHorizontalDragGestures { _, dragAmount ->
+                            val isRtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
+                            // In RTL, dragging rightwards (>15px) closes the drawer
+                            // In LTR, dragging leftwards (<-15px) closes the drawer
+                            if (isRtl && dragAmount > 15) {
+                                viewModel.closeMenu()
+                            } else if (!isRtl && dragAmount < -15) {
+                                viewModel.closeMenu()
+                            }
+                        }
+                    }
             ) {
-                CaliqSideMenu(
-                    viewModel = viewModel,
-                    onClose = { viewModel.closeMenu() },
-                    onNavigate = { screen ->
-                        viewModel.closeMenu()
-                        viewModel.navigateTo(screen)
-                    },
+                // 1. Semi-transparent Scrim covering full screen - tapping it closes the menu immediately
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.52f))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { viewModel.closeMenu() }
+                        )
                 )
+
+                // 2. Sliding Drawer Panel
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterStart)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {} // Consumes clicks inside drawer to prevent closing when tapping menu items
+                        )
+                        .animateEnterExit(
+                            enter = slideInHorizontally(
+                                initialOffsetX = { if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl) it else -it },
+                                animationSpec = tween(durationMillis = 300, easing = CubicBezierEasing(0.16f, 1f, 0.3f, 1f))
+                            ),
+                            exit = slideOutHorizontally(
+                                targetOffsetX = { if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl) it else -it },
+                                animationSpec = tween(durationMillis = 240, easing = CubicBezierEasing(0.16f, 1f, 0.3f, 1f))
+                            )
+                        )
+                ) {
+                    CaliqSideMenu(
+                        viewModel = viewModel,
+                        onClose = { viewModel.closeMenu() },
+                        onNavigate = { screen ->
+                            viewModel.closeMenu()
+                            viewModel.navigateTo(screen)
+                        },
+                    )
+                }
             }
         }
 

@@ -89,9 +89,10 @@ fun GradeInputField(
             disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
             disabledPlaceholderColor = com.Nightjar.caliq5.theme.successColor.copy(alpha = 0.85f),
+            cursorColor = MaterialTheme.colorScheme.primary,
             selectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
                 handleColor = MaterialTheme.colorScheme.primary,
-                backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.40f else 0.30f)
             )
         )
     )
@@ -147,7 +148,7 @@ fun SmallGradeInput(
     ) {
         val selectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
             handleColor = primaryColor,
-            backgroundColor = primaryColor.copy(alpha = 0.35f)
+            backgroundColor = primaryColor.copy(alpha = if (isDark) 0.40f else 0.30f)
         )
         CompositionLocalProvider(
             androidx.compose.foundation.text.selection.LocalTextSelectionColors provides selectionColors
@@ -244,7 +245,7 @@ fun CaliqOutlinedInput(
     ) {
         val selectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
             handleColor = primaryColor,
-            backgroundColor = primaryColor.copy(alpha = 0.35f)
+            backgroundColor = primaryColor.copy(alpha = if (isDark) 0.40f else 0.30f)
         )
         CompositionLocalProvider(
             androidx.compose.foundation.text.selection.LocalTextSelectionColors provides selectionColors
