@@ -97,6 +97,8 @@ android {
 
 dependencies {
     implementation(project(":shared"))
+    implementation(compose.material3)
+    implementation(compose.foundation)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation3.runtime)

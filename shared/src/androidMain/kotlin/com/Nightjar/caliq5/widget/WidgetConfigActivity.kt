@@ -18,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,8 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 class WidgetConfigActivity : ComponentActivity() {
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
@@ -74,8 +72,8 @@ class WidgetConfigActivity : ComponentActivity() {
             .putFloat("widget_opacity", opacity)
             .commit()
 
-        // Immediate update to all widgets
-        CaliqWidgetReceiver.updateWidget(this)
+        // Immediate update to all widgets via PlatformWidget
+        updateAppWidget()
 
         val resultValue = Intent().apply {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -84,6 +82,12 @@ class WidgetConfigActivity : ComponentActivity() {
         finish()
     }
 }
+
+private data class ConfigOption(
+    val key: String,
+    val title: String,
+    val subtitle: String
+)
 
 @Composable
 fun WidgetConfigScreen(
@@ -101,10 +105,10 @@ fun WidgetConfigScreen(
     }
 
     val styles = listOf(
-        Triple("material_you", "متريال يو ديناميكي (Material You)", "يتطابق مع خلفية شاشة هاتفك وألوان النظام تلقائياً"),
-        Triple("frosted_glass", "خلفية زجاجية غائمة (Blur Glass)", "مظهر زجاجي شفاف فاخر يعكس ما خلفه بضبابية أنيقة"),
-        Triple("pure_black", "أسود فاحم (OLED Black)", "أسود داكن عميق موفر للبطارية مع عناصر عالية التباين"),
-        Triple("app_theme", "ثيم التطبيق الأساسي", "يتماشى مع لون الثيم المختار داخل التطبيق بدقة")
+        ConfigOption("material_you", "متريال يو ديناميكي (Material You)", "يتطابق مع خلفية شاشة هاتفك وألوان النظام تلقائياً"),
+        ConfigOption("frosted_glass", "خلفية زجاجية غائمة (Blur Glass)", "مظهر زجاجي شفاف فاخر يعكس ما خلفه بضبابية أنيقة"),
+        ConfigOption("pure_black", "أسود فاحم (OLED Black)", "أسود داكن عميق موفر للبطارية مع عناصر عالية التباين"),
+        ConfigOption("app_theme", "ثيم التطبيق الأساسي", "يتماشى مع لون الثيم المختار داخل التطبيق بدقة")
     )
 
     Column(
@@ -145,7 +149,7 @@ fun WidgetConfigScreen(
             }
         }
 
-        Divider()
+        HorizontalDivider()
 
         // Background Style Selection
         Text(
@@ -153,13 +157,13 @@ fun WidgetConfigScreen(
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         )
 
-        styles.forEach { (key, title, subtitle) ->
-            val isSelected = selectedStyle == key
+        styles.forEach { option ->
+            val isSelected = selectedStyle == option.key
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .clickable { selectedStyle = key },
+                    .clickable { selectedStyle = option.key },
                 shape = RoundedCornerShape(16.dp),
                 color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
                 border = BorderStroke(
@@ -174,15 +178,15 @@ fun WidgetConfigScreen(
                 ) {
                     RadioButton(
                         selected = isSelected,
-                        onClick = { selectedStyle = key }
+                        onClick = { selectedStyle = option.key }
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = title,
+                            text = option.title,
                             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
                         )
                         Text(
-                            text = subtitle,
+                            text = option.subtitle,
                             style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                         )
                     }
@@ -207,7 +211,7 @@ fun WidgetConfigScreen(
                 0.96f to "شبه صلب (96%)"
             )
             opacities.forEach { (alphaVal, label) ->
-                val isSelected = kotlin.math.abs(selectedOpacity - alphaVal) < 0.05f
+                val isSelected = abs(selectedOpacity - alphaVal) < 0.05f
                 FilterChip(
                     selected = isSelected,
                     onClick = { selectedOpacity = alphaVal },
