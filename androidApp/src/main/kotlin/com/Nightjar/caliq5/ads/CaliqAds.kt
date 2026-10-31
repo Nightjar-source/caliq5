@@ -112,14 +112,22 @@ fun CaliqAdaptiveBanner(
                     val adView = AdView(context)
                     adView.adUnitId = BuildConfig.ADMOB_BANNER_ID
 
-                    // Adaptive banner width
+                    // Official AdMob Guidelines for Tablets, Large Screens, Foldables & Phones
                     val displayMetrics = context.resources.displayMetrics
                     val widthPixels = displayMetrics.widthPixels.toFloat()
                     val density = displayMetrics.density
                     val rawWidth = (widthPixels / density).toInt()
-                    val adWidth = rawWidth.coerceAtMost(728)
 
-                    adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth))
+                    // Standard Tablet Leaderboard is 728dp width. For phones, use anchored adaptive width.
+                    val adSize = if (rawWidth >= 728) {
+                        AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, 728)
+                    } else if (rawWidth >= 600) {
+                        AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, rawWidth.coerceAtMost(640))
+                    } else {
+                        AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, rawWidth)
+                    }
+
+                    adView.setAdSize(adSize)
                     adView.adListener = object : AdListener() {
                         override fun onAdLoaded() {
                             isAdLoaded = true

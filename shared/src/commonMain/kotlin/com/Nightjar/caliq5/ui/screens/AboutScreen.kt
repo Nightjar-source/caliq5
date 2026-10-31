@@ -165,12 +165,22 @@ fun AboutScreen(viewModel: AppViewModel) {
                 }
             }
 
-            // Telegram Contact Card
-            item {
+            // Channels and Bots Section Header
+            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Text(
+                    text = "قنواتنا وخدماتنا على تليغرام",
+                    style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold),
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp).popInOnInitialLoad(4),
+                    textAlign = TextAlign.Start
+                )
+            }
+
+            // 1. Official Channel: https://t.me/iraqitrb
+            item(key = "about_chan_official") {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
                 Surface(
-                    onClick = { uriHandler.openUri("https://t.me/iraqitrb?direct") },
-                    modifier = Modifier.fillMaxWidth().popInOnInitialLoad(4),
+                    onClick = { uriHandler.openUri("https://t.me/iraqitrb") },
+                    modifier = Modifier.fillMaxWidth().popInOnInitialLoad(5),
                     shape = RoundedCornerShape(20.dp),
                     color = MaterialTheme.colorScheme.surface,
                     border = BorderStroke(
@@ -188,27 +198,140 @@ fun AboutScreen(viewModel: AppViewModel) {
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             Box(
-                                modifier = Modifier.size(40.dp).background(Color(0xFF0088CC), CircleShape),
+                                modifier = Modifier.size(42.dp).background(Color(0xFF0088CC), CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.Send,
                                     contentDescription = null,
                                     tint = Color.White,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
-                            Text(
-                                text = "عبر تيليجرام",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Column {
+                                Text(
+                                    text = "قناتنا على تليغرام",
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                                Text(
+                                    text = "@iraqitrb • القناة الرسمية للأخبار والتعليمات",
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                )
+                            }
                         }
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+
+            // 2. Books & Guides Channel: https://t.me/bookiraqi
+            item(key = "about_chan_books") {
+                val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
+                Surface(
+                    onClick = { uriHandler.openUri("https://t.me/bookiraqi") },
+                    modifier = Modifier.fillMaxWidth().popInOnInitialLoad(6),
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.25f else 0.45f)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier.size(42.dp).background(Color(0xFF2E7D32), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.MenuBook,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                            Column {
+                                Text(
+                                    text = "قناة الكتب والملازم",
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                                Text(
+                                    text = "@bookiraqi • تحميل جميع المناهج والملازم",
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                )
+                            }
+                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+
+            // 3. Books Download Bot: @Bookiraqbot
+            item(key = "about_bot_books") {
+                val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
+                Surface(
+                    onClick = { uriHandler.openUri("https://t.me/Bookiraqbot") },
+                    modifier = Modifier.fillMaxWidth().popInOnInitialLoad(7),
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.25f else 0.45f)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier.size(42.dp).background(Color(0xFFE65100), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.SmartToy,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                            Column {
+                                Text(
+                                    text = "بوت تحميل الكتب والملازم",
+                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                                Text(
+                                    text = "@Bookiraqbot • بحث وتحميل فوري عبر تيليجرام",
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                )
+                            }
+                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }

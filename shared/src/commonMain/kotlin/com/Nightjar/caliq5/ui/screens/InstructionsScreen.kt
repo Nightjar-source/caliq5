@@ -103,7 +103,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
+            item(key = "inst_mygrades") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(1)) {
                     ExpandableInstructionCard(title = "طريقة استخدام \"درجاتي (السجل الشامل)\"") {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -117,7 +117,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
+            item(key = "inst_exemption") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(2)) {
                     ExpandableInstructionCard(title = "طريقة استخدام \"حساب الإعفاء\"") {
                         Text("1. اختر صفك الدراسي من القائمة.\n2. أدخل درجة السعي السنوي لكل مادة.\n3. اضغط \"لا تشملني\" للمواد غير المطلوبة.\n4. استخدم \"+ إضافة مادة\" للمواد الأخرى.", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp, lineHeight = 24.sp))
@@ -125,7 +125,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
+            item(key = "inst_annual") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(3)) {
                     ExpandableInstructionCard(title = "طريقة استخدام \"السعي السنوي\"") {
                         Text("أدخل اسم المادة ودرجات الفصل الأول، نصف السنة، والفصل الثاني للمادة، ثم اضغط \"حساب السعي\".", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp, lineHeight = 24.sp))
@@ -133,7 +133,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
+            item(key = "inst_monthly") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(4)) {
                     ExpandableInstructionCard(title = "طريقة استخدام \"المعدل الفصلي\"") {
                         Text("أدخل درجات امتحانات الأشهر لهذا الفصل (شهر أول، شهر ثاني، ...)، ثم اضغط حساب.", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp, lineHeight = 24.sp))
@@ -141,7 +141,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
+            item(key = "inst_term2") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(5)) {
                     ExpandableInstructionCard(title = "طريقة استخدام \"درجة الفصل 2\"") {
                         Text("استخدم هذه الميزة لمعرفة الدرجة التي تحتاجها في الفصل الثاني لتحقيق سعي 75% أو 90%.", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 15.sp, lineHeight = 24.sp))
@@ -149,7 +149,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
+            item(key = "inst_disclaimer") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(6)) {
                     ExpandableInstructionCard(title = "🔹 إخلاء مسؤولية") {
                         Text(

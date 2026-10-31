@@ -50,17 +50,25 @@ fun CaliqSideMenu(
     onClose: () -> Unit,
     onNavigate: (Screen) -> Unit,
 ) {
-    ModalDrawerSheet(
-        modifier = Modifier
-            .widthIn(min = 320.dp, max = 380.dp).fillMaxWidth(0.85f)
-            .fillMaxHeight(),
-        drawerShape = RoundedCornerShape(topEnd = 28.dp, bottomEnd = 28.dp),
-        drawerContainerColor = MaterialTheme.colorScheme.surface,
-        drawerContentColor = MaterialTheme.colorScheme.onSurface,
-        drawerTonalElevation = 0.dp,
-        windowInsets = WindowInsets(0, 0, 0, 0)
-    ) {
-        SideMenuHeader()
+    BoxWithConstraints(modifier = Modifier.fillMaxHeight()) {
+        // Material 3 Adaptive Drawer Width: proportional and sleek on phones, standard on tablets/foldables
+        val drawerWidth = when {
+            maxWidth < 360.dp -> (maxWidth - 52.dp).coerceAtLeast(260.dp)
+            maxWidth < 600.dp -> (maxWidth * 0.74f).coerceIn(270.dp, 305.dp)
+            maxWidth < 840.dp -> 320.dp
+            else -> 340.dp
+        }
+        ModalDrawerSheet(
+            modifier = Modifier
+                .width(drawerWidth)
+                .fillMaxHeight(),
+            drawerShape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp),
+            drawerContainerColor = MaterialTheme.colorScheme.surface,
+            drawerContentColor = MaterialTheme.colorScheme.onSurface,
+            drawerTonalElevation = 0.dp,
+            windowInsets = WindowInsets(0, 0, 0, 0)
+        ) {
+            SideMenuHeader()
 
         Column(
             modifier = Modifier
@@ -109,6 +117,7 @@ fun CaliqSideMenu(
             Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)))
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
     }
 }
 

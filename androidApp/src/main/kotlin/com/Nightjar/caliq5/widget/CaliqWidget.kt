@@ -43,20 +43,20 @@ class CaliqWidgetReceiver : GlanceAppWidgetReceiver() {
             kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
                 try {
                     CaliqWidget().updateAll(context)
-                } catch (_: Throwable) {
-                    try {
-                        val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(context)
-                        val myProvider = android.content.ComponentName(context, CaliqWidgetReceiver::class.java)
-                        val ids = appWidgetManager.getAppWidgetIds(myProvider)
-                        if (ids != null && ids.isNotEmpty()) {
-                            val intent = Intent(context, CaliqWidgetReceiver::class.java).apply {
-                                action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                                putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-                            }
-                            context.sendBroadcast(intent)
+                } catch (_: Throwable) {}
+
+                try {
+                    val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(context)
+                    val myProvider = android.content.ComponentName(context, CaliqWidgetReceiver::class.java)
+                    val ids = appWidgetManager.getAppWidgetIds(myProvider)
+                    if (ids != null && ids.isNotEmpty()) {
+                        val intent = Intent(context, CaliqWidgetReceiver::class.java).apply {
+                            action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                            putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
                         }
-                    } catch (_: Throwable) {}
-                }
+                        context.sendBroadcast(intent)
+                    }
+                } catch (_: Throwable) {}
             }
         }
     }
@@ -85,10 +85,20 @@ class CaliqWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetContent(context: Context, settings: AppSettings) {
+        val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
+        val prefTheme = widgetPrefs.getString("theme", null)
+        val prefPrimaryColor = widgetPrefs.getString("primary_color", null)
+        val prefUseMaterialYou = if (widgetPrefs.contains("use_material_you")) widgetPrefs.getBoolean("use_material_you", true) else settings.useMaterialYou
+        val prefPureBlack = if (widgetPrefs.contains("pure_black_mode")) widgetPrefs.getBoolean("pure_black_mode", false) else settings.pureBlackMode
+        val prefPureWhite = if (widgetPrefs.contains("pure_white_mode")) widgetPrefs.getBoolean("pure_white_mode", false) else settings.pureWhiteMode
+
+        val effectiveTheme = prefTheme ?: settings.theme
+        val effectivePrimaryColor = prefPrimaryColor ?: settings.primaryColor
+
         val size = LocalSize.current
         val isVertical = size.height > size.width * 1.15f
 
-        val isDark = when (settings.theme) {
+        val isDark = when (effectiveTheme) {
             "dark" -> true
             "light" -> false
             else -> {
@@ -97,7 +107,7 @@ class CaliqWidget : GlanceAppWidget() {
             }
         }
 
-        val isDynamic = settings.useMaterialYou && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
+        val isDynamic = prefUseMaterialYou && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
 
         // Resolved primary color (either from Material You or app's selected theme)
         val primaryColorObj = if (isDynamic) {
@@ -109,7 +119,7 @@ class CaliqWidget : GlanceAppWidget() {
             }
         } else {
             try {
-                val themeHex = settings.primaryColor
+                val themeHex = effectivePrimaryColor
                 val effectiveHex = if (themeHex.equals("#800020", ignoreCase = true) || themeHex.equals("#9E1B3E", ignoreCase = true)) "#d41145" else themeHex
                 Color(android.graphics.Color.parseColor(effectiveHex))
             } catch (_: Throwable) {
@@ -117,42 +127,64 @@ class CaliqWidget : GlanceAppWidget() {
             }
         }
 
-        // Material 3 Dynamic Translucent Background (tints subtly with theme color or wallpaper palette)
-        val widgetBg = if (isDynamic) {
-            try {
-                val surfaceRes = if (isDark) android.R.color.system_neutral1_900 else android.R.color.system_neutral1_50
-                val surfaceColor = Color(androidx.core.content.ContextCompat.getColor(context, surfaceRes))
-                if (isDark) {
-                    if (settings.pureBlackMode) Color.Black.copy(alpha = 0.92f) else surfaceColor.copy(alpha = 0.88f)
-                } else {
-                    if (settings.pureWhiteMode) Color.White.copy(alpha = 0.95f) else surfaceColor.copy(alpha = 0.90f)
-                }
-            } catch (_: Throwable) {
-                if (isDark) Color(0xFF1B1A22).copy(alpha = 0.88f) else Color(0xFFFAF8FC).copy(alpha = 0.90f)
+        val bgStyle = widgetPrefs.getString("widget_bg_style", "material_you") ?: "material_you"
+        val customOpacity = widgetPrefs.getFloat("widget_opacity", 0.88f)
+
+        // Custom Background Resolution based on user choice (Blur Glass, Material You, Pure Black, App Theme)
+        val widgetBg = when (bgStyle) {
+            "frosted_glass" -> {
+                if (isDark) Color(0xFF1E1E24).copy(alpha = customOpacity.coerceIn(0.60f, 0.95f))
+                else Color(0xFFFFFFFF).copy(alpha = customOpacity.coerceIn(0.65f, 0.95f))
             }
-        } else {
-            // When Material You is OFF, the widget background is subtly tinted with the app's selected theme color!
-            if (isDark) {
-                if (settings.pureBlackMode) {
-                    Color.Black.copy(alpha = 0.92f)
+            "pure_black" -> Color.Black.copy(alpha = 0.98f)
+            "app_theme" -> {
+                if (isDark) {
+                    Color(
+                        red = 0.12f * primaryColorObj.red + 0.88f * 0.08f,
+                        green = 0.12f * primaryColorObj.green + 0.88f * 0.08f,
+                        blue = 0.12f * primaryColorObj.blue + 0.88f * 0.10f,
+                        alpha = customOpacity
+                    )
                 } else {
                     Color(
-                        red = 0.08f * primaryColorObj.red + 0.92f * 0.10f,
-                        green = 0.08f * primaryColorObj.green + 0.92f * 0.10f,
-                        blue = 0.08f * primaryColorObj.blue + 0.92f * 0.13f,
-                        alpha = 0.90f
+                        red = 0.08f * primaryColorObj.red + 0.92f * 0.96f,
+                        green = 0.08f * primaryColorObj.green + 0.92f * 0.96f,
+                        blue = 0.08f * primaryColorObj.blue + 0.92f * 0.98f,
+                        alpha = customOpacity
                     )
                 }
-            } else {
-                if (settings.pureWhiteMode) {
-                    Color.White.copy(alpha = 0.95f)
+            }
+            else -> { // "material_you" or default
+                if (isDynamic) {
+                    try {
+                        val surfaceRes = if (isDark) android.R.color.system_neutral1_900 else android.R.color.system_neutral1_50
+                        val surfaceColor = Color(androidx.core.content.ContextCompat.getColor(context, surfaceRes))
+                        if (isDark) {
+                            if (prefPureBlack) Color.Black.copy(alpha = 0.95f) else surfaceColor.copy(alpha = customOpacity)
+                        } else {
+                            if (prefPureWhite) Color.White.copy(alpha = 0.95f) else surfaceColor.copy(alpha = customOpacity)
+                        }
+                    } catch (_: Throwable) {
+                        if (isDark) Color(0xFF1B1A22).copy(alpha = customOpacity) else Color(0xFFFAF8FC).copy(alpha = customOpacity)
+                    }
                 } else {
-                    Color(
-                        red = 0.06f * primaryColorObj.red + 0.94f * 0.98f,
-                        green = 0.06f * primaryColorObj.green + 0.94f * 0.98f,
-                        blue = 0.06f * primaryColorObj.blue + 0.94f * 0.99f,
-                        alpha = 0.92f
-                    )
+                    if (isDark) {
+                        if (prefPureBlack) Color.Black.copy(alpha = 0.95f)
+                        else Color(
+                            red = 0.08f * primaryColorObj.red + 0.92f * 0.10f,
+                            green = 0.08f * primaryColorObj.green + 0.92f * 0.10f,
+                            blue = 0.08f * primaryColorObj.blue + 0.92f * 0.13f,
+                            alpha = customOpacity
+                        )
+                    } else {
+                        if (prefPureWhite) Color.White.copy(alpha = 0.95f)
+                        else Color(
+                            red = 0.06f * primaryColorObj.red + 0.94f * 0.97f,
+                            green = 0.06f * primaryColorObj.green + 0.94f * 0.97f,
+                            blue = 0.06f * primaryColorObj.blue + 0.94f * 0.99f,
+                            alpha = customOpacity
+                        )
+                    }
                 }
             }
         }

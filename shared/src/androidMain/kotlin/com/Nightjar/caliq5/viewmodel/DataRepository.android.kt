@@ -156,6 +156,18 @@ actual object DataRepository {
 
     actual suspend fun saveSettings(settings: AppSettings): Unit = withContext(Dispatchers.IO) {
         cachedSettings = settings
+        // Synchronously commit to SharedPreferences for instant 0ms widget & cross-process synchronization
+        try {
+            val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", android.content.Context.MODE_PRIVATE)
+            widgetPrefs.edit()
+                .putString("theme", settings.theme)
+                .putString("primary_color", settings.primaryColor)
+                .putBoolean("use_material_you", settings.useMaterialYou)
+                .putBoolean("pure_black_mode", settings.pureBlackMode)
+                .putBoolean("pure_white_mode", settings.pureWhiteMode)
+                .commit()
+        } catch (_: Throwable) {}
+
         val payload = json.encodeToString(settings)
         context.dataStore.edit { prefs ->
             prefs[SETTINGS_KEY] = payload

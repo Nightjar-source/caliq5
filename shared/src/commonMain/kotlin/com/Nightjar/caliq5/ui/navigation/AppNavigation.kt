@@ -84,29 +84,35 @@ fun AppNavigation(
 
     val editingStudentMode by viewModel.editingStudentMode.collectAsState()
 
-    // Clear text field focus and hide virtual keyboard immediately when side drawer opens or when navigating between screens/results
+    // Clear text field focus and hide virtual keyboard & floating text selection toolbar immediately
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     val keyboardController = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+    val textToolbar = androidx.compose.ui.platform.LocalTextToolbar.current
+    val dismissFocusAndToolbar: () -> Unit = {
+        focusManager.clearFocus(force = true)
+        keyboardController?.hide()
+        textToolbar.hide()
+    }
     LaunchedEffect(showSideMenu) {
         if (showSideMenu) {
-            focusManager.clearFocus(force = true)
-            keyboardController?.hide()
+            dismissFocusAndToolbar()
         }
     }
     LaunchedEffect(currentScreen, editingStudentMode, resultState != null) {
-        focusManager.clearFocus(force = true)
-        keyboardController?.hide()
+        dismissFocusAndToolbar()
     }
 
     // Dedicated high-priority BackHandler for Side Drawer: closes drawer immediately without touching screen stack
     if (showSideMenu) {
         com.Nightjar.caliq5.utils.BackHandler(enabled = true) {
+            dismissFocusAndToolbar()
             viewModel.closeMenu()
         }
     }
 
     // Main back navigation handling for app screens and results
     com.Nightjar.caliq5.utils.BackHandler(enabled = !showSideMenu && (resultState != null || canGoBack || editingStudentMode != null || currentScreen != Screen.EXEMPTION_SELECT)) {
+        dismissFocusAndToolbar()
         viewModel.handleTopBarBack()
     }
 
@@ -196,8 +202,14 @@ fun AppNavigation(
                     CaliqNavigationRail(
                         currentScreen = currentScreen,
                         isMenuOpen = showSideMenu,
-                        onScreenSelected = { screen -> viewModel.navigateTo(screen) },
-                        onMenuClick = { viewModel.openMenu() },
+                        onScreenSelected = { screen ->
+                            dismissFocusAndToolbar()
+                            viewModel.navigateTo(screen)
+                        },
+                        onMenuClick = {
+                            dismissFocusAndToolbar()
+                            viewModel.openMenu()
+                        },
                         railWidth = railWidth
                     )
                 }
@@ -279,8 +291,14 @@ fun AppNavigation(
                 CaliqBottomNav(
                     currentScreen = currentScreen,
                     isMenuOpen = showSideMenu,
-                    onScreenSelected = { viewModel.navigateTo(it) },
-                    onMenuClick = { viewModel.openMenu() },
+                    onScreenSelected = { screen ->
+                        dismissFocusAndToolbar()
+                        viewModel.navigateTo(screen)
+                    },
+                    onMenuClick = {
+                        dismissFocusAndToolbar()
+                        viewModel.openMenu()
+                    },
                     modifier = Modifier
                         .padding(top = 4.dp, bottom = 12.dp, start = 8.dp, end = 8.dp),
                 )
@@ -348,7 +366,10 @@ fun AppNavigation(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = { viewModel.closeMenu() }
+                            onClick = {
+                            dismissFocusAndToolbar()
+                            viewModel.closeMenu()
+                        }
                         )
                 )
 
@@ -375,8 +396,12 @@ fun AppNavigation(
                 ) {
                     CaliqSideMenu(
                         viewModel = viewModel,
-                        onClose = { viewModel.closeMenu() },
+                        onClose = {
+                            dismissFocusAndToolbar()
+                            viewModel.closeMenu()
+                        },
                         onNavigate = { screen ->
+                            dismissFocusAndToolbar()
                             viewModel.closeMenu()
                             viewModel.navigateTo(screen)
                         },
