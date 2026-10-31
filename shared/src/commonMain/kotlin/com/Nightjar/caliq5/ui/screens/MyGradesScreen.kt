@@ -309,7 +309,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                 )
                             ) {
                             BoxWithConstraints(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp)) {
-                                val isCardCompact = maxWidth < 340.dp
+                                val isCardCompact = maxWidth < 360.dp
                                 if (isCardCompact) {
                                     Column(
                                         modifier = Modifier.fillMaxWidth(),
@@ -322,7 +322,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                     interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                                                     indication = null
                                                 ) { editingStudentId = student.id; showEditView = true },
-                                            horizontalAlignment = Alignment.End
+                                            horizontalAlignment = Alignment.Start
                                         ) {
                                             Text(
                                                 text = student.name,
@@ -330,7 +330,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                     color = MaterialTheme.colorScheme.primary,
                                                     fontWeight = FontWeight.Bold,
                                                 ),
-                                                textAlign = TextAlign.End,
+                                                textAlign = TextAlign.Start,
                                                 maxLines = 2,
                                                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                             )
@@ -341,7 +341,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                     style = MaterialTheme.typography.bodySmall.copy(
                                                         color = MaterialTheme.colorScheme.secondary,
                                                     ),
-                                                    textAlign = TextAlign.End,
+                                                    textAlign = TextAlign.Start,
                                                     maxLines = 1,
                                                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                                 )
@@ -360,7 +360,8 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                 },
                                                 icon = Icons.Outlined.Visibility,
                                                 label = "معاينة",
-                                                tintColor = MaterialTheme.colorScheme.secondary
+                                                tintColor = MaterialTheme.colorScheme.secondary,
+                                                modifier = Modifier.weight(1f)
                                             )
                                             ExpressiveActionButton(
                                                 onClick = { 
@@ -369,13 +370,15 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                 },
                                                 icon = Icons.Outlined.PictureAsPdf,
                                                 label = "طباعة",
-                                                tintColor = com.Nightjar.caliq5.theme.successColor
+                                                tintColor = com.Nightjar.caliq5.theme.successColor,
+                                                modifier = Modifier.weight(1f)
                                             )
                                             ExpressiveActionButton(
                                                 onClick = { editingStudentId = student.id; showEditView = true },
                                                 icon = Icons.Outlined.Edit,
                                                 label = "تعديل",
-                                                tintColor = MaterialTheme.colorScheme.primary
+                                                tintColor = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.weight(1f)
                                             )
                                         }
                                     }
@@ -385,6 +388,41 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .clickable(
+                                                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                                                    indication = null
+                                                ) { editingStudentId = student.id; showEditView = true },
+                                            horizontalAlignment = Alignment.Start
+                                        ) {
+                                            Text(
+                                                text = student.name,
+                                                style = MaterialTheme.typography.titleMedium.copy(
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    fontWeight = FontWeight.Bold,
+                                                ),
+                                                textAlign = TextAlign.Start,
+                                                maxLines = 2,
+                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                            )
+                                            if (student.className.isNotBlank()) {
+                                                Spacer(Modifier.height(4.dp))
+                                                Text(
+                                                    text = student.className,
+                                                    style = MaterialTheme.typography.bodySmall.copy(
+                                                        color = MaterialTheme.colorScheme.secondary,
+                                                    ),
+                                                    textAlign = TextAlign.Start,
+                                                    maxLines = 1,
+                                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(Modifier.width(14.dp))
+
                                         Row(
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                                             verticalAlignment = Alignment.CenterVertically,
@@ -399,7 +437,6 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                 label = "معاينة",
                                                 tintColor = MaterialTheme.colorScheme.secondary
                                             )
-                                            
                                             ExpressiveActionButton(
                                                 onClick = { 
                                                     val latest = students.find { it.id == student.id } ?: student
@@ -409,7 +446,6 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                 label = "طباعة",
                                                 tintColor = com.Nightjar.caliq5.theme.successColor
                                             )
-                                            
                                             ExpressiveActionButton(
                                                 onClick = { editingStudentId = student.id; showEditView = true },
                                                 icon = Icons.Outlined.Edit,
@@ -417,46 +453,10 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                 tintColor = MaterialTheme.colorScheme.primary
                                             )
                                         }
-
-                                        Spacer(Modifier.width(14.dp))
-
-                                        Column(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .clickable(
-                                                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                                                    indication = null
-                                                ) { editingStudentId = student.id; showEditView = true },
-                                            horizontalAlignment = Alignment.End
-                                        ) {
-                                            Text(
-                                                text = student.name,
-                                                style = MaterialTheme.typography.titleMedium.copy(
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                    fontWeight = FontWeight.Bold,
-                                                ),
-                                                textAlign = TextAlign.End,
-                                                maxLines = 2,
-                                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                            )
-                                            if (student.className.isNotBlank()) {
-                                                Spacer(Modifier.height(4.dp))
-                                                Text(
-                                                    text = student.className,
-                                                    style = MaterialTheme.typography.bodySmall.copy(
-                                                        color = MaterialTheme.colorScheme.secondary,
-                                                    ),
-                                                    textAlign = TextAlign.End,
-                                                    maxLines = 1,
-                                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                                )
-                                            }
-                                        }
                                     }
                                 }
                             }
                         }
-                    }
                     }
                 }
 
