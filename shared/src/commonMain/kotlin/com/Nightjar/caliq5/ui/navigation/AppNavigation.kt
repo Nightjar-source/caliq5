@@ -84,7 +84,7 @@ fun AppNavigation(
 
     val editingStudentMode by viewModel.editingStudentMode.collectAsState()
 
-    // Clear text field focus and hide virtual keyboard immediately when side drawer opens
+    // Clear text field focus and hide virtual keyboard immediately when side drawer opens or when navigating between screens/results
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     val keyboardController = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
     LaunchedEffect(showSideMenu) {
@@ -92,6 +92,10 @@ fun AppNavigation(
             focusManager.clearFocus(force = true)
             keyboardController?.hide()
         }
+    }
+    LaunchedEffect(currentScreen, editingStudentMode, resultState != null) {
+        focusManager.clearFocus(force = true)
+        keyboardController?.hide()
     }
 
     // Dedicated high-priority BackHandler for Side Drawer: closes drawer immediately without touching screen stack
