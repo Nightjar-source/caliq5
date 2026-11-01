@@ -53,18 +53,19 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
     val scope = rememberCoroutineScope()
     var snapJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
 
-    // When keyboard appears, smoothly glide the screen back up so the inputs are never covered!
+    // When keyboard appears, stay in place without jumping back to original position (0)!
+    // It stays in place and shifts only slightly for the active input element to remain visible.
     val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density) > 0
     androidx.compose.runtime.LaunchedEffect(isImeVisible) {
         if (isImeVisible && overscrollOffset.value > 0f) {
+            val gentleOffset = (overscrollOffset.value * 0.75f).coerceAtLeast(0f)
             overscrollOffset.animateTo(
-                targetValue = 0f,
+                targetValue = gentleOffset,
                 animationSpec = spring(
-                    dampingRatio = 0.82f,
-                    stiffness = Spring.StiffnessMediumLow
+                    dampingRatio = 0.85f,
+                    stiffness = Spring.StiffnessLow
                 )
             )
-            isRestingInReachability = false
         }
     }
 
