@@ -47,6 +47,18 @@ data class WidgetConfigData(
 class CaliqWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = CaliqWidget()
 
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        val action = intent.action ?: return
+        if (action == Intent.ACTION_CONFIGURATION_CHANGED ||
+            action == Intent.ACTION_WALLPAPER_CHANGED ||
+            action == Intent.ACTION_MY_PACKAGE_REPLACED ||
+            action == Intent.ACTION_LOCALE_CHANGED
+        ) {
+            updateWidgetSync(context, AppWidgetManager.INVALID_APPWIDGET_ID)
+        }
+    }
+
     companion object {
         @JvmStatic
         fun updateWidgetSync(context: Context, targetWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID) {

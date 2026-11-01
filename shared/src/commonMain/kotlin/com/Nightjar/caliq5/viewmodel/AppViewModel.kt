@@ -294,16 +294,16 @@ class AppViewModel : ViewModel() {
     fun updateSettings(newSettings: AppSettings) {
         _settings.value = newSettings
         DataRepository.cachedSettings = newSettings
+        com.Nightjar.caliq5.widget.syncWidgetSettings(
+            theme = newSettings.theme,
+            primaryColor = newSettings.primaryColor,
+            useMaterialYou = newSettings.useMaterialYou,
+            pureBlackMode = newSettings.pureBlackMode,
+            pureWhiteMode = newSettings.pureWhiteMode
+        )
+        com.Nightjar.caliq5.widget.updateAppWidget()
         viewModelScope.launch {
             DataRepository.saveSettings(newSettings)
-            com.Nightjar.caliq5.widget.syncWidgetSettings(
-                theme = newSettings.theme,
-                primaryColor = newSettings.primaryColor,
-                useMaterialYou = newSettings.useMaterialYou,
-                pureBlackMode = newSettings.pureBlackMode,
-                pureWhiteMode = newSettings.pureWhiteMode
-            )
-            com.Nightjar.caliq5.widget.updateAppWidget()
         }
     }
 
