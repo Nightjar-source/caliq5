@@ -1,5 +1,3 @@
-@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-
 package com.Nightjar.caliq5.ui.components
 
 import androidx.compose.ui.composed
@@ -55,14 +53,15 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
     val scope = rememberCoroutineScope()
     var snapJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
 
+    // When keyboard appears, smoothly glide the screen back up so the inputs are never covered!
     val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density) > 0
     androidx.compose.runtime.LaunchedEffect(isImeVisible) {
         if (isImeVisible && overscrollOffset.value > 0f) {
             overscrollOffset.animateTo(
                 targetValue = 0f,
                 animationSpec = spring(
-                    dampingRatio = 0.85f,
-                    stiffness = Spring.StiffnessMedium
+                    dampingRatio = 0.82f,
+                    stiffness = Spring.StiffnessMediumLow
                 )
             )
             isRestingInReachability = false
@@ -107,7 +106,7 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                     val current = overscrollOffset.value
                     val maxPull = maxRestingTarget * 1.30f
                     val progress = (current / maxPull).coerceIn(0f, 1f)
-                    val resistance = 0.50f * (1f - progress * 0.7f)
+                    val resistance = 0.55f * (1f - progress * 0.65f)
                     val target = (current + delta * resistance).coerceAtMost(maxPull)
                     snapJob?.cancel()
                     snapJob = scope.launch { overscrollOffset.snapTo(target) }
@@ -132,8 +131,8 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                     overscrollOffset.animateTo(
                         targetValue = targetValue,
                         animationSpec = spring(
-                            dampingRatio = 0.85f,
-                            stiffness = Spring.StiffnessMedium
+                            dampingRatio = 0.78f, // Fluid liquid spring
+                            stiffness = Spring.StiffnessLow
                         )
                     )
                     return available

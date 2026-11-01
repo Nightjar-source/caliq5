@@ -1,11 +1,6 @@
-@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-
 package com.Nightjar.caliq5.ui.components
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.ui.focus.onFocusEvent
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,9 +37,6 @@ fun GradeInputField(
     isError: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val scope = rememberCoroutineScope()
-
     var tfv by remember(value) {
         mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length)))
     }
@@ -92,14 +84,6 @@ fun GradeInputField(
         trailingIcon = if (showPercent) { { Text("%") } } else null,
         modifier = modifier
             .fillMaxWidth()
-            .bringIntoViewRequester(bringIntoViewRequester)
-            .onFocusEvent { focusState ->
-                if (focusState.isFocused) {
-                    scope.launch {
-                        bringIntoViewRequester.bringIntoView()
-                    }
-                }
-            }
             .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f)),
         shape = shape,
         colors = OutlinedTextFieldDefaults.colors(
@@ -166,14 +150,6 @@ fun SmallGradeInput(
 
     Box(
         modifier = modifier
-            .bringIntoViewRequester(bringIntoViewRequester)
-            .onFocusEvent { focusState ->
-                if (focusState.isFocused) {
-                    scope.launch {
-                        bringIntoViewRequester.bringIntoView()
-                    }
-                }
-            }
             .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f))
             .background(containerColor, shape)
             .border(1.dp, borderColor, shape)
@@ -266,23 +242,12 @@ fun CaliqOutlinedInput(
         MaterialTheme.colorScheme.outline.copy(alpha = if (isDark) 0.45f else 0.38f)
     }
     
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val scope = rememberCoroutineScope()
-
     var tfv by remember(value) {
         mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length)))
     }
 
     Box(
         modifier = modifier
-            .bringIntoViewRequester(bringIntoViewRequester)
-            .onFocusEvent { focusState ->
-                if (focusState.isFocused) {
-                    scope.launch {
-                        bringIntoViewRequester.bringIntoView()
-                    }
-                }
-            }
             .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f))
             .background(containerColor, shape)
             .padding(vertical = 12.dp, horizontal = 4.dp),

@@ -54,8 +54,10 @@ fun AboutScreen(viewModel: AppViewModel) {
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 840.dp -> 820.dp
-                maxWidth >= 600.dp -> 680.dp
+                maxWidth >= 1400.dp -> 1340.dp
+                maxWidth >= 1100.dp -> 1140.dp
+                maxWidth >= 840.dp -> 960.dp
+                maxWidth >= 600.dp -> 840.dp
                 else -> maxWidth
             }
 
