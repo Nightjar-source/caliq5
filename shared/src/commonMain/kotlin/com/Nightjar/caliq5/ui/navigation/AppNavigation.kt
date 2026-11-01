@@ -646,7 +646,6 @@ private fun MainContent(
                 ) {
                     CaliqIconButton(
                         onClick = { 
-                            dismissFocusAndToolbar()
                             viewModel.handleTopBarBack() 
                         },
                         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),

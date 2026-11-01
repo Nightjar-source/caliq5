@@ -76,7 +76,7 @@ fun GradeInputField(
         isError = isError,
         enabled = enabled,
         textStyle = LocalTextStyle.current.copy(
-            textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrRtls,
+            textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrRtl,
             textAlign = TextAlign.Start
         ),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
