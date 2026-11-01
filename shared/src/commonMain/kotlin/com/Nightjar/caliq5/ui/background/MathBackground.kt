@@ -88,26 +88,15 @@ fun MathBackground(
     val isAppVisible = lifecycleState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)
 
     androidx.compose.runtime.LaunchedEffect(isHighPerf, isAppVisible) {
-        if (!isAppVisible) return@LaunchedEffect
+        if (!isAppVisible || !isHighPerf) return@LaunchedEffect
         kotlinx.coroutines.delay(350) // Smooth initial startup frame
         var previousFrame = androidx.compose.runtime.withFrameMillis { it }
         while (true) {
             val currentFrame = androidx.compose.runtime.withFrameMillis { it }
             val delta = (currentFrame - previousFrame).toFloat()
             previousFrame = currentFrame
-            
-            // On weak phones, move 4x slower to create a calm, barely-moving effect
-            val speedMultiplier = if (isHighPerf) 1f else 0.25f
-            masterTime += delta * speedMultiplier
-            
-            // Limit frame rate to save battery globally:
-            // Strong phones: ~30 fps (delay 33ms)
-            // Weak phones: ~10 fps (delay 100ms)
-            if (isHighPerf) {
-                kotlinx.coroutines.delay(33)
-            } else {
-                kotlinx.coroutines.delay(100)
-            }
+            masterTime += delta
+            kotlinx.coroutines.delay(40) // Smooth ~25fps loop with minimal CPU overhead
         }
     }
 

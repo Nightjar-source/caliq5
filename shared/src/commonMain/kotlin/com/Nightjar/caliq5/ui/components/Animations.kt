@@ -51,6 +51,21 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
     val overscrollOffset = remember { Animatable(0f) }
     var isRestingInReachability by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    var snapJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+
+    val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density) > 0
+    androidx.compose.runtime.LaunchedEffect(isImeVisible) {
+        if (isImeVisible && overscrollOffset.value > 0f) {
+            overscrollOffset.animateTo(
+                targetValue = 0f,
+                animationSpec = spring(
+                    dampingRatio = 0.85f,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
+            isRestingInReachability = false
+        }
+    }
 
     val maxRestingTarget = with(density) {
         val calculated = if (componentHeight > 0) componentHeight * 0.32f else 220.dp.toPx()
@@ -65,11 +80,11 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                 val delta = available.y
 
                 // If currently displaced downwards and user scrolls UP (delta < 0):
-                // Consume upward scroll to slide back up towards 0
                 if (current > 0f && delta < 0f && source == NestedScrollSource.UserInput) {
                     val newOffset = (current + delta).coerceAtLeast(0f)
                     val consumedY = newOffset - current
-                    scope.launch { overscrollOffset.snapTo(newOffset) }
+                    snapJob?.cancel()
+                    snapJob = scope.launch { overscrollOffset.snapTo(newOffset) }
                     if (newOffset == 0f) {
                         isRestingInReachability = false
                     }
@@ -92,7 +107,8 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                     val progress = (current / maxPull).coerceIn(0f, 1f)
                     val resistance = 0.50f * (1f - progress * 0.7f)
                     val target = (current + delta * resistance).coerceAtMost(maxPull)
-                    scope.launch { overscrollOffset.snapTo(target) }
+                    snapJob?.cancel()
+                    snapJob = scope.launch { overscrollOffset.snapTo(target) }
                     return Offset(0f, delta)
                 }
 
@@ -114,8 +130,8 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                     overscrollOffset.animateTo(
                         targetValue = targetValue,
                         animationSpec = spring(
-                            dampingRatio = 0.82f,
-                            stiffness = Spring.StiffnessLow
+                            dampingRatio = 0.85f,
+                            stiffness = Spring.StiffnessMedium
                         )
                     )
                     return available

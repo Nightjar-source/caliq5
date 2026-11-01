@@ -17,18 +17,17 @@ actual fun rememberIsHighPerformanceDevice(): Boolean {
         // 1. Android Go / Manufacturer Low RAM flag
         if (activityManager.isLowRamDevice) return@remember false
         
-        // 2. Exact physical total RAM check (Graceful degradation for <= 3.2GB RAM devices)
-        // Works universally across all Android versions (including Android 15, 16, 17+)
+        // 2. Exact physical total RAM check (Graceful degradation for <= 3.5GB RAM devices)
         val memoryInfo = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(memoryInfo)
         val totalRamGb = memoryInfo.totalMem / (1024.0 * 1024.0 * 1024.0)
-        if (totalRamGb <= 3.2) return@remember false
+        if (totalRamGb <= 3.5) return@remember false
         
         // 3. CPU Core count check (Quad-core or lower is considered low-end)
         val cores = Runtime.getRuntime().availableProcessors()
-        if (cores <= 4 && totalRamGb < 4.0) return@remember false
+        if (cores <= 4 && totalRamGb < 6.0) return@remember false
 
-        // 4. OS Version check (Android 9 and older have legacy Skia drivers)
-        Build.VERSION.SDK_INT >= 29
+        // 4. Hardware-accelerated RenderEffect requires Android 12+ (API 31+)
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     }
 }
