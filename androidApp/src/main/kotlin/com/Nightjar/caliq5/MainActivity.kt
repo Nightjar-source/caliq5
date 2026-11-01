@@ -47,6 +47,8 @@ class MainActivity : ComponentActivity() {
         // Initialize Google Mobile Ads SDK & sync widget theme asynchronously
         kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
             try {
+                // AOT Baseline Profile installer: compile DEX profile ahead of time to eliminate initial animation stutter
+                androidx.profileinstaller.ProfileInstaller.writeProfile(this@MainActivity)
                 com.google.android.gms.ads.MobileAds.initialize(this@MainActivity) {}
                 com.Nightjar.caliq5.ads.CaliqAdsManager.loadInterstitial(this@MainActivity)
                 com.Nightjar.caliq5.widget.updateAppWidget()

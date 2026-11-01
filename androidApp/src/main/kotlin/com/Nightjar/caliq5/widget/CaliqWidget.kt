@@ -114,14 +114,13 @@ class CaliqWidget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        try {
+            DataRepository.loadSettings()
+        } catch (_: Throwable) {}
+
         provideContent {
             val updateTick = CaliqWidgetReceiver.widgetUpdateTrigger.value
-
-            val settings = try {
-                DataRepository.loadSettings()
-            } catch (e: Exception) {
-                DataRepository.cachedSettings ?: AppSettings()
-            }
+            val settings = DataRepository.cachedSettings ?: AppSettings()
 
             val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
             val prefTheme = widgetPrefs.getString("theme", null)
