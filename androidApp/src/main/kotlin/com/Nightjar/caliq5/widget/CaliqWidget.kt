@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -48,23 +49,29 @@ class CaliqWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = CaliqWidget()
 
     companion object {
+        val widgetUpdateTrigger = mutableStateOf(System.currentTimeMillis())
+
         @JvmStatic
         fun updateWidgetSync(context: Context, targetWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID) {
+            widgetUpdateTrigger.value = System.currentTimeMillis()
             val widget = CaliqWidget()
             try {
-                if (targetWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                    val manager = GlanceAppWidgetManager(context)
-                    runBlocking {
+                val manager = GlanceAppWidgetManager(context)
+                runBlocking {
+                    if (targetWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                         try {
                             val glanceId = manager.getGlanceIdBy(targetWidgetId)
                             widget.update(context, glanceId)
                         } catch (_: Throwable) {
                             widget.updateAll(context)
                         }
-                    }
-                } else {
-                    runBlocking {
-                        widget.updateAll(context)
+                    } else {
+                        val ids = manager.getGlanceIds(CaliqWidget::class.java)
+                        if (ids.isNotEmpty()) {
+                            ids.forEach { widget.update(context, it) }
+                        } else {
+                            widget.updateAll(context)
+                        }
                     }
                 }
             } catch (_: Throwable) {
@@ -85,7 +92,6 @@ class CaliqWidgetReceiver : GlanceAppWidgetReceiver() {
                     appWidgetManager.getAppWidgetIds(provider)
                 }
                 if (ids != null && ids.isNotEmpty()) {
-                    appWidgetManager.notifyAppWidgetViewDataChanged(ids, android.R.id.background)
                     val updateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
                         component = provider
                         putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
@@ -108,31 +114,33 @@ class CaliqWidget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val settings = try {
-            DataRepository.loadSettings()
-        } catch (e: Exception) {
-            DataRepository.cachedSettings ?: AppSettings()
-        }
-
-        val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
-        val prefTheme = widgetPrefs.getString("theme", null)
-        val prefPrimaryColor = widgetPrefs.getString("primary_color", null)
-        val prefUseMaterialYou = if (widgetPrefs.contains("use_material_you")) widgetPrefs.getBoolean("use_material_you", false) else settings.useMaterialYou
-        val prefPureBlack = if (widgetPrefs.contains("pure_black_mode")) widgetPrefs.getBoolean("pure_black_mode", false) else settings.pureBlackMode
-        val prefPureWhite = if (widgetPrefs.contains("pure_white_mode")) widgetPrefs.getBoolean("pure_white_mode", false) else settings.pureWhiteMode
-
-        val config = WidgetConfigData(
-            bgStyle = widgetPrefs.getString("widget_bg_style", "app_theme") ?: "app_theme",
-            opacity = widgetPrefs.getFloat("widget_opacity", 0.88f),
-            effectiveTheme = prefTheme ?: settings.theme,
-            effectivePrimaryColor = prefPrimaryColor ?: settings.primaryColor,
-            prefUseMaterialYou = prefUseMaterialYou,
-            prefPureBlack = prefPureBlack,
-            prefPureWhite = prefPureWhite,
-            updateTimestamp = System.currentTimeMillis()
-        )
-
         provideContent {
+            val updateTick = CaliqWidgetReceiver.widgetUpdateTrigger.value
+
+            val settings = try {
+                DataRepository.loadSettings()
+            } catch (e: Exception) {
+                DataRepository.cachedSettings ?: AppSettings()
+            }
+
+            val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
+            val prefTheme = widgetPrefs.getString("theme", null)
+            val prefPrimaryColor = widgetPrefs.getString("primary_color", null)
+            val prefUseMaterialYou = if (widgetPrefs.contains("use_material_you")) widgetPrefs.getBoolean("use_material_you", false) else settings.useMaterialYou
+            val prefPureBlack = if (widgetPrefs.contains("pure_black_mode")) widgetPrefs.getBoolean("pure_black_mode", false) else settings.pureBlackMode
+            val prefPureWhite = if (widgetPrefs.contains("pure_white_mode")) widgetPrefs.getBoolean("pure_white_mode", false) else settings.pureWhiteMode
+
+            val config = WidgetConfigData(
+                bgStyle = widgetPrefs.getString("widget_bg_style", "app_theme") ?: "app_theme",
+                opacity = widgetPrefs.getFloat("widget_opacity", 0.88f),
+                effectiveTheme = prefTheme ?: settings.theme,
+                effectivePrimaryColor = prefPrimaryColor ?: settings.primaryColor,
+                prefUseMaterialYou = prefUseMaterialYou,
+                prefPureBlack = prefPureBlack,
+                prefPureWhite = prefPureWhite,
+                updateTimestamp = updateTick
+            )
+
             WidgetContent(context, settings, config)
         }
     }
@@ -225,7 +233,7 @@ class CaliqWidget : GlanceAppWidget() {
         val isNearZeroOpacity = config.opacity <= 0.22f && !isFrosted
 
         val buttonContainerColor = when {
-            isFrosted -> if (isDark) Color.White.copy(alpha = 0.13f) else Color.White.copy(alpha = 0.45f)
+            isFrosted -> if (isDark) Color.White.copy(alpha = 0.16f) else Color.White.copy(alpha = 0.55f)
             isPureBlack -> Color.White.copy(alpha = 0.16f)
             isNearZeroOpacity -> if (isDark) Color.White.copy(alpha = 0.22f) else Color.Black.copy(alpha = 0.16f)
             isDynamic -> {
@@ -240,7 +248,7 @@ class CaliqWidget : GlanceAppWidget() {
         }
 
         val iconColor = when {
-            isFrosted -> if (isDark) Color(0xFFF2F2F7) else primaryColorObj
+            isFrosted -> primaryColorObj
             isPureBlack -> primaryColorObj
             isNearZeroOpacity -> if (isDark) Color.White else primaryColorObj
             else -> primaryColorObj

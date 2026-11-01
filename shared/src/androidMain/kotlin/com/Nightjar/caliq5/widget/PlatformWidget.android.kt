@@ -30,7 +30,7 @@ actual fun isAppWidgetPinned(): Boolean {
 
 actual fun updateAppWidget() {
     val context = CaliqApplication.appContext
-    kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+    kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main.immediate).launch {
         try {
             val receiverClass = Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
             try {
@@ -46,7 +46,6 @@ actual fun updateAppWidget() {
                 val myProvider = ComponentName(context, "com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
                 val ids = appWidgetManager.getAppWidgetIds(myProvider)
                 if (ids != null && ids.isNotEmpty()) {
-                    appWidgetManager.notifyAppWidgetViewDataChanged(ids, android.R.id.background)
                     val intent = Intent(context, Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")).apply {
                         action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
                         putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)

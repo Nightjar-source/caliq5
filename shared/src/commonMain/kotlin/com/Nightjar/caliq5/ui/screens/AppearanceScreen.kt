@@ -169,7 +169,7 @@ fun AppearanceScreen(viewModel: AppViewModel) {
                                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                                     )
                                     Text(
-                                        text = "تطبيق ألوان متناسقة مع خلفية جهازك",
+                                        text = "تطبيق ألوان متناسقة مع خلفية جهازك (أندرويد 12 فما فوق - الأجهزة الأقدم تعتمد اللون المختار بأمان تام)",
                                         style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     )
                                 }
