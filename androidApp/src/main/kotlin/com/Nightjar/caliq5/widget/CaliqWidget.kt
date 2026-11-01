@@ -190,8 +190,9 @@ class CaliqWidget : GlanceAppWidget() {
         // Background Resolution based on style
         val widgetBg = when {
             isFrosted -> {
-                if (isDark) Color(0xFF181922).copy(alpha = 0.65f)
-                else Color(0xFFFFFFFF).copy(alpha = 0.65f)
+                val frostedAlpha = config.opacity.coerceIn(0.20f, 0.90f)
+                if (isDark) Color(0xFF1E202B).copy(alpha = frostedAlpha)
+                else Color(0xFFEEF2F8).copy(alpha = frostedAlpha)
             }
             isPureBlack -> Color.Black.copy(alpha = config.opacity.coerceIn(0.0f, 1.0f))
             else -> { // "app_theme" or "material_you"
@@ -269,17 +270,10 @@ class CaliqWidget : GlanceAppWidget() {
             WidgetAction("السجل", R.drawable.ic_widget_grades, "caliq://grades")
         )
 
-        val rootModifier = if (isFrosted) {
-            GlanceModifier
-                .fillMaxSize()
-                .background(ImageProvider(if (isDark) R.drawable.widget_frosted_glass_dark else R.drawable.widget_frosted_glass_light))
-                .cornerRadius(28.dp)
-        } else {
-            GlanceModifier
-                .fillMaxSize()
-                .background(widgetBg)
-                .cornerRadius(28.dp)
-        }
+        val rootModifier = GlanceModifier
+            .fillMaxSize()
+            .background(widgetBg)
+            .cornerRadius(28.dp)
 
         if (isVertical) {
             // Vertical orientation (Column layout)
