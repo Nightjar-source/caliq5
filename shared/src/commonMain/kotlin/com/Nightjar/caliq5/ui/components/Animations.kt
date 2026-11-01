@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+
 package com.Nightjar.caliq5.ui.components
 
 import androidx.compose.ui.composed
