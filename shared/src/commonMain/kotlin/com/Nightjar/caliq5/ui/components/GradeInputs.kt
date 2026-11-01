@@ -145,9 +145,6 @@ fun SmallGradeInput(
         mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length)))
     }
 
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val scope = rememberCoroutineScope()
-
     Box(
         modifier = modifier
             .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f))
