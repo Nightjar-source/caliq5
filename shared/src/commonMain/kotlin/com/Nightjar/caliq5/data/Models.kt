@@ -149,6 +149,6 @@ data class AppSettings(
     val theme: String = "system",
     val pureBlackMode: Boolean = false,
     val pureWhiteMode: Boolean = false,
-    val useMaterialYou: Boolean = false,
-    val primaryColor: String = "#ec4899",
+    val useMaterialYou: Boolean = true,
+    val primaryColor: String = "#2563eb",
 )
