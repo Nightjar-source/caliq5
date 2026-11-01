@@ -14,3 +14,14 @@ expect fun isAppWidgetPinned(): Boolean
  * Updates the app widget.
  */
 expect fun updateAppWidget()
+
+/**
+ * Synchronizes appearance settings to widget preferences.
+ */
+expect fun syncWidgetSettings(
+    theme: String,
+    primaryColor: String,
+    useMaterialYou: Boolean,
+    pureBlackMode: Boolean,
+    pureWhiteMode: Boolean
+)

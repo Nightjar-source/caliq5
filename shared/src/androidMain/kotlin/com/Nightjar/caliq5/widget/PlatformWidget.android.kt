@@ -3,6 +3,7 @@ package com.Nightjar.caliq5.widget
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.content.ComponentName
+import android.content.Context
 import android.os.Build
 import com.Nightjar.caliq5.CaliqApplication
 import kotlinx.coroutines.launch
@@ -32,7 +33,7 @@ actual fun updateAppWidget() {
     kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
         try {
             val receiverClass = Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
-            val updateMethod = receiverClass.getMethod("updateWidget", android.content.Context::class.java)
+            val updateMethod = receiverClass.getMethod("updateWidget", Context::class.java)
             updateMethod.invoke(null, context)
         } catch (_: Throwable) {
             try {
@@ -49,4 +50,24 @@ actual fun updateAppWidget() {
             } catch (_: Throwable) {}
         }
     }
+}
+
+actual fun syncWidgetSettings(
+    theme: String,
+    primaryColor: String,
+    useMaterialYou: Boolean,
+    pureBlackMode: Boolean,
+    pureWhiteMode: Boolean
+) {
+    try {
+        val context = CaliqApplication.appContext
+        val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
+        widgetPrefs.edit()
+            .putString("theme", theme)
+            .putString("primary_color", primaryColor)
+            .putBoolean("use_material_you", useMaterialYou)
+            .putBoolean("pure_black_mode", pureBlackMode)
+            .putBoolean("pure_white_mode", pureWhiteMode)
+            .commit()
+    } catch (_: Throwable) {}
 }

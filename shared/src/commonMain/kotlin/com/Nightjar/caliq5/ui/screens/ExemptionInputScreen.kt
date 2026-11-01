@@ -652,6 +652,7 @@ private fun CustomSubjectRow(
     onGradeChange: (String) -> Unit,
     onDetailChange: (String, String, String) -> Unit,
     onRemove: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
@@ -673,8 +674,7 @@ private fun CustomSubjectRow(
     )
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .padding(vertical = 4.dp)
             .shadow(
                 elevation = 1.5.dp,
