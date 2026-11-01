@@ -117,7 +117,7 @@ class CaliqWidget : GlanceAppWidget() {
         val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
         val prefTheme = widgetPrefs.getString("theme", null)
         val prefPrimaryColor = widgetPrefs.getString("primary_color", null)
-        val prefUseMaterialYou = if (widgetPrefs.contains("use_material_you")) widgetPrefs.getBoolean("use_material_you", true) else settings.useMaterialYou
+        val prefUseMaterialYou = if (widgetPrefs.contains("use_material_you")) widgetPrefs.getBoolean("use_material_you", false) else settings.useMaterialYou
         val prefPureBlack = if (widgetPrefs.contains("pure_black_mode")) widgetPrefs.getBoolean("pure_black_mode", false) else settings.pureBlackMode
         val prefPureWhite = if (widgetPrefs.contains("pure_white_mode")) widgetPrefs.getBoolean("pure_white_mode", false) else settings.pureWhiteMode
 

@@ -209,11 +209,11 @@ actual object PdfExporter {
                             Color.argb((it.alpha * 255).toInt(), (it.red * 255).toInt(), (it.green * 255).toInt(), (it.blue * 255).toInt())
                         }
                     } else {
-                        val themeHex = settings.primaryColor ?: "#2563eb"
+                        val themeHex = settings.primaryColor ?: "#ec4899"
                         val parsed = Color.parseColor(themeHex)
                         if (themeHex.equals("#800020", ignoreCase = true) || themeHex.equals("#9E1B3E", ignoreCase = true)) Color.parseColor("#d41145") else parsed
                     }
-                } catch(e:Exception) { Color.parseColor("#2563eb") }
+                } catch(e:Exception) { Color.parseColor("#ec4899") }
                 
                 val containerColor = try {
                     val hsv = FloatArray(3)
@@ -235,11 +235,11 @@ actual object PdfExporter {
                             Color.argb((it.alpha * 255).toInt(), (it.red * 255).toInt(), (it.green * 255).toInt(), (it.blue * 255).toInt())
                         }
                     } else {
-                        val themeHex = settings.primaryColor ?: "#2563eb"
+                        val themeHex = settings.primaryColor ?: "#ec4899"
                         val effectiveHex = if (themeHex.equals("#800020", ignoreCase = true) || themeHex.equals("#9E1B3E", ignoreCase = true)) "#d41145" else themeHex
                         Color.parseColor(effectiveHex)
                     }
-                } catch(e:Exception) { Color.parseColor("#2563eb") }
+                } catch(e:Exception) { Color.parseColor("#ec4899") }
             
             val containerColor = try {
                 val hsv = FloatArray(3)
