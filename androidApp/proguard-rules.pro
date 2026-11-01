@@ -37,3 +37,11 @@
 # 5. Modern R8 (Google 2026/2027 Guidelines): Safely remove logs without side-effect assumption risks
 # Removes Verbose (2), Debug (3), Info (4) while safely preserving Warn (5) and Error (6)
 -maximumremovedandroidloglevel 4
+
+# 6. Google Mobile Ads SDK (AdMob) Explicit Preservation
+# Prevents R8 from shrinking, stripping, or obfuscating any AdMob classes, listeners, or callbacks
+-keep class com.google.android.gms.ads.** { *; }
+-keep interface com.google.android.gms.ads.** { *; }
+-keep class com.google.ads.** { *; }
+-keep interface com.google.ads.** { *; }
+-keep class com.Nightjar.caliq5.ads.** { *; }

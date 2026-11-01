@@ -28,7 +28,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
     val selectedClass by viewModel.selectedClass.collectAsState()
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
 
-    CaliqScreen(title = "الاعفاء العام والفردي", scrollable = false) {
+    CaliqScreen(title = "الاعفاء العام والفردي", scrollable = false, oneUiReachabilityEnabled = true) {
         val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         val topStatusPadding = WindowInsets.statusBars
             .union(WindowInsets.captionBar)
@@ -38,9 +38,10 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
 
         BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val containerMaxWidth = when {
-                maxWidth >= 1200.dp -> 820.dp
-                maxWidth >= 840.dp -> 740.dp
-                maxWidth >= 600.dp -> 640.dp
+                maxWidth >= 1400.dp -> 1280.dp
+                maxWidth >= 1100.dp -> 1080.dp
+                maxWidth >= 840.dp -> 960.dp
+                maxWidth >= 600.dp -> 720.dp
                 else -> maxWidth
             }
             LazyVerticalGrid(
@@ -94,19 +95,27 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
 
             itemsIndexed(
                 items = ClassData.classNames,
-                key = { _, name -> "class_$name" }
+                key = { _, name -> "class_$name" },
+                span = { index, _ ->
+                    if (maxLineSpan > 1 && ClassData.classNames.size % maxLineSpan == 1 && index == ClassData.classNames.lastIndex) {
+                        GridItemSpan(maxLineSpan)
+                    } else {
+                        GridItemSpan(1)
+                    }
+                }
             ) { index, className ->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp)
-                        .popInOnInitialLoad(index + 2)
+                        .popInOnInitialLoad(index + 2),
+                    contentAlignment = Alignment.Center
                 ) {
                     ClassCardButton(
                         text = className,
                         selected = selectedClass == className,
                         onClick = { viewModel.selectClass(className) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
                     )
                 }
             }

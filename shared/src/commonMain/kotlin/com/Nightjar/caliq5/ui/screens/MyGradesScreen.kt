@@ -231,7 +231,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                 .asPaddingValues()
                 .calculateBottomPadding()
 
-            CaliqScreen(title = "درجاتي (السجل الشامل)", onBack = { viewModel.goBack() }, scrollable = false) {
+            CaliqScreen(title = "درجاتي (السجل الشامل)", onBack = { viewModel.goBack() }, scrollable = false, oneUiReachabilityEnabled = true) {
                 BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                     val isLandscape = maxWidth > maxHeight
                     val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
@@ -251,7 +251,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                     androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                         state = listGridState,
                         columns = gridColumns,
-                        modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().padding(horizontal = 8.dp),
+                        modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 8.dp),
                         contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 160.dp + bottomSafeInset),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -282,7 +282,13 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                     itemsIndexed(
                         students,
                         key = { _, it -> it.id },
-                        span = { _, _ -> if (students.size == 1) androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) else androidx.compose.foundation.lazy.grid.GridItemSpan(1) }
+                        span = { index, _ ->
+                            if (maxLineSpan > 1 && students.size % maxLineSpan == 1 && index == students.lastIndex) {
+                                androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)
+                            } else {
+                                androidx.compose.foundation.lazy.grid.GridItemSpan(1)
+                            }
+                        }
                     ) { index, student ->
                         val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
                         val cardShape = RoundedCornerShape(22.dp)
@@ -292,9 +298,9 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                         ) {
                             Surface(
                                 modifier = Modifier
-                                    .widthIn(max = 680.dp)
+                                    .widthIn(max = 520.dp)
                                     .fillMaxWidth()
-                                    .defaultMinSize(minHeight = 96.dp)
+                                    .defaultMinSize(minHeight = 106.dp)
                                     .animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow))
                                     .animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f))
                                     .popInOnInitialLoad(index + 1)
@@ -311,7 +317,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 16.dp, vertical = 14.dp),
-                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                    verticalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     // Upper half: Name on Right (Start in RTL), Class Name on Left (End in RTL)
                                     Row(
@@ -321,7 +327,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                     ) {
                                         Box(
                                             modifier = Modifier
-                                                .weight(1f)
+                                                .weight(1f, fill = false)
                                                 .clickable(
                                                     interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                                                     indication = null
@@ -339,7 +345,8 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                     color = MaterialTheme.colorScheme.primary,
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = nameFontSize,
-                                                    lineHeight = (nameFontSize.value * 1.25).sp
+                                                    lineHeight = (nameFontSize.value * 1.25).sp,
+                                                    textDirection = androidx.compose.ui.text.style.TextDirection.Rtl
                                                 ),
                                                 textAlign = TextAlign.Start,
                                                 maxLines = 2,
@@ -353,7 +360,9 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                                 text = student.className,
                                                 style = MaterialTheme.typography.bodySmall.copy(
                                                     color = MaterialTheme.colorScheme.secondary,
-                                                    fontWeight = FontWeight.Medium
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontSize = 12.sp,
+                                                    textDirection = androidx.compose.ui.text.style.TextDirection.Rtl
                                                 ),
                                                 textAlign = TextAlign.End,
                                                 maxLines = 1,
@@ -362,6 +371,8 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                                             )
                                         }
                                     }
+
+                                    Spacer(Modifier.height(8.dp))
 
                                     // Lower half: 3 buttons located below class name / centered toward middle
                                     Row(
@@ -666,7 +677,7 @@ fun StudentEditView(
         .asPaddingValues()
         .calculateBottomPadding()
 
-    CaliqScreen(title = if (student == null) "إضافة سجل درجاتي (السجل الشامل)" else "تعديل سجل درجاتي (السجل الشامل)", onBack = { if (hasUnsavedChanges) showUnsavedDialog = true else onCancel() }, scrollable = false) {
+    CaliqScreen(title = if (student == null) "إضافة سجل درجاتي (السجل الشامل)" else "تعديل سجل درجاتي (السجل الشامل)", onBack = { if (hasUnsavedChanges) showUnsavedDialog = true else onCancel() }, scrollable = false, oneUiReachabilityEnabled = true) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
@@ -688,7 +699,7 @@ fun StudentEditView(
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             state = editGridState,
             columns = gridColumns,
-            modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().padding(horizontal = 8.dp),
+            modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 8.dp),
             contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 160.dp + bottomSafeInset),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -702,7 +713,7 @@ fun StudentEditView(
                 ) {
                     Box(
                         modifier = Modifier
-                            .widthIn(max = 760.dp)
+                            .widthIn(max = 480.dp)
                             .fillMaxWidth()
                             .shadow(
                                 elevation = 6.dp,
@@ -1027,7 +1038,13 @@ Box(modifier = Modifier.fillMaxWidth()) {
                 itemsIndexed(
                     items = sortedEntries,
                     key = { _, it -> it.id },
-                    span = { _, _ -> if (sortedEntries.size == 1) androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) else androidx.compose.foundation.lazy.grid.GridItemSpan(1) }
+                    span = { index, _ ->
+                        if (maxLineSpan > 1 && sortedEntries.size % maxLineSpan == 1 && index == sortedEntries.lastIndex) {
+                            androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)
+                        } else {
+                            androidx.compose.foundation.lazy.grid.GridItemSpan(1)
+                        }
+                    }
                 ) { index, entry ->
                     val isSubjectCustom = isCustomClass || !predefinedSubjects.contains(entry.name)
                     val isOptional = !isCustomClass && (com.Nightjar.caliq5.data.ClassData.getSubjects(selectedClassName).find { it.name == entry.name }?.optional == true)
@@ -1457,6 +1474,7 @@ fun SubjectGradeEditCard(
     ) {
         Box(
             modifier = Modifier
+                .widthIn(max = 440.dp)
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
                 .shadow(

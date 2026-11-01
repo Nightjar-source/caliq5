@@ -296,6 +296,17 @@ class AppViewModel : ViewModel() {
         DataRepository.cachedSettings = newSettings
         viewModelScope.launch {
             DataRepository.saveSettings(newSettings)
+            try {
+                val context = com.Nightjar.caliq5.CaliqApplication.appContext
+                val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", android.content.Context.MODE_PRIVATE)
+                widgetPrefs.edit()
+                    .putString("theme", newSettings.theme)
+                    .putString("primary_color", newSettings.primaryColor)
+                    .putBoolean("use_material_you", newSettings.useMaterialYou)
+                    .putBoolean("pure_black_mode", newSettings.pureBlackMode)
+                    .putBoolean("pure_white_mode", newSettings.pureWhiteMode)
+                    .commit()
+            } catch (_: Throwable) {}
             com.Nightjar.caliq5.widget.updateAppWidget()
         }
     }

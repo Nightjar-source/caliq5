@@ -49,7 +49,8 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
     CaliqScreen(
         title = "إدخال الدرجات - $selectedClass",
         onBack = { viewModel.goBack() },
-        scrollable = false
+        scrollable = false,
+        oneUiReachabilityEnabled = true
     ) {
         val lazyGridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
         var isControlVisible by remember { mutableStateOf(true) }
@@ -122,7 +123,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 state = lazyGridState,
                 columns = gridColumns,
                 modifier = Modifier
-                    .widthIn(min = 320.dp, max = containerMaxWidth)
+                    .widthIn(max = containerMaxWidth)
                     .fillMaxWidth()
                     .imePadding()
                     .padding(horizontal = 16.dp),
@@ -149,7 +150,16 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 // Predefined Subjects with Staggered Entrance
                 itemsIndexed(
                     items = predefinedSubjects,
-                    key = { _, it -> "pre_" + it.name }
+                    key = { _, it -> "pre_" + it.name },
+                    span = { index, _ ->
+                        val totalCount = predefinedSubjects.size + customSubjects.size
+                        val isLastItem = customSubjects.isEmpty() && index == predefinedSubjects.lastIndex
+                        if (maxLineSpan > 1 && totalCount % maxLineSpan == 1 && isLastItem) {
+                            GridItemSpan(maxLineSpan)
+                        } else {
+                            GridItemSpan(1)
+                        }
+                    }
                 ) { index, subject ->
                     val entry = exemptionGrades[subject.name] ?: SubjectGradeEntry(
                         name = subject.name, grade = null, isSkipped = false
@@ -178,6 +188,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                                 viewModel.updateSubjectDetailGrades(subject.name, t1, mid, t2)
                             },
                             onSkipToggle = { viewModel.toggleSkipSubject(subject.name) },
+                            modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
                         )
                     }
                 }
@@ -185,7 +196,16 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 // Custom Subjects with Fluid animateItem and Staggered Entrance
                 itemsIndexed(
                     items = customSubjects,
-                    key = { _, it -> it.id }
+                    key = { _, it -> it.id },
+                    span = { index, _ ->
+                        val totalCount = predefinedSubjects.size + customSubjects.size
+                        val isLastItem = index == customSubjects.lastIndex
+                        if (maxLineSpan > 1 && totalCount % maxLineSpan == 1 && isLastItem) {
+                            GridItemSpan(maxLineSpan)
+                        } else {
+                            GridItemSpan(1)
+                        }
+                    }
                 ) { index, subject ->
                     Box(
                         modifier = Modifier
@@ -209,6 +229,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                             onGradeChange = { viewModel.updateCustomSubjectGrade(index, it) },
                             onDetailChange = { t1, mid, t2 -> viewModel.updateCustomSubjectDetailGrades(index, t1, mid, t2) },
                             onRemove = { viewModel.removeCustomSubject(index) },
+                            modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
                         )
                     }
                 }

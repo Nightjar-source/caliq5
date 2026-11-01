@@ -21,7 +21,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
     val term2 by viewModel.annualTerm2.collectAsState()
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
 
-    CaliqScreen(title = "حاسبة السعي السنوي", onBack = { viewModel.goBack() }, scrollable = false) {
+    CaliqScreen(title = "حاسبة السعي السنوي", onBack = { viewModel.goBack() }, scrollable = false, oneUiReachabilityEnabled = true) {
         val topSafeInset = WindowInsets.statusBars
             .union(WindowInsets.captionBar)
             .union(WindowInsets.displayCutout)
@@ -56,7 +56,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
-                modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
@@ -87,7 +87,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                         label = "الفصل الأول:",
                         value = term1,
                         onValueChange = { viewModel.updateAnnualField("term1", it) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
                     )
                 }
             }
@@ -98,18 +98,18 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                         label = "نصف السنة:",
                         value = midYear,
                         onValueChange = { viewModel.updateAnnualField("midYear", it) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
                     )
                 }
             }
 
-            item(key = "annual_term2", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(1) }) {
+            item(key = "annual_term2", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(if (maxLineSpan == 2) maxLineSpan else 1) }) {
                 Box(modifier = Modifier.fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)).popInOnInitialLoad(4), contentAlignment = Alignment.Center) {
                     GradeInputField(
                         label = "الفصل الثاني:",
                         value = term2,
                         onValueChange = { viewModel.updateAnnualField("term2", it) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
                     )
                 }
             }

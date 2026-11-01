@@ -6,14 +6,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 /**
- * Unified Edge-to-Edge Screen Container with Elastic Overscroll and Safe Insets Handling.
+ * Unified Edge-to-Edge Screen Container with Samsung One UI Reachability and Safe Insets Handling.
  */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun CaliqScreen(
     title: String,
@@ -21,6 +23,7 @@ fun CaliqScreen(
     showBottomNav: Boolean = true,
     scrollable: Boolean = true,
     scrollState: androidx.compose.foundation.ScrollState = androidx.compose.foundation.rememberScrollState(),
+    oneUiReachabilityEnabled: Boolean = false,
     content: @Composable () -> Unit
 ) {
     Surface(
@@ -28,7 +31,12 @@ fun CaliqScreen(
         color = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {
-        val outerModifier = Modifier.fillMaxSize().elasticOverscroll()
+        val outerModifier = if (oneUiReachabilityEnabled) {
+            Modifier.fillMaxSize().elasticOverscroll()
+        } else {
+            Modifier.fillMaxSize()
+        }
+
         BoxWithConstraints(modifier = outerModifier) {
             val isWide = maxWidth >= 600.dp
             val isWideOrLandscape = maxWidth >= 600.dp
@@ -41,7 +49,7 @@ fun CaliqScreen(
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .widthIn(min = 320.dp, max = 840.dp)
+                        .widthIn(max = 840.dp)
                         .fillMaxWidth()
                         .imePadding()
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
@@ -60,13 +68,17 @@ fun CaliqScreen(
                     Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
                 }
             } else {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.TopCenter
+                CompositionLocalProvider(
+                    androidx.compose.foundation.LocalOverscrollConfiguration provides null
                 ) {
-                    content()
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        content()
+                    }
                 }
             }
         }

@@ -71,14 +71,15 @@ fun GradeInputField(
                 onValueChange(newVal.text)
             }
         },
-        label = if (label.isNotEmpty()) { { Text(label) } } else null,
-        placeholder = if (placeholder.isNotEmpty()) { { Text(placeholder) } } else null,
+        label = if (label.isNotEmpty()) { { Text(label, style = LocalTextStyle.current.copy(textDirection = androidx.compose.ui.text.style.TextDirection.Rtl)) } } else null,
+        placeholder = if (placeholder.isNotEmpty()) { { Text(placeholder, style = LocalTextStyle.current.copy(textDirection = androidx.compose.ui.text.style.TextDirection.Rtl)) } } else null,
         isError = isError,
         enabled = enabled,
         textStyle = LocalTextStyle.current.copy(
-            textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrRtl,
+            textDirection = androidx.compose.ui.text.style.TextDirection.Rtl,
             textAlign = TextAlign.Start
         ),
+        singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         trailingIcon = if (showPercent) { { Text("%") } } else null,
         modifier = modifier.fillMaxWidth().animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f)),

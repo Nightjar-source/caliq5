@@ -118,7 +118,7 @@ fun ResultCard(
     ) {
         Box(
             modifier = Modifier
-                .widthIn(max = 680.dp)
+                .widthIn(max = 500.dp)
                 .fillMaxWidth()
                 .clip(cardShape)
                 .background(surfaceColor)
@@ -305,7 +305,7 @@ fun FeatureExplanationCard(
 
         Box(
             modifier = Modifier
-                .widthIn(max = 680.dp)
+                .widthIn(max = 500.dp)
                 .fillMaxWidth()
                 .zIndex(20f)
                 .interactive3DTilt(maxTiltDegrees = 6.5f)

@@ -96,22 +96,14 @@ class WidgetConfigActivity : ComponentActivity() {
             .putFloat("widget_opacity", opacity)
             .commit()
 
-        // Immediate synchronous update to all widgets
+        // Immediate direct update to Glance widget
         try {
-            val appWidgetManager = AppWidgetManager.getInstance(this)
             val receiverClass = Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
-            val myProvider = ComponentName(this, receiverClass)
-            val ids = appWidgetManager.getAppWidgetIds(myProvider)
-            if (ids != null && ids.isNotEmpty()) {
-                val intent = Intent(this, receiverClass).apply {
-                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-                }
-                sendBroadcast(intent)
-            }
-        } catch (_: Throwable) {}
-
-        updateAppWidget()
+            val updateMethod = receiverClass.getMethod("updateWidget", Context::class.java)
+            updateMethod.invoke(null, this)
+        } catch (_: Throwable) {
+            updateAppWidget()
+        }
 
         val resultValue = Intent().apply {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)

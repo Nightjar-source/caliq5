@@ -28,14 +28,21 @@ fun UpdatesScreen(viewModel: AppViewModel) {
         .calculateBottomPadding()
 
     CaliqScreen(title = "التحديثات", onBack = { viewModel.goBack() }, scrollable = false) {
-        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-            state = gridState,
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
-        ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            val containerMaxWidth = when {
+                maxWidth >= 840.dp -> 820.dp
+                maxWidth >= 600.dp -> 680.dp
+                else -> maxWidth
+            }
+
+            androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+                state = gridState,
+                columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 300.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+            ) {
             item(key = "updates_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                     ResultCard {
@@ -122,6 +129,7 @@ fun UpdatesScreen(viewModel: AppViewModel) {
                     }
                 }
             }
+        }
         }
     }
 }

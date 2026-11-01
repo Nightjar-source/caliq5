@@ -27,7 +27,7 @@ class CaliqCleanupService : Service() {
             try {
                 cleanDirectoryContents(context.cacheDir)
                 cleanDirectoryContents(context.externalCacheDir)
-                try { cleanDirectoryContents(context.codeCacheDir) } catch (_: Throwable) {}
+                // Preserved: context.codeCacheDir is intentionally NOT touched to preserve ART Ahead-Of-Time (AOT) bytecode and compiled Compose animations!
                 try {
                     val dataDir = context.applicationInfo.dataDir
                     val webviewCache = java.io.File(dataDir, "app_webview/Default/HTTP Cache")

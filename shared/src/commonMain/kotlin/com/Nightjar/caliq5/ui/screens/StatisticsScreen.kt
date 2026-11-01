@@ -57,13 +57,20 @@ fun StatisticsScreen(viewModel: AppViewModel) {
             )
         }
         
-        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp),
-            contentPadding = PaddingValues(bottom = 145.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = topSafeInset + 65.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
-        ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            val containerMaxWidth = when {
+                maxWidth >= 840.dp -> 820.dp
+                maxWidth >= 600.dp -> 680.dp
+                else -> maxWidth
+            }
+
+            androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+                columns = androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 320.dp),
+                contentPadding = PaddingValues(bottom = 145.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = topSafeInset + 65.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+            ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 FeatureExplanationCard(
                     icon = "school",
@@ -185,6 +192,7 @@ fun StatisticsScreen(viewModel: AppViewModel) {
                     }
                 }
             }
+        }
         }
     }
 }

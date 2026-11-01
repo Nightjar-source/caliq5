@@ -234,10 +234,11 @@ fun AppNavigation(
 
             // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively at bottom center)
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
-            if (isWideScreen && !isImeVisible) {
+            if (isWideScreen && !isImeVisible && resultState == null) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
+                        .zIndex(10f)
                         .windowInsetsPadding(safeBottomInsets)
                         .padding(bottom = 4.dp)
                 ) {
@@ -269,6 +270,7 @@ fun AppNavigation(
                 exit = fadeOut(tween(150)),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
+                    .zIndex(10f)
                     .fillMaxWidth()
                     .windowInsetsPadding(safeBottomInsets)
                     .padding(bottom = phoneBannerBottomOffset)
@@ -352,7 +354,7 @@ fun AppNavigation(
             visible = showSideMenu,
             enter = fadeIn(tween(280)),
             exit = fadeOut(tween(240)),
-            modifier = Modifier.fillMaxSize().graphicsLayer { }.zIndex(1000f)
+            modifier = Modifier.fillMaxSize().graphicsLayer { }.zIndex(9999f)
         ) {
             Box(
                 modifier = Modifier

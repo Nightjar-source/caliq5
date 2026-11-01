@@ -54,9 +54,8 @@ fun AboutScreen(viewModel: AppViewModel) {
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1340.dp
-                maxWidth >= 1100.dp -> 1140.dp
-                maxWidth >= 840.dp -> 960.dp
+                maxWidth >= 840.dp -> 820.dp
+                maxWidth >= 600.dp -> 680.dp
                 else -> maxWidth
             }
 
@@ -66,7 +65,7 @@ fun AboutScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
-                modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
             ) {
             // App Icon & Animated Shimmer Title
             item(key = "about_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
@@ -121,7 +120,7 @@ fun AboutScreen(viewModel: AppViewModel) {
 
             // App Description Card
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(1)) {
+                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(1), contentAlignment = Alignment.Center) {
                     ResultCard {
                         Text(
                             text = "تطبيق شامل ومطور خصيصاً لمساعدة الطلبة في العراق لحساب الإعفاء العام والفردي، السعي السنوي، المعدل الفصلي، ومتابعة الدرجات بدقة عالية وحفظها عبر ميزة (السجل الشامل).",

@@ -80,7 +80,6 @@ Landroidx/compose/material3/adaptive/layout/**;
 HSPLandroidx/compose/material3/adaptive/layout/**;->**(**)**
 Landroidx/compose/material3/adaptive/navigation/**;
 HSPLandroidx/compose/material3/adaptive/navigation/**;->**(**)**
-Lorg/jetbrains/androidx/navigation3/**;
 HSPLorg/jetbrains/androidx/navigation3/**;->**(**)**
 Landroidx/navigation/**;
 HSPLandroidx/navigation/**;->**(**)**

@@ -33,7 +33,7 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
 
 
     // Disable default CaliqScreen scroll so we can use LazyColumn for smooth item animations
-    CaliqScreen(title = "حاسبة الفصلي", onBack = { viewModel.goBack() }, scrollable = false) {
+    CaliqScreen(title = "حاسبة الفصلي", onBack = { viewModel.goBack() }, scrollable = false, oneUiReachabilityEnabled = true) {
         val topSafeInset = WindowInsets.statusBars
             .union(WindowInsets.captionBar)
             .union(WindowInsets.displayCutout)
@@ -60,16 +60,17 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1180.dp
-                maxWidth >= 1100.dp -> 980.dp
-                maxWidth >= 720.dp -> 820.dp
+                maxWidth >= 1400.dp -> 1280.dp
+                maxWidth >= 1100.dp -> 1080.dp
+                maxWidth >= 840.dp -> 960.dp
+                maxWidth >= 600.dp -> 720.dp
                 else -> maxWidth
             }
 
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                 state = gridState,
                 columns = gridColumns,
-                modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 12.dp),
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 12.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 90.dp, bottom = dynamicBottomPadding, start = 4.dp, end = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -103,9 +104,7 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
                 count = grades.size, 
                 key = { index -> grades[index].id },
                 span = { index ->
-                    if (grades.size == 1) {
-                        androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)
-                    } else if (grades.size % 2 != 0 && index == grades.lastIndex) {
+                    if (maxLineSpan > 1 && grades.size % maxLineSpan == 1 && index == grades.lastIndex) {
                         androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)
                     } else {
                         androidx.compose.foundation.lazy.grid.GridItemSpan(1)
@@ -206,7 +205,7 @@ private fun MonthRowItem(
     }
 
     Row(
-        modifier = (if (isTrailingOdd) Modifier.widthIn(max = 380.dp).fillMaxWidth() else Modifier.fillMaxWidth()),
+        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {

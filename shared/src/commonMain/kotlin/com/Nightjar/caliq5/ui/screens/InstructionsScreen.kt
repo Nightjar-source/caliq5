@@ -50,9 +50,8 @@ fun InstructionsScreen(viewModel: AppViewModel) {
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1340.dp
-                maxWidth >= 1100.dp -> 1140.dp
-                maxWidth >= 840.dp -> 960.dp
+                maxWidth >= 840.dp -> 820.dp
+                maxWidth >= 600.dp -> 680.dp
                 else -> maxWidth
             }
 
@@ -61,7 +60,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
-                modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
             ) {
             item(key = "instructions_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {

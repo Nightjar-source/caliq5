@@ -20,7 +20,7 @@ fun Term2Screen(viewModel: AppViewModel) {
     val midYear by viewModel.term2MidYear.collectAsState()
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
 
-    CaliqScreen(title = "كم تحتاج في الفصل الثاني", onBack = { viewModel.goBack() }, scrollable = false) {
+    CaliqScreen(title = "كم تحتاج في الفصل الثاني", onBack = { viewModel.goBack() }, scrollable = false, oneUiReachabilityEnabled = true) {
         val topSafeInset = WindowInsets.statusBars
             .union(WindowInsets.captionBar)
             .union(WindowInsets.displayCutout)
@@ -55,7 +55,7 @@ fun Term2Screen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
-                modifier = Modifier.widthIn(min = 320.dp, max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
@@ -86,7 +86,7 @@ fun Term2Screen(viewModel: AppViewModel) {
                         label = "الفصل الأول:",
                         value = term1,
                         onValueChange = { viewModel.updateTerm2Field("term1", it) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
                     )
                 }
             }
@@ -97,7 +97,7 @@ fun Term2Screen(viewModel: AppViewModel) {
                         label = "نصف السنة:",
                         value = midYear,
                         onValueChange = { viewModel.updateTerm2Field("midYear", it) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
                     )
                 }
             }

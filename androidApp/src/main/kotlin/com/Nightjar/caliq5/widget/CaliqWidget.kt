@@ -32,30 +32,12 @@ import com.Nightjar.caliq5.viewmodel.DataRepository
 class CaliqWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = CaliqWidget()
 
-    override fun onReceive(context: Context, intent: Intent) {
-        super.onReceive(context, intent)
-        updateWidget(context)
-    }
-
     companion object {
         @JvmStatic
         fun updateWidget(context: Context) {
             kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
                 try {
                     CaliqWidget().updateAll(context)
-                } catch (_: Throwable) {}
-
-                try {
-                    val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(context)
-                    val myProvider = android.content.ComponentName(context, CaliqWidgetReceiver::class.java)
-                    val ids = appWidgetManager.getAppWidgetIds(myProvider)
-                    if (ids != null && ids.isNotEmpty()) {
-                        val intent = Intent(context, CaliqWidgetReceiver::class.java).apply {
-                            action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                            putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-                        }
-                        context.sendBroadcast(intent)
-                    }
                 } catch (_: Throwable) {}
             }
         }
@@ -66,10 +48,10 @@ class CaliqWidget : GlanceAppWidget() {
     override val sizeMode: SizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val settings = DataRepository.cachedSettings ?: try {
+        val settings = try {
             DataRepository.loadSettings()
         } catch (e: Exception) {
-            AppSettings()
+            DataRepository.cachedSettings ?: AppSettings()
         }
 
         provideContent {
@@ -207,7 +189,7 @@ class CaliqWidget : GlanceAppWidget() {
         }
 
         val iconColor = when {
-            isPureBlack -> Color(0xFFEADDFF)
+            isPureBlack -> primaryColorObj
             isNearZeroOpacity -> if (isDark) Color.White else primaryColorObj
             else -> primaryColorObj
         }
