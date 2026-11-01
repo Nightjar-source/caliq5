@@ -17,8 +17,8 @@ android {
         applicationId = "com.Nightjar.caliq5"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 51443
-        versionName = "5.14.43"
+        versionCode = 51444
+        versionName = "5.14.44"
     }
 
     buildFeatures {
@@ -56,6 +56,8 @@ android {
             storePassword = keystoreProperties.getProperty("KEYSTORE_PASSWORD")
             keyAlias = "Nightjar"
             keyPassword = keystoreProperties.getProperty("KEY_PASSWORD")
+            enableV1Signing = true
+            enableV2Signing = true
         }
     }
 
