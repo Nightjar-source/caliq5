@@ -1,5 +1,7 @@
 package com.Nightjar.caliq5.widget
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -12,13 +14,13 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.*
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.updateAll
-import kotlinx.coroutines.launch
 import androidx.glance.color.ColorProvider
 import androidx.glance.layout.*
 import androidx.glance.text.FontWeight
@@ -28,17 +30,75 @@ import androidx.glance.text.TextStyle
 import com.Nightjar.caliq5.R
 import com.Nightjar.caliq5.data.AppSettings
 import com.Nightjar.caliq5.viewmodel.DataRepository
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+
+data class WidgetConfigData(
+    val bgStyle: String,
+    val opacity: Float,
+    val effectiveTheme: String,
+    val effectivePrimaryColor: String,
+    val prefUseMaterialYou: Boolean,
+    val prefPureBlack: Boolean,
+    val prefPureWhite: Boolean,
+    val updateTimestamp: Long
+)
 
 class CaliqWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = CaliqWidget()
 
     companion object {
         @JvmStatic
+        fun updateWidgetSync(context: Context, targetWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID) {
+            val widget = CaliqWidget()
+            try {
+                if (targetWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    val manager = GlanceAppWidgetManager(context)
+                    runBlocking {
+                        try {
+                            val glanceId = manager.getGlanceIdBy(targetWidgetId)
+                            widget.update(context, glanceId)
+                        } catch (_: Throwable) {
+                            widget.updateAll(context)
+                        }
+                    }
+                } else {
+                    runBlocking {
+                        widget.updateAll(context)
+                    }
+                }
+            } catch (_: Throwable) {
+                runBlocking {
+                    try {
+                        widget.updateAll(context)
+                    } catch (_: Throwable) {}
+                }
+            }
+
+            // Force notify AppWidgetManager on Xiaomi HyperOS / MIUI / Samsung
+            try {
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val provider = ComponentName(context, CaliqWidgetReceiver::class.java)
+                val ids = if (targetWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    intArrayOf(targetWidgetId)
+                } else {
+                    appWidgetManager.getAppWidgetIds(provider)
+                }
+                if (ids != null && ids.isNotEmpty()) {
+                    appWidgetManager.notifyAppWidgetViewDataChanged(ids, android.R.id.background)
+                    val updateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                        component = provider
+                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+                    }
+                    context.sendBroadcast(updateIntent)
+                }
+            } catch (_: Throwable) {}
+        }
+
+        @JvmStatic
         fun updateWidget(context: Context) {
             kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
-                try {
-                    CaliqWidget().updateAll(context)
-                } catch (_: Throwable) {}
+                updateWidgetSync(context, AppWidgetManager.INVALID_APPWIDGET_ID)
             }
         }
     }
@@ -54,8 +114,26 @@ class CaliqWidget : GlanceAppWidget() {
             DataRepository.cachedSettings ?: AppSettings()
         }
 
+        val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
+        val prefTheme = widgetPrefs.getString("theme", null)
+        val prefPrimaryColor = widgetPrefs.getString("primary_color", null)
+        val prefUseMaterialYou = if (widgetPrefs.contains("use_material_you")) widgetPrefs.getBoolean("use_material_you", true) else settings.useMaterialYou
+        val prefPureBlack = if (widgetPrefs.contains("pure_black_mode")) widgetPrefs.getBoolean("pure_black_mode", false) else settings.pureBlackMode
+        val prefPureWhite = if (widgetPrefs.contains("pure_white_mode")) widgetPrefs.getBoolean("pure_white_mode", false) else settings.pureWhiteMode
+
+        val config = WidgetConfigData(
+            bgStyle = widgetPrefs.getString("widget_bg_style", "app_theme") ?: "app_theme",
+            opacity = widgetPrefs.getFloat("widget_opacity", 0.88f),
+            effectiveTheme = prefTheme ?: settings.theme,
+            effectivePrimaryColor = prefPrimaryColor ?: settings.primaryColor,
+            prefUseMaterialYou = prefUseMaterialYou,
+            prefPureBlack = prefPureBlack,
+            prefPureWhite = prefPureWhite,
+            updateTimestamp = System.currentTimeMillis()
+        )
+
         provideContent {
-            WidgetContent(context, settings)
+            WidgetContent(context, settings, config)
         }
     }
 
@@ -66,21 +144,11 @@ class CaliqWidget : GlanceAppWidget() {
     )
 
     @Composable
-    private fun WidgetContent(context: Context, settings: AppSettings) {
-        val widgetPrefs = context.getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
-        val prefTheme = widgetPrefs.getString("theme", null)
-        val prefPrimaryColor = widgetPrefs.getString("primary_color", null)
-        val prefUseMaterialYou = if (widgetPrefs.contains("use_material_you")) widgetPrefs.getBoolean("use_material_you", true) else settings.useMaterialYou
-        val prefPureBlack = if (widgetPrefs.contains("pure_black_mode")) widgetPrefs.getBoolean("pure_black_mode", false) else settings.pureBlackMode
-        val prefPureWhite = if (widgetPrefs.contains("pure_white_mode")) widgetPrefs.getBoolean("pure_white_mode", false) else settings.pureWhiteMode
-
-        val effectiveTheme = prefTheme ?: settings.theme
-        val effectivePrimaryColor = prefPrimaryColor ?: settings.primaryColor
-
+    private fun WidgetContent(context: Context, settings: AppSettings, config: WidgetConfigData) {
         val size = LocalSize.current
         val isVertical = size.height > size.width * 1.15f
 
-        val isDark = when (effectiveTheme) {
+        val isDark = when (config.effectiveTheme) {
             "dark" -> true
             "light" -> false
             else -> {
@@ -89,7 +157,7 @@ class CaliqWidget : GlanceAppWidget() {
             }
         }
 
-        val isDynamic = prefUseMaterialYou && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
+        val isDynamic = config.prefUseMaterialYou && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
 
         // Resolved primary color (either from Material You or app's selected theme)
         val primaryColorObj = if (isDynamic) {
@@ -101,7 +169,7 @@ class CaliqWidget : GlanceAppWidget() {
             }
         } else {
             try {
-                val themeHex = effectivePrimaryColor
+                val themeHex = config.effectivePrimaryColor
                 val effectiveHex = if (themeHex.equals("#800020", ignoreCase = true) || themeHex.equals("#9E1B3E", ignoreCase = true)) "#d41145" else themeHex
                 Color(android.graphics.Color.parseColor(effectiveHex))
             } catch (_: Throwable) {
@@ -109,72 +177,55 @@ class CaliqWidget : GlanceAppWidget() {
             }
         }
 
-        val bgStyle = widgetPrefs.getString("widget_bg_style", "material_you") ?: "material_you"
-        val customOpacity = widgetPrefs.getFloat("widget_opacity", 0.88f)
+        val isFrosted = config.bgStyle == "frosted_blur" || config.bgStyle == "frosted_glass"
+        val isPureBlack = config.bgStyle == "pure_black"
 
-        // Custom Background Resolution based on user choice (Blur Glass, Material You, Pure Black, App Theme)
-        val widgetBg = when (bgStyle) {
-            "frosted_glass", "frosted_blur" -> {
-                if (isDark) Color(0xFF1E1E24).copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
-                else Color(0xFFFFFFFF).copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
+        // Background Resolution based on style
+        val widgetBg = when {
+            isFrosted -> {
+                if (isDark) Color(0xFF181922).copy(alpha = 0.65f)
+                else Color(0xFFFFFFFF).copy(alpha = 0.65f)
             }
-            "pure_black" -> Color.Black.copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
-            "app_theme" -> {
-                if (isDark) {
-                    Color(
-                        red = 0.12f * primaryColorObj.red + 0.88f * 0.08f,
-                        green = 0.12f * primaryColorObj.green + 0.88f * 0.08f,
-                        blue = 0.12f * primaryColorObj.blue + 0.88f * 0.10f,
-                        alpha = customOpacity.coerceIn(0.0f, 1.0f)
-                    )
-                } else {
-                    Color(
-                        red = 0.08f * primaryColorObj.red + 0.92f * 0.96f,
-                        green = 0.08f * primaryColorObj.green + 0.92f * 0.96f,
-                        blue = 0.08f * primaryColorObj.blue + 0.92f * 0.98f,
-                        alpha = customOpacity.coerceIn(0.0f, 1.0f)
-                    )
-                }
-            }
-            else -> { // "material_you" or default
+            isPureBlack -> Color.Black.copy(alpha = config.opacity.coerceIn(0.0f, 1.0f))
+            else -> { // "app_theme" or "material_you"
                 if (isDynamic) {
                     try {
                         val surfaceRes = if (isDark) android.R.color.system_neutral1_900 else android.R.color.system_neutral1_50
                         val surfaceColor = Color(androidx.core.content.ContextCompat.getColor(context, surfaceRes))
                         if (isDark) {
-                            if (prefPureBlack) Color.Black.copy(alpha = 0.95f) else surfaceColor.copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
+                            if (config.prefPureBlack) Color.Black.copy(alpha = 0.95f) else surfaceColor.copy(alpha = config.opacity.coerceIn(0.0f, 1.0f))
                         } else {
-                            if (prefPureWhite) Color.White.copy(alpha = 0.95f) else surfaceColor.copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
+                            if (config.prefPureWhite) Color.White.copy(alpha = 0.95f) else surfaceColor.copy(alpha = config.opacity.coerceIn(0.0f, 1.0f))
                         }
                     } catch (_: Throwable) {
-                        if (isDark) Color(0xFF1B1A22).copy(alpha = customOpacity.coerceIn(0.0f, 1.0f)) else Color(0xFFFAF8FC).copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
+                        if (isDark) Color(0xFF1B1A22).copy(alpha = config.opacity.coerceIn(0.0f, 1.0f)) else Color(0xFFFAF8FC).copy(alpha = config.opacity.coerceIn(0.0f, 1.0f))
                     }
                 } else {
                     if (isDark) {
-                        if (prefPureBlack) Color.Black.copy(alpha = 0.95f)
+                        if (config.prefPureBlack) Color.Black.copy(alpha = 0.95f)
                         else Color(
                             red = 0.08f * primaryColorObj.red + 0.92f * 0.10f,
                             green = 0.08f * primaryColorObj.green + 0.92f * 0.10f,
                             blue = 0.08f * primaryColorObj.blue + 0.92f * 0.13f,
-                            alpha = customOpacity.coerceIn(0.0f, 1.0f)
+                            alpha = config.opacity.coerceIn(0.0f, 1.0f)
                         )
                     } else {
-                        if (prefPureWhite) Color.White.copy(alpha = 0.95f)
+                        if (config.prefPureWhite) Color.White.copy(alpha = 0.95f)
                         else Color(
                             red = 0.06f * primaryColorObj.red + 0.94f * 0.97f,
                             green = 0.06f * primaryColorObj.green + 0.94f * 0.97f,
                             blue = 0.06f * primaryColorObj.blue + 0.94f * 0.99f,
-                            alpha = customOpacity.coerceIn(0.0f, 1.0f)
+                            alpha = config.opacity.coerceIn(0.0f, 1.0f)
                         )
                     }
                 }
             }
         }
 
-        val isPureBlack = bgStyle == "pure_black"
-        val isNearZeroOpacity = customOpacity <= 0.22f
+        val isNearZeroOpacity = config.opacity <= 0.22f && !isFrosted
 
         val buttonContainerColor = when {
+            isFrosted -> if (isDark) Color.White.copy(alpha = 0.13f) else Color.White.copy(alpha = 0.45f)
             isPureBlack -> Color.White.copy(alpha = 0.16f)
             isNearZeroOpacity -> if (isDark) Color.White.copy(alpha = 0.22f) else Color.Black.copy(alpha = 0.16f)
             isDynamic -> {
@@ -189,12 +240,14 @@ class CaliqWidget : GlanceAppWidget() {
         }
 
         val iconColor = when {
+            isFrosted -> if (isDark) Color(0xFFF2F2F7) else primaryColorObj
             isPureBlack -> primaryColorObj
             isNearZeroOpacity -> if (isDark) Color.White else primaryColorObj
             else -> primaryColorObj
         }
 
         val textColor = when {
+            isFrosted -> if (isDark) Color(0xFFEBEBF5) else Color(0xFF1C1B1F)
             isPureBlack -> Color.White
             isNearZeroOpacity -> if (isDark) Color.White else Color(0xFF1C1B1F)
             isDark -> Color(0xFFE6E1E5)
@@ -209,6 +262,18 @@ class CaliqWidget : GlanceAppWidget() {
             WidgetAction("السجل", R.drawable.ic_widget_grades, "caliq://grades")
         )
 
+        val rootModifier = if (isFrosted) {
+            GlanceModifier
+                .fillMaxSize()
+                .background(ImageProvider(if (isDark) R.drawable.widget_frosted_glass_dark else R.drawable.widget_frosted_glass_light))
+                .cornerRadius(28.dp)
+        } else {
+            GlanceModifier
+                .fillMaxSize()
+                .background(widgetBg)
+                .cornerRadius(28.dp)
+        }
+
         if (isVertical) {
             // Vertical orientation (Column layout)
             val showLabels = size.width >= 70.dp
@@ -221,11 +286,7 @@ class CaliqWidget : GlanceAppWidget() {
             val iconSize = if (size.width < 70.dp || size.height < 220.dp) 20.dp else 24.dp
 
             Column(
-                modifier = GlanceModifier
-                    .fillMaxSize()
-                    .background(widgetBg)
-                    .cornerRadius(28.dp)
-                    .padding(vertical = 8.dp, horizontal = 4.dp),
+                modifier = rootModifier.padding(vertical = 8.dp, horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -255,11 +316,7 @@ class CaliqWidget : GlanceAppWidget() {
             val iconSize = if (size.height < 56.dp) 20.dp else 24.dp
 
             Row(
-                modifier = GlanceModifier
-                    .fillMaxSize()
-                    .background(widgetBg)
-                    .cornerRadius(28.dp)
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier = rootModifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

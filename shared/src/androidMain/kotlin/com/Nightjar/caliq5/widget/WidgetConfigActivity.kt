@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Palette
@@ -35,12 +36,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import com.Nightjar.caliq5.data.AppSettings
 import com.Nightjar.caliq5.theme.CaliqTheme
 import com.Nightjar.caliq5.ui.background.MathBackground
 import com.Nightjar.caliq5.ui.components.CaliqButton
 import com.Nightjar.caliq5.ui.components.CaliqOutlinedButton
 import com.Nightjar.caliq5.viewmodel.DataRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 class WidgetConfigActivity : ComponentActivity() {
@@ -90,26 +95,35 @@ class WidgetConfigActivity : ComponentActivity() {
     }
 
     private fun savePreferencesAndFinish(bgStyle: String, opacity: Float) {
-        val prefs = getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
-        prefs.edit()
-            .putString("widget_bg_style", bgStyle)
-            .putFloat("widget_opacity", opacity)
-            .commit()
+        lifecycleScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.IO) {
+                val prefs = getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE)
+                prefs.edit()
+                    .putString("widget_bg_style", bgStyle)
+                    .putFloat("widget_opacity", opacity)
+                    .commit()
 
-        // Immediate direct update to Glance widget
-        try {
-            val receiverClass = Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
-            val updateMethod = receiverClass.getMethod("updateWidget", Context::class.java)
-            updateMethod.invoke(null, this)
-        } catch (_: Throwable) {
-            updateAppWidget()
-        }
+                // Immediate synchronous update to Glance widget and AppWidgetManager
+                try {
+                    val receiverClass = Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
+                    try {
+                        val updateSyncMethod = receiverClass.getMethod("updateWidgetSync", Context::class.java, Int::class.javaPrimitiveType)
+                        updateSyncMethod.invoke(null, applicationContext, appWidgetId)
+                    } catch (_: Throwable) {
+                        val updateMethod = receiverClass.getMethod("updateWidget", Context::class.java)
+                        updateMethod.invoke(null, applicationContext)
+                    }
+                } catch (_: Throwable) {
+                    updateAppWidget()
+                }
+            }
 
-        val resultValue = Intent().apply {
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            val resultValue = Intent().apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            }
+            setResult(Activity.RESULT_OK, resultValue)
+            finish()
         }
-        setResult(Activity.RESULT_OK, resultValue)
-        finish()
     }
 }
 
@@ -128,18 +142,34 @@ fun WidgetConfigScreen(
     val prefs = remember { context.getSharedPreferences("caliq_widget_prefs", Context.MODE_PRIVATE) }
 
     var selectedStyle by remember {
-        mutableStateOf(prefs.getString("widget_bg_style", "material_you") ?: "material_you")
+        val saved = prefs.getString("widget_bg_style", "app_theme") ?: "app_theme"
+        // Normalize legacy keys
+        val normalized = if (saved == "material_you" || saved == "app_theme") "app_theme" else saved
+        mutableStateOf(normalized)
     }
     var selectedOpacity by remember {
         mutableStateOf(prefs.getFloat("widget_opacity", 0.88f))
     }
 
     val styles = listOf(
-        ConfigOption("material_you", "متريال يو ديناميكي (Material You)", "يتناسق مع ألوان هاتفك وخلفية الشاشة تلقائياً"),
-        ConfigOption("frosted_glass", "خلفية زجاجية غائمة (Frosted Blur)", "مظهر زجاجي شفاف فاخر وضبابية تعكس خلفية الشاشة بنقاء"),
-        ConfigOption("pure_black", "أسود فاحم (OLED Black)", "أسود داكن عميق موفر للطاقة بأيقونات ونصوص عالية التباين"),
-        ConfigOption("app_theme", "ثيم التطبيق الأساسي", "يتماشى مع لون الثيم المختار داخل التطبيق بدقة")
+        ConfigOption(
+            key = "app_theme",
+            title = "ثيم وتصميم التطبيق (Material You / الثيم المختار)",
+            subtitle = "يتطابق تلقائياً مع خياراتك داخل التطبيق (ألوان متريال يو الديناميكية الرسمية، أو لون الثيم المخصص)"
+        ),
+        ConfigOption(
+            key = "frosted_blur",
+            title = "خلفية زجاجية غائمة (Frosted Blur Glass)",
+            subtitle = "مظهر زجاجي مثلج حقيقي مع تأثير ضبابي وانعكاس بلوري نقي لخلفية هاتفك"
+        ),
+        ConfigOption(
+            key = "pure_black",
+            title = "أسود فاحم (OLED Black)",
+            subtitle = "خلفية داكنة عميقة موفرة للطاقة مع تباين فائق للأيقونات والنصوص"
+        )
     )
+
+    val isFrostedGlass = selectedStyle == "frosted_blur" || selectedStyle == "frosted_glass"
 
     Column(
         modifier = Modifier
@@ -182,7 +212,7 @@ fun WidgetConfigScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "تحكم بنمط الخلفية ونسبة الشفافية والتباين الفوري",
+                    text = "تحكم بنمط الخلفية ونسبة التباين والانعكاس الفوري",
                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                 )
             }
@@ -203,7 +233,7 @@ fun WidgetConfigScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             styles.forEach { option ->
-                val isSelected = selectedStyle == option.key
+                val isSelected = selectedStyle == option.key || (selectedStyle == "frosted_glass" && option.key == "frosted_blur")
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -219,9 +249,9 @@ fun WidgetConfigScreen(
                     )
                 ) {
                     Row(
-                        modifier = Modifier.padding(14.dp),
+                        modifier = Modifier.fillMaxWidth().padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(14.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         RadioButton(
                             selected = isSelected,
@@ -244,77 +274,107 @@ fun WidgetConfigScreen(
             }
         }
 
-        // Opacity Slider (0% to 100%)
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.40f),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.30f))
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+        if (isFrostedGlass) {
+            // Authentic Frosted Blur info card (No fake opacity slider)
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "خلفية زجاجية بضبابية بصرية نقية (Real Frosted Blur): تم ضبط تأثير الضبابية البلوري بدقة لعكس خلفية هاتفك بانسيابية حقيقية دون الاعتماد على نسبة الشفافية.",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            lineHeight = 18.sp
+                        )
+                    )
+                }
+            }
+        } else {
+            // Opacity Slider (0% to 100%) for App Theme / OLED Black
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.40f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.30f))
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Row(
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(Icons.Default.Tune, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                            Text(
+                                text = "درجة شفافية الخلفية:",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            )
+                        }
+                        val pct = (selectedOpacity * 100).roundToInt()
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        ) {
+                            Text(
+                                text = "$pct%",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    Slider(
+                        value = selectedOpacity,
+                        onValueChange = { selectedOpacity = it },
+                        valueRange = 0f..1f,
+                        colors = SliderDefaults.colors(
+                            thumbColor = MaterialTheme.colorScheme.primary,
+                            activeTrackColor = MaterialTheme.colorScheme.primary,
+                            inactiveTrackColor = MaterialTheme.colorScheme.outlineVariant
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Quick preset buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.Tune, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                        Text(
-                            text = "درجة شفافية الخلفية:",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        val presets = listOf(
+                            0.0f to "0% (شفاف)",
+                            0.50f to "50%",
+                            0.85f to "85% (متوازن)",
+                            1.0f to "100% (معتم)"
                         )
-                    }
-                    val pct = (selectedOpacity * 100).roundToInt()
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    ) {
-                        Text(
-                            text = "$pct%",
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                        )
-                    }
-                }
-
-                Slider(
-                    value = selectedOpacity,
-                    onValueChange = { selectedOpacity = it },
-                    valueRange = 0f..1f,
-                    colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colorScheme.primary,
-                        activeTrackColor = MaterialTheme.colorScheme.primary,
-                        inactiveTrackColor = MaterialTheme.colorScheme.outlineVariant
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                // Quick preset buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    val presets = listOf(
-                        0.0f to "0% (شفاف)",
-                        0.50f to "50%",
-                        0.85f to "85% (متوازن)",
-                        1.0f to "100% (معتم)"
-                    )
-                    presets.forEach { (alphaVal, label) ->
-                        val isPresetActive = kotlin.math.abs(selectedOpacity - alphaVal) < 0.04f
-                        FilterChip(
-                            selected = isPresetActive,
-                            onClick = { selectedOpacity = alphaVal },
-                            label = { Text(label, style = MaterialTheme.typography.labelSmall) },
-                            modifier = Modifier.weight(1f)
-                        )
+                        presets.forEach { (alphaVal, label) ->
+                            val isPresetActive = kotlin.math.abs(selectedOpacity - alphaVal) < 0.04f
+                            FilterChip(
+                                selected = isPresetActive,
+                                onClick = { selectedOpacity = alphaVal },
+                                label = { Text(label, style = MaterialTheme.typography.labelSmall) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                 }
             }
@@ -341,7 +401,7 @@ fun WidgetConfigScreen(
             ) {
                 Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("حفظ وتطبيق فوري")
+                Text("حفظ وتطبيق")
             }
         }
     }

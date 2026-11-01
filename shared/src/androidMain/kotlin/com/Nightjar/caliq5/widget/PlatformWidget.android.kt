@@ -33,14 +33,20 @@ actual fun updateAppWidget() {
     kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
         try {
             val receiverClass = Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
-            val updateMethod = receiverClass.getMethod("updateWidget", Context::class.java)
-            updateMethod.invoke(null, context)
+            try {
+                val updateSyncMethod = receiverClass.getMethod("updateWidgetSync", Context::class.java, Int::class.javaPrimitiveType)
+                updateSyncMethod.invoke(null, context, AppWidgetManager.INVALID_APPWIDGET_ID)
+            } catch (_: Throwable) {
+                val updateMethod = receiverClass.getMethod("updateWidget", Context::class.java)
+                updateMethod.invoke(null, context)
+            }
         } catch (_: Throwable) {
             try {
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 val myProvider = ComponentName(context, "com.Nightjar.caliq5.widget.CaliqWidgetReceiver")
                 val ids = appWidgetManager.getAppWidgetIds(myProvider)
                 if (ids != null && ids.isNotEmpty()) {
+                    appWidgetManager.notifyAppWidgetViewDataChanged(ids, android.R.id.background)
                     val intent = Intent(context, Class.forName("com.Nightjar.caliq5.widget.CaliqWidgetReceiver")).apply {
                         action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
                         putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
