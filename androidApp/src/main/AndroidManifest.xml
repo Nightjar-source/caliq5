@@ -1,18 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Permissions for saving PDF to downloads -->
+    <!-- Permissions for saving PDF to downloads and system notifications -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Googlebook OS & Desktop compatibility: allows installation on non-touchscreen devices -->
+    <!-- Universal Hardware & Device Type Compatibility: Smart Phones, Tablets, Foldables, Laptops, PCs & XR -->
+    <!-- Ensures installation on non-touchscreen computers, laptops, Chromebooks, Samsung DeX, and desktop stations -->
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.hardware.faketouch" android:required="false" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <uses-feature android:name="android.hardware.wifi" android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
+    <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
 
-    <!-- Android XR Spatial Computing Support: allows running as a spatial panel in XR headsets -->
+    <!-- Android XR Spatial Computing & Headset Compatibility -->
     <uses-feature android:name="android.software.xr.api.spatial" android:required="false" />
+    <uses-feature android:name="android.software.xr.api.openxr" android:required="false" />
+    <uses-feature android:name="android.hardware.vr.headtracking" android:required="false" />
 
-    <!-- Googlebook OS, Samsung DeX, Tablets & Foldable Screens Support -->
+    <!-- Android TV / Leanback / Big Screen Compatibility -->
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+
+    <!-- Googlebook OS, ChromeOS, Samsung DeX, Tablets & Foldable Screens Support -->
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -40,6 +56,8 @@
         <meta-data android:name="com.sec.android.multiwindow.activity.STYLE" android:value="fullscreen|freeform|split" />
         <meta-data android:name="com.samsung.android.sdk.multiwindow.enable" android:value="true" />
         <meta-data android:name="miui.freeform.support" android:value="true" />
+        <meta-data android:name="android.max_aspect" android:value="3.0" />
+        <meta-data android:name="android.min_aspect" android:value="1.0" />
         
         <activity
             android:name=".MainActivity"
@@ -58,12 +76,15 @@
                 android:minHeight="100dp"
                 android:gravity="center" />
 
-            <!-- Samsung One UI, Xiaomi HyperOS/MIUI & Android Multi-Window and Freeform Pop-up Window Support -->
+            <!-- Samsung One UI, Xiaomi HyperOS/MIUI, ChromeOS Desktop Windowing & XR Support -->
             <meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />
             <meta-data android:name="com.sec.android.multiwindow.activity.STYLE" android:value="fullscreen|freeform|split" />
             <meta-data android:name="com.samsung.android.sdk.multiwindow.enable" android:value="true" />
             <meta-data android:name="miui.freeform.support" android:value="true" />
 
+            <property
+                android:name="android.window.PROPERTY_SUPPORT_DESKTOP_WINDOWING"
+                android:value="true" />
             <property
                 android:name="android.window.PROPERTY_FREEFORM_WINDOW_MANAGEMENT"
                 android:value="true" />
@@ -76,6 +97,9 @@
             <property
                 android:name="android.window.PROPERTY_XR_ACTIVITY_START_MODE"
                 android:value="XR_ACTIVITY_START_MODE_HOME_SPACE" />
+            <property
+                android:name="android.window.PROPERTY_XR_BOUNDARY_MODE"
+                android:value="XR_BOUNDARY_MODE_SPATIAL" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
