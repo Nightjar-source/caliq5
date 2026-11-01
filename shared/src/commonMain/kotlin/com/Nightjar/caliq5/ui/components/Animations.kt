@@ -46,27 +46,36 @@ import kotlinx.coroutines.launch
  * Elastic bounce/overscroll effect on vertical scrolling.
  */
 fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = composed {
+    val density = androidx.compose.ui.platform.LocalDensity.current
     var componentHeight by remember { mutableStateOf(0f) }
     val overscrollOffset = remember { Animatable(0f) }
+    var isRestingInReachability by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    val nestedScrollConnection = remember {
+    val maxRestingTarget = with(density) {
+        val calculated = if (componentHeight > 0) componentHeight * 0.32f else 220.dp.toPx()
+        calculated.coerceIn(160.dp.toPx(), 260.dp.toPx())
+    }
+    val triggerThreshold = maxRestingTarget * 0.38f
+
+    val nestedScrollConnection = remember(componentHeight, maxRestingTarget) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val current = overscrollOffset.value
-                if (current != 0f && source == NestedScrollSource.UserInput) {
-                    val delta = available.y
-                    if ((current > 0 && delta < 0) || (current < 0 && delta > 0)) {
-                        val newOffset = current + delta
-                        return if ((current > 0 && newOffset <= 0) || (current < 0 && newOffset >= 0)) {
-                            scope.launch { overscrollOffset.snapTo(0f) }
-                            Offset(0f, current)
-                        } else {
-                            scope.launch { overscrollOffset.snapTo(newOffset) }
-                            Offset(0f, delta)
-                        }
+                val delta = available.y
+
+                // If currently displaced downwards and user scrolls UP (delta < 0):
+                // Consume upward scroll to slide back up towards 0
+                if (current > 0f && delta < 0f && source == NestedScrollSource.UserInput) {
+                    val newOffset = (current + delta).coerceAtLeast(0f)
+                    val consumedY = newOffset - current
+                    scope.launch { overscrollOffset.snapTo(newOffset) }
+                    if (newOffset == 0f) {
+                        isRestingInReachability = false
                     }
+                    return Offset(0f, consumedY)
                 }
+
                 return Offset.Zero
             }
 
@@ -75,23 +84,36 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                 available: Offset,
                 source: NestedScrollSource
             ): Offset {
-                if (source == NestedScrollSource.UserInput && available.y != 0f) {
-                    val maxOffset = if (componentHeight > 0) componentHeight * maxStretchRatio else 140f
+                val delta = available.y
+                // When pulling down at the top of the list (available.y > 0):
+                if (source == NestedScrollSource.UserInput && delta > 0f) {
                     val current = overscrollOffset.value
-                    val progress = (kotlin.math.abs(current) / maxOffset).coerceIn(0f, 1f)
-                    val resistance = 0.35f * (1f - progress * progress)
-                    val targetOffset = (current + available.y * resistance).coerceIn(-maxOffset, maxOffset)
-                    scope.launch { overscrollOffset.snapTo(targetOffset) }
-                    return Offset(0f, available.y)
+                    val maxPull = maxRestingTarget * 1.30f
+                    val progress = (current / maxPull).coerceIn(0f, 1f)
+                    val resistance = 0.50f * (1f - progress * 0.7f)
+                    val target = (current + delta * resistance).coerceAtMost(maxPull)
+                    scope.launch { overscrollOffset.snapTo(target) }
+                    return Offset(0f, delta)
                 }
+
                 return Offset.Zero
             }
 
             override suspend fun onPreFling(available: Velocity): Velocity {
-                if (overscrollOffset.value != 0f) {
+                val current = overscrollOffset.value
+                if (current > 0f) {
+                    val shouldRest = if (isRestingInReachability) {
+                        available.y > -250f && current > triggerThreshold * 0.5f
+                    } else {
+                        current >= triggerThreshold || available.y > 250f
+                    }
+
+                    val targetValue = if (shouldRest) maxRestingTarget else 0f
+                    isRestingInReachability = shouldRest
+
                     overscrollOffset.animateTo(
-                        0f,
-                        spring(
+                        targetValue = targetValue,
+                        animationSpec = spring(
                             dampingRatio = 0.82f,
                             stiffness = Spring.StiffnessLow
                         )

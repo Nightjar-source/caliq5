@@ -53,13 +53,16 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 1050.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 250.dp)
+                maxWidth >= 720.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
+                maxWidth >= 540.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1200.dp -> 820.dp
-                maxWidth >= 840.dp -> 760.dp
+                maxWidth >= 1400.dp -> 1180.dp
+                maxWidth >= 1100.dp -> 980.dp
+                maxWidth >= 720.dp -> 820.dp
                 else -> maxWidth
             }
 
