@@ -36,21 +36,29 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
             .asPaddingValues()
             .calculateTopPadding()
 
-        LazyVerticalGrid(
-            state = gridState,
-            columns = GridCells.Adaptive(minSize = 160.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 14.dp),
-            contentPadding = PaddingValues(
-                top = topStatusPadding + 65.dp,
-                bottom = 160.dp + bottomNavPadding,
-                start = 2.dp,
-                end = 2.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            val containerMaxWidth = when {
+                maxWidth >= 1200.dp -> 820.dp
+                maxWidth >= 840.dp -> 740.dp
+                maxWidth >= 600.dp -> 640.dp
+                else -> maxWidth
+            }
+            LazyVerticalGrid(
+                state = gridState,
+                columns = GridCells.Adaptive(minSize = 160.dp),
+                modifier = Modifier
+                    .widthIn(max = containerMaxWidth)
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp),
+                contentPadding = PaddingValues(
+                    top = topStatusPadding + 65.dp,
+                    bottom = 160.dp + bottomNavPadding,
+                    start = 2.dp,
+                    end = 2.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
             item(span = { GridItemSpan(maxLineSpan) }, key = "select_explanation") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                     FeatureExplanationCard(
@@ -134,6 +142,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                 }
             }
         }
+    }
     }
 }
 

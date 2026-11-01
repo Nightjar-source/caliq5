@@ -132,25 +132,25 @@ class CaliqWidget : GlanceAppWidget() {
 
         // Custom Background Resolution based on user choice (Blur Glass, Material You, Pure Black, App Theme)
         val widgetBg = when (bgStyle) {
-            "frosted_glass" -> {
-                if (isDark) Color(0xFF1E1E24).copy(alpha = customOpacity.coerceIn(0.60f, 0.95f))
-                else Color(0xFFFFFFFF).copy(alpha = customOpacity.coerceIn(0.65f, 0.95f))
+            "frosted_glass", "frosted_blur" -> {
+                if (isDark) Color(0xFF1E1E24).copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
+                else Color(0xFFFFFFFF).copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
             }
-            "pure_black" -> Color.Black.copy(alpha = 0.98f)
+            "pure_black" -> Color.Black.copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
             "app_theme" -> {
                 if (isDark) {
                     Color(
                         red = 0.12f * primaryColorObj.red + 0.88f * 0.08f,
                         green = 0.12f * primaryColorObj.green + 0.88f * 0.08f,
                         blue = 0.12f * primaryColorObj.blue + 0.88f * 0.10f,
-                        alpha = customOpacity
+                        alpha = customOpacity.coerceIn(0.0f, 1.0f)
                     )
                 } else {
                     Color(
                         red = 0.08f * primaryColorObj.red + 0.92f * 0.96f,
                         green = 0.08f * primaryColorObj.green + 0.92f * 0.96f,
                         blue = 0.08f * primaryColorObj.blue + 0.92f * 0.98f,
-                        alpha = customOpacity
+                        alpha = customOpacity.coerceIn(0.0f, 1.0f)
                     )
                 }
             }
@@ -160,12 +160,12 @@ class CaliqWidget : GlanceAppWidget() {
                         val surfaceRes = if (isDark) android.R.color.system_neutral1_900 else android.R.color.system_neutral1_50
                         val surfaceColor = Color(androidx.core.content.ContextCompat.getColor(context, surfaceRes))
                         if (isDark) {
-                            if (prefPureBlack) Color.Black.copy(alpha = 0.95f) else surfaceColor.copy(alpha = customOpacity)
+                            if (prefPureBlack) Color.Black.copy(alpha = 0.95f) else surfaceColor.copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
                         } else {
-                            if (prefPureWhite) Color.White.copy(alpha = 0.95f) else surfaceColor.copy(alpha = customOpacity)
+                            if (prefPureWhite) Color.White.copy(alpha = 0.95f) else surfaceColor.copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
                         }
                     } catch (_: Throwable) {
-                        if (isDark) Color(0xFF1B1A22).copy(alpha = customOpacity) else Color(0xFFFAF8FC).copy(alpha = customOpacity)
+                        if (isDark) Color(0xFF1B1A22).copy(alpha = customOpacity.coerceIn(0.0f, 1.0f)) else Color(0xFFFAF8FC).copy(alpha = customOpacity.coerceIn(0.0f, 1.0f))
                     }
                 } else {
                     if (isDark) {
@@ -174,7 +174,7 @@ class CaliqWidget : GlanceAppWidget() {
                             red = 0.08f * primaryColorObj.red + 0.92f * 0.10f,
                             green = 0.08f * primaryColorObj.green + 0.92f * 0.10f,
                             blue = 0.08f * primaryColorObj.blue + 0.92f * 0.13f,
-                            alpha = customOpacity
+                            alpha = customOpacity.coerceIn(0.0f, 1.0f)
                         )
                     } else {
                         if (prefPureWhite) Color.White.copy(alpha = 0.95f)
@@ -182,26 +182,42 @@ class CaliqWidget : GlanceAppWidget() {
                             red = 0.06f * primaryColorObj.red + 0.94f * 0.97f,
                             green = 0.06f * primaryColorObj.green + 0.94f * 0.97f,
                             blue = 0.06f * primaryColorObj.blue + 0.94f * 0.99f,
-                            alpha = customOpacity
+                            alpha = customOpacity.coerceIn(0.0f, 1.0f)
                         )
                     }
                 }
             }
         }
 
-        val buttonContainerColor = if (isDynamic) {
-            try {
-                val containerRes = if (isDark) android.R.color.system_accent1_700 else android.R.color.system_accent1_100
-                Color(androidx.core.content.ContextCompat.getColor(context, containerRes)).copy(alpha = if (isDark) 0.40f else 0.30f)
-            } catch (_: Throwable) {
-                primaryColorObj.copy(alpha = if (isDark) 0.22f else 0.15f)
+        val isPureBlack = bgStyle == "pure_black"
+        val isNearZeroOpacity = customOpacity <= 0.22f
+
+        val buttonContainerColor = when {
+            isPureBlack -> Color.White.copy(alpha = 0.16f)
+            isNearZeroOpacity -> if (isDark) Color.White.copy(alpha = 0.22f) else Color.Black.copy(alpha = 0.16f)
+            isDynamic -> {
+                try {
+                    val containerRes = if (isDark) android.R.color.system_accent1_700 else android.R.color.system_accent1_100
+                    Color(androidx.core.content.ContextCompat.getColor(context, containerRes)).copy(alpha = if (isDark) 0.40f else 0.30f)
+                } catch (_: Throwable) {
+                    primaryColorObj.copy(alpha = if (isDark) 0.22f else 0.15f)
+                }
             }
-        } else {
-            primaryColorObj.copy(alpha = if (isDark) 0.22f else 0.15f)
+            else -> primaryColorObj.copy(alpha = if (isDark) 0.22f else 0.15f)
         }
 
-        val iconColor = primaryColorObj
-        val textColor = if (isDark) Color(0xFFE6E1E5) else Color(0xFF1C1B1F)
+        val iconColor = when {
+            isPureBlack -> Color(0xFFEADDFF)
+            isNearZeroOpacity -> if (isDark) Color.White else primaryColorObj
+            else -> primaryColorObj
+        }
+
+        val textColor = when {
+            isPureBlack -> Color.White
+            isNearZeroOpacity -> if (isDark) Color.White else Color(0xFF1C1B1F)
+            isDark -> Color(0xFFE6E1E5)
+            else -> Color(0xFF1C1B1F)
+        }
 
         val allActions = listOf(
             WidgetAction("الاعفاء", R.drawable.ic_widget_school, "caliq://exemption"),

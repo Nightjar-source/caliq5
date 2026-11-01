@@ -75,6 +75,10 @@ fun GradeInputField(
         placeholder = if (placeholder.isNotEmpty()) { { Text(placeholder) } } else null,
         isError = isError,
         enabled = enabled,
+        textStyle = LocalTextStyle.current.copy(
+            textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrRtls,
+            textAlign = TextAlign.Start
+        ),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         trailingIcon = if (showPercent) { { Text("%") } } else null,
         modifier = modifier.fillMaxWidth().animateContentSize(animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow, dampingRatio = 0.85f)),

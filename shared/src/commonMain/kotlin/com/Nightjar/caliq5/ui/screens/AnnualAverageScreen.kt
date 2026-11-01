@@ -40,18 +40,14 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
             val isLandscape = maxWidth > maxHeight
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
-                isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 1200.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 290.dp)
-                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 310.dp)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 680.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(3)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1340.dp
-                maxWidth >= 1100.dp -> 1140.dp
-                maxWidth >= 840.dp -> 960.dp
-                else -> maxWidth
+                maxWidth >= 1200.dp -> 760.dp
+                maxWidth >= 680.dp -> 720.dp
+                else -> 480.dp
             }
 
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
@@ -107,13 +103,13 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item(key = "annual_term2", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+            item(key = "annual_term2", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(1) }) {
                 Box(modifier = Modifier.fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)).popInOnInitialLoad(4), contentAlignment = Alignment.Center) {
                     GradeInputField(
                         label = "الفصل الثاني:",
                         value = term2,
                         onValueChange = { viewModel.updateAnnualField("term2", it) },
-                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

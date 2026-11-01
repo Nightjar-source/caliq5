@@ -92,8 +92,8 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                     overscrollOffset.animateTo(
                         0f,
                         spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMediumLow
+                            dampingRatio = 0.82f,
+                            stiffness = Spring.StiffnessLow
                         )
                     )
                     return available

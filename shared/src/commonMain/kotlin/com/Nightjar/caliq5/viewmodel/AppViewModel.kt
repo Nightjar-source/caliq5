@@ -153,7 +153,10 @@ class AppViewModel : ViewModel() {
                 return true
             }
             if (_editingStudentMode.value != null) {
-                _myGradesBackEvents.tryEmit(Unit)
+                val emitted = _myGradesBackEvents.tryEmit(Unit)
+                if (!emitted) {
+                    _editingStudentMode.value = null
+                }
                 return true
             }
             if (_currentScreen.value == Screen.EXEMPTION_INPUT) {

@@ -89,9 +89,15 @@ fun AppNavigation(
     val keyboardController = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
     val textToolbar = androidx.compose.ui.platform.LocalTextToolbar.current
     val dismissFocusAndToolbar: () -> Unit = {
-        focusManager.clearFocus(force = true)
-        keyboardController?.hide()
-        textToolbar.hide()
+        try {
+            focusManager.clearFocus(force = true)
+        } catch (_: Throwable) {}
+        try {
+            keyboardController?.hide()
+        } catch (_: Throwable) {}
+        try {
+            textToolbar.hide()
+        } catch (_: Throwable) {}
     }
     LaunchedEffect(showSideMenu) {
         if (showSideMenu) {
@@ -111,7 +117,13 @@ fun AppNavigation(
     }
 
     // Main back navigation handling for app screens and results
-    com.Nightjar.caliq5.utils.BackHandler(enabled = !showSideMenu && (resultState != null || canGoBack || editingStudentMode != null || currentScreen != Screen.EXEMPTION_SELECT)) {
+    val shouldHandleBack = !showSideMenu && (
+        resultState != null || 
+        editingStudentMode != null || 
+        canGoBack || 
+        currentScreen != Screen.EXEMPTION_SELECT
+    )
+    com.Nightjar.caliq5.utils.BackHandler(enabled = shouldHandleBack) {
         dismissFocusAndToolbar()
         viewModel.handleTopBarBack()
     }
@@ -633,7 +645,10 @@ private fun MainContent(
                     exit = fadeOut(tween(180)) + scaleOut(targetScale = 0.75f, animationSpec = tween(180))
                 ) {
                     CaliqIconButton(
-                        onClick = { viewModel.handleTopBarBack() },
+                        onClick = { 
+                            dismissFocusAndToolbar()
+                            viewModel.handleTopBarBack() 
+                        },
                         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.82f else 0.88f),
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         border = BorderStroke(
