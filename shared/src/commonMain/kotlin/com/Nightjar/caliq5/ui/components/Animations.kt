@@ -58,14 +58,15 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
     val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density) > 0
     androidx.compose.runtime.LaunchedEffect(isImeVisible) {
         if (isImeVisible && overscrollOffset.value > 0f) {
+            // Keep reachability position in place without jumping by large amounts to 0!
+            val gentleOffset = (overscrollOffset.value * 0.85f).coerceAtLeast(0f)
             overscrollOffset.animateTo(
-                targetValue = 0f,
+                targetValue = gentleOffset,
                 animationSpec = spring(
                     dampingRatio = 0.85f,
-                    stiffness = Spring.StiffnessMediumLow
+                    stiffness = Spring.StiffnessLow
                 )
             )
-            isRestingInReachability = false
         }
     }
 

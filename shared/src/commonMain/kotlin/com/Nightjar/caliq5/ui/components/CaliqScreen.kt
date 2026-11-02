@@ -27,12 +27,7 @@ fun CaliqScreen(
     oneUiReachabilityEnabled: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
-    androidx.compose.runtime.LaunchedEffect(scrollState.isScrollInProgress) {
-        if (scrollState.isScrollInProgress) {
-            focusManager.clearFocus()
-        }
-    }
+
     Surface(
         modifier = Modifier.fillMaxSize().clipToBounds(),
         color = Color.Transparent,

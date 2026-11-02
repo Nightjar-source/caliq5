@@ -21,12 +21,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
     val midYear by viewModel.annualMidYear.collectAsState()
     val term2 by viewModel.annualTerm2.collectAsState()
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
-    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
-    androidx.compose.runtime.LaunchedEffect(gridState.isScrollInProgress) {
-        if (gridState.isScrollInProgress) {
-            focusManager.clearFocus()
-        }
-    }
+
 
     CaliqScreen(title = "حاسبة السعي السنوي", onBack = { viewModel.goBack() }, scrollable = false, oneUiReachabilityEnabled = true) {
         val topSafeInset = WindowInsets.statusBars

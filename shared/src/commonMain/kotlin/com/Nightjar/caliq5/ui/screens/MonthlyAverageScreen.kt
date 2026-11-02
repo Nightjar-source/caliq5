@@ -28,12 +28,7 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
     val grades by viewModel.monthlyGrades.collectAsState()
     
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
-    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
-    androidx.compose.runtime.LaunchedEffect(gridState.isScrollInProgress) {
-        if (gridState.isScrollInProgress) {
-            focusManager.clearFocus()
-        }
-    }
+
     val coroutineScope = rememberCoroutineScope()
     var previousGradesSize by remember { mutableStateOf(grades.size) }
 

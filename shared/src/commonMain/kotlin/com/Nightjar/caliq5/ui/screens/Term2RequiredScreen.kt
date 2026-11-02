@@ -30,12 +30,7 @@ fun Term2Screen(viewModel: AppViewModel) {
         val bottomNavPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         val density = androidx.compose.ui.platform.LocalDensity.current
         val isImeVisible = WindowInsets.ime.getBottom(density) > 0
-        val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
-        androidx.compose.runtime.LaunchedEffect(gridState.isScrollInProgress) {
-            if (gridState.isScrollInProgress) {
-                focusManager.clearFocus()
-            }
-        }
+
         val dynamicBottomPadding by androidx.compose.animation.core.animateDpAsState(
             targetValue = if (isImeVisible) 130.dp else (160.dp + bottomNavPadding),
             animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),

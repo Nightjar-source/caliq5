@@ -143,12 +143,7 @@ fun ExpressiveActionButton(
 fun MyGradesScreen(viewModel: AppViewModel) {
     val students by viewModel.students.collectAsState()
     val listGridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
-    val listFocusManager = androidx.compose.ui.platform.LocalFocusManager.current
-    androidx.compose.runtime.LaunchedEffect(listGridState.isScrollInProgress) {
-        if (listGridState.isScrollInProgress) {
-            listFocusManager.clearFocus()
-        }
-    }
+
     var editingStudentId by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf<String?>(null) }
     var showEditView by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     val editingStudent = remember(editingStudentId, students) {
@@ -673,12 +668,7 @@ fun StudentEditView(
     }
 
     val editGridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
-    val editFocusManager = androidx.compose.ui.platform.LocalFocusManager.current
-    androidx.compose.runtime.LaunchedEffect(editGridState.isScrollInProgress) {
-        if (editGridState.isScrollInProgress) {
-            editFocusManager.clearFocus()
-        }
-    }
+
 
     val topSafeInset = WindowInsets.statusBars
         .union(WindowInsets.captionBar)
