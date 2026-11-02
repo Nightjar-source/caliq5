@@ -101,11 +101,9 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             // Official Compose Adaptive Layout: Dynamic multi-column adaptation without locking to 2 columns
             val gridColumns = when {
-                isPhoneLandscape -> GridCells.Fixed(2)
-                maxWidth >= 1200.dp -> GridCells.Adaptive(minSize = 290.dp)
-                maxWidth >= 840.dp -> GridCells.Adaptive(minSize = 320.dp)
-                maxWidth >= 600.dp -> GridCells.Fixed(2)
-                else -> GridCells.Fixed(1)
+                isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 300.dp)
+                else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
             val topSafeInset = WindowInsets.statusBars
                 .union(WindowInsets.captionBar)

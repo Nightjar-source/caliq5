@@ -33,9 +33,7 @@ fun NewsScreen(viewModel: AppViewModel) {
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 1200.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 290.dp)
-                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 310.dp)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 300.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
@@ -43,7 +41,6 @@ fun NewsScreen(viewModel: AppViewModel) {
                 maxWidth >= 1400.dp -> 1340.dp
                 maxWidth >= 1100.dp -> 1140.dp
                 maxWidth >= 840.dp -> 960.dp
-                maxWidth >= 600.dp -> 840.dp
                 else -> maxWidth
             }
 

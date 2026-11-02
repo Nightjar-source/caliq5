@@ -39,9 +39,28 @@
 -maximumremovedandroidloglevel 4
 
 # 6. Google Mobile Ads SDK (AdMob) Explicit Preservation
-# Prevents R8 from shrinking, stripping, or obfuscating any AdMob classes, listeners, or callbacks
+# Prevents R8 from shrinking, stripping, or obfuscating any AdMob classes, listeners, callbacks, or JNI bridges
 -keep class com.google.android.gms.ads.** { *; }
 -keep interface com.google.android.gms.ads.** { *; }
 -keep class com.google.ads.** { *; }
 -keep interface com.google.ads.** { *; }
+-keep class com.google.android.gms.internal.ads.** { *; }
+-keep interface com.google.android.gms.internal.ads.** { *; }
 -keep class com.Nightjar.caliq5.ads.** { *; }
+-keepclassmembers class com.google.android.gms.ads.** { *; }
+-keepclassmembers class * extends android.webkit.WebViewClient { *; }
+-keepclassmembers class * extends android.webkit.WebChromeClient { *; }
+-dontwarn com.google.android.gms.ads.**
+
+# 7. Compose Animations, Transitions, Spring Physics & Specular Graphics Layer Effects
+# Preserves Jetpack Compose animation runtime, spring specifications, and custom graphics modifiers
+-keep class androidx.compose.animation.** { *; }
+-keep class androidx.compose.animation.core.** { *; }
+-keep class androidx.compose.ui.graphics.** { *; }
+-keep class androidx.compose.ui.draw.** { *; }
+-keep class com.Nightjar.caliq5.ui.components.AnimationsKt { *; }
+-keepclassmembers class * {
+    androidx.compose.animation.core.Animatable *;
+    androidx.compose.animation.core.AnimationSpec *;
+    androidx.compose.animation.core.SpringSpec *;
+}
