@@ -234,7 +234,7 @@ fun AppNavigation(
 
             // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively at bottom center)
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
-            if (isWideScreen && !isImeVisible && resultState == null) {
+            if (isWideScreen && resultState == null) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -265,7 +265,7 @@ fun AppNavigation(
             // Persistent AdMob Adaptive Banner across all main & sub-screens (Phone Portrait)
             // Independent of bottom nav container to guarantee ZERO jumping/re-measurement jitter
             AnimatedVisibility(
-                visible = !isImeVisible && resultState == null && !isWideScreen,
+                visible = resultState == null && !isWideScreen,
                 enter = fadeIn(tween(250)),
                 exit = fadeOut(tween(150)),
                 modifier = Modifier
