@@ -1880,6 +1880,7 @@ fun CaliqConfirmationDialog(
 
             val isLandscape = maxWidth > maxHeight
             val isCompactHeight = maxHeight < 500.dp
+            val isCompact = isCompactHeight || maxWidth < 340.dp
             val isUltraCompact = maxWidth < 260.dp || maxHeight < 360.dp
             val isExtremelyNarrow = maxWidth < 240.dp
 
