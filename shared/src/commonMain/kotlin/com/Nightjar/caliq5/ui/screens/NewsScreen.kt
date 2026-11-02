@@ -52,11 +52,12 @@ fun NewsScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
-                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().androidx.compose.ui.draw.clipToBounds().padding(horizontal = 16.dp)
             ) {
             item(key = "news_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
-                    ResultCard {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth().popInOnInitialLoad(0)) {
+                        ResultCard {
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -96,6 +97,7 @@ fun NewsScreen(viewModel: AppViewModel) {
                             }
                         }
                     }
+                    }
                 }
             }
 
@@ -115,7 +117,7 @@ fun NewsScreen(viewModel: AppViewModel) {
                     NewsItemCard(
                         title = "وزارة التربية تعلن ضوابط الإعفاء",
                         description = "أعلنت وزارة التربية عن التعليمات الجديدة الخاصة بالامتحانات والإعفاء العام والفردي...",
-                        modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()
+                        modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth()
                     )
                 }
             }

@@ -368,7 +368,7 @@ fun CaliqTheme(
     val animatedColorScheme = animateColorScheme(colorScheme)
 
     val globalSelectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
-        handleColor = animatedColorScheme.primary,
+        handleColor = Color.Transparent,
         backgroundColor = animatedColorScheme.primary.copy(alpha = if (darkTheme) 0.40f else 0.30f)
     )
 

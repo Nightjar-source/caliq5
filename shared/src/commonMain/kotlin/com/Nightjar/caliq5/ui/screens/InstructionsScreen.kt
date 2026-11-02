@@ -43,8 +43,8 @@ fun InstructionsScreen(viewModel: AppViewModel) {
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 1200.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
-                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
+                maxWidth >= 1200.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 290.dp)
+                maxWidth >= 840.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 310.dp)
                 maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
@@ -62,7 +62,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
-                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().androidx.compose.ui.draw.clipToBounds().padding(horizontal = 16.dp)
             ) {
             item(key = "instructions_header") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
@@ -169,9 +169,8 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item(key = "inst_disclaimer", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.widthIn(max = 640.dp).fillMaxWidth().popInOnInitialLoad(6)) {
+            item(key = "inst_disclaimer") {
+                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(6)) {
                     ExpandableInstructionCard(title = "🔹 إخلاء مسؤولية") {
                         Text(
                             "هذا التطبيق أداة تعليمية غير رسمية تستند إلى التعليمات الرسمية لوزارة التربية العراقية للتسهيل على الطلاب.",
@@ -180,7 +179,6 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                }
                 }
             }
 

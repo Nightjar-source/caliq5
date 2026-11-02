@@ -20,6 +20,12 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
     val midYear by viewModel.annualMidYear.collectAsState()
     val term2 by viewModel.annualTerm2.collectAsState()
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    androidx.compose.runtime.LaunchedEffect(gridState.isScrollInProgress) {
+        if (gridState.isScrollInProgress) {
+            focusManager.clearFocus()
+        }
+    }
 
     CaliqScreen(title = "حاسبة السعي السنوي", onBack = { viewModel.goBack() }, scrollable = false, oneUiReachabilityEnabled = true) {
         val topSafeInset = WindowInsets.statusBars
@@ -56,7 +62,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
-                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().androidx.compose.ui.draw.clipToBounds().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {

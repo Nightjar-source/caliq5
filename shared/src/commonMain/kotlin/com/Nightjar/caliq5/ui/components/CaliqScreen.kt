@@ -26,8 +26,14 @@ fun CaliqScreen(
     oneUiReachabilityEnabled: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    androidx.compose.runtime.LaunchedEffect(scrollState.isScrollInProgress) {
+        if (scrollState.isScrollInProgress) {
+            focusManager.clearFocus()
+        }
+    }
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().androidx.compose.ui.draw.clipToBounds(),
         color = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {
@@ -53,6 +59,7 @@ fun CaliqScreen(
                         .fillMaxWidth()
                         .imePadding()
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+                        .androidx.compose.ui.draw.clipToBounds()
                         .verticalScroll(scrollState)
                         .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,

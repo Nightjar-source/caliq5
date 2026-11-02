@@ -67,7 +67,7 @@ fun AboutScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
-                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().androidx.compose.ui.draw.clipToBounds().padding(horizontal = 16.dp)
             ) {
             // App Icon & Animated Shimmer Title
             item(key = "about_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
@@ -150,7 +150,7 @@ fun AboutScreen(viewModel: AppViewModel) {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Surface(
-                        modifier = Modifier.widthIn(max = 640.dp).fillMaxWidth().popInOnInitialLoad(3),
+                        modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth().popInOnInitialLoad(3),
                     shape = RoundedCornerShape(20.dp),
                     color = MaterialTheme.colorScheme.surface,
                     border = BorderStroke(
@@ -305,12 +305,11 @@ fun AboutScreen(viewModel: AppViewModel) {
             }
 
             // 3. Books Download Bot: @Bookiraqbot
-            item(key = "about_bot_books", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+            item(key = "about_bot_books") {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Surface(
-                        onClick = { uriHandler.openUri("https://t.me/Bookiraqbot") },
-                        modifier = Modifier.widthIn(max = 640.dp).fillMaxWidth().popInOnInitialLoad(7),
+                Surface(
+                    onClick = { uriHandler.openUri("https://t.me/Bookiraqbot") },
+                    modifier = Modifier.fillMaxWidth().popInOnInitialLoad(7),
                     shape = RoundedCornerShape(20.dp),
                     color = MaterialTheme.colorScheme.surface,
                     border = BorderStroke(
@@ -357,7 +356,6 @@ fun AboutScreen(viewModel: AppViewModel) {
                         )
                     }
                 }
-                }
             }
 
             // Golden Spiritual Card placed at the very bottom with compact size and shimmering calligraphy
@@ -365,9 +363,10 @@ fun AboutScreen(viewModel: AppViewModel) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp)
+                        .padding(top = 8.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    GoldenSpiritualCard(modifier = Modifier.fillMaxWidth())
+                    GoldenSpiritualCard(modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth())
                 }
             }
         }

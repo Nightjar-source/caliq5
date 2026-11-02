@@ -81,13 +81,17 @@ fun StatisticsScreen(viewModel: AppViewModel) {
                 contentPadding = PaddingValues(bottom = 145.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(), top = topSafeInset + 65.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().androidx.compose.ui.draw.clipToBounds().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                FeatureExplanationCard(
-                    icon = "school",
-                    text = "هنا تجد جميع النتائج التي قمت بحسابها وحفظها مسبقاً."
-                )
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth()) {
+                        FeatureExplanationCard(
+                            icon = "school",
+                            text = "هنا تجد جميع النتائج التي قمت بحسابها وحفظها مسبقاً."
+                        )
+                    }
+                }
             }
 
             if (history.isEmpty()) {

@@ -53,6 +53,12 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
         oneUiReachabilityEnabled = true
     ) {
         val lazyGridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+        val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+        androidx.compose.runtime.LaunchedEffect(lazyGridState.isScrollInProgress) {
+            if (lazyGridState.isScrollInProgress) {
+                focusManager.clearFocus()
+            }
+        }
         var isControlVisible by remember { mutableStateOf(true) }
 
         LaunchedEffect(lazyGridState) {
@@ -126,6 +132,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                     .widthIn(max = containerMaxWidth)
                     .fillMaxWidth()
                     .imePadding()
+                    .androidx.compose.ui.draw.clipToBounds()
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(
                     top = topSafeInset + 115.dp,
