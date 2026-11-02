@@ -1539,246 +1539,23 @@ fun CaliqSnackbar(
 @Composable
 
 fun DeleteConfirmDialog(
-
     onConfirm: () -> Unit,
-
     onDismiss: () -> Unit,
-
     title: String = "تأكيد الحذف",
-
     message: String = "هل أنت متأكد من الحذف؟",
-
     text: String = ""
-
 ) {
-
     val displayMessage = if (text.isNotEmpty()) text else message
-
-    var isVisible by remember { mutableStateOf(false) }
-
-    val coroutineScope = rememberCoroutineScope()
-
-
-
-    LaunchedEffect(Unit) {
-
-        isVisible = true
-
-    }
-
-
-
-    val dismissWithAnim: (action: () -> Unit) -> Unit = { action ->
-
-        coroutineScope.launch {
-
-            isVisible = false
-
-            delay(170)
-
-            action()
-
-        }
-
-    }
-
-
-
-    androidx.compose.ui.window.Dialog(
-
-        onDismissRequest = { dismissWithAnim(onDismiss) },
-
-        properties = androidx.compose.ui.window.DialogProperties(
-
-            usePlatformDefaultWidth = false
-
-        )
-
-    ) {
-
-        Box(
-
-            modifier = Modifier
-
-                .fillMaxSize()
-
-                .clickable(
-
-                    interactionSource = remember { MutableInteractionSource() },
-
-                    indication = null,
-
-                    onClick = { dismissWithAnim(onDismiss) }
-
-                ),
-
-            contentAlignment = Alignment.Center
-
-        ) {
-
-            AnimatedVisibility(
-
-                visible = isVisible,
-
-                enter = fadeIn(animationSpec = tween(170)) + 
-
-                        scaleIn(initialScale = 0.85f, animationSpec = spring(dampingRatio = 0.68f, stiffness = 380f)),
-
-                exit = fadeOut(animationSpec = tween(150)) + 
-
-                       scaleOut(targetScale = 0.85f, animationSpec = tween(150))
-
-            ) {
-
-                Surface(
-
-                    modifier = Modifier
-
-                        .padding(horizontal = 24.dp)
-
-                        .widthIn(max = 400.dp)
-
-                        .fillMaxWidth()
-
-                        .clickable(
-
-                            interactionSource = remember { MutableInteractionSource() },
-
-                            indication = null,
-
-                            onClick = {} // Intercept clicks inside card
-
-                        )
-
-                        .neuralAmbientGlow(cornerRadius = 28.dp, elevation = 8.dp, tintColor = MaterialTheme.colorScheme.error),
-
-                    shape = RoundedCornerShape(28.dp),
-
-                    color = MaterialTheme.colorScheme.surface,
-
-                    tonalElevation = 6.dp
-
-                ) {
-
-                    Column(
-
-                        modifier = Modifier.padding(24.dp),
-
-                        horizontalAlignment = Alignment.CenterHorizontally,
-
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-
-                    ) {
-
-                        Icon(
-
-                            imageVector = Icons.Default.Delete,
-
-                            contentDescription = null,
-
-                            tint = MaterialTheme.colorScheme.error,
-
-                            modifier = Modifier.size(36.dp)
-
-                        )
-
-                        Text(
-
-                            title,
-
-                            style = MaterialTheme.typography.headlineSmall.copy(
-
-                                fontWeight = FontWeight.Bold,
-
-                                color = MaterialTheme.colorScheme.error
-
-                            ),
-
-                            textAlign = TextAlign.Center
-
-                        )
-
-                        Text(
-
-                            displayMessage,
-
-                            style = MaterialTheme.typography.bodyLarge.copy(
-
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-
-                                lineHeight = 24.sp
-
-                            ),
-
-                            textAlign = TextAlign.Justify,
-
-                            modifier = Modifier.fillMaxWidth()
-
-                        )
-
-                        Row(
-
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-
-                            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
-
-                            verticalAlignment = Alignment.CenterVertically
-
-                        ) {
-
-                            CaliqOutlinedButton(
-
-                                onClick = { dismissWithAnim(onDismiss) },
-
-                                modifier = Modifier.weight(1f),
-
-                                contentPadding = PaddingValues(vertical = 12.dp),
-
-                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-
-                            ) {
-
-                                Text("إلغاء", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-
-                            }
-
-                            CaliqButton(
-
-                                onClick = { dismissWithAnim(onConfirm) },
-
-                                modifier = Modifier.weight(1f),
-
-                                colors = ButtonDefaults.buttonColors(
-
-                                    containerColor = MaterialTheme.colorScheme.error,
-
-                                    contentColor = MaterialTheme.colorScheme.onError
-
-                                ),
-
-                                contentPadding = PaddingValues(vertical = 12.dp)
-
-                            ) {
-
-                                Text("حذف", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    }
-
+    CaliqConfirmationDialog(
+        title = title,
+        message = displayMessage,
+        confirmText = "حذف",
+        dismissText = "إلغاء",
+        isDestructive = true,
+        onConfirm = onConfirm,
+        onDismiss = onDismiss
+    )
 }
-
-
 
 /**
 
@@ -1878,26 +1655,15 @@ fun CaliqConfirmationDialog(
 
         ) {
 
-            val isLandscape = maxWidth > maxHeight
-            val isCompactHeight = maxHeight < 500.dp
-            val isCompact = isCompactHeight || maxWidth < 340.dp
-            val isUltraCompact = maxWidth < 260.dp || maxHeight < 360.dp
-            val isExtremelyNarrow = maxWidth < 240.dp
-
-            val dialogMaxWidth = when {
-                isLandscape && isCompactHeight -> 520.dp
-                maxWidth >= 840.dp -> 480.dp
-                maxWidth >= 600.dp -> 440.dp
-                else -> 380.dp
-            }
-
-            val dialogHorizontalPad = if (isUltraCompact) 8.dp else if (isLandscape) 16.dp else 24.dp
-            val innerPad = if (isUltraCompact) 10.dp else if (isCompactHeight) 14.dp else 22.dp
-            val titleSize = if (isUltraCompact) 15.sp else if (isCompactHeight) 17.sp else 19.sp
-            val messageSize = if (isUltraCompact) 12.sp else if (isCompactHeight) 13.5.sp else 15.sp
-            val messageLineHeight = if (isUltraCompact) 18.sp else if (isCompactHeight) 20.sp else 23.sp
-            val btnVerticalPad = if (isUltraCompact) 6.dp else if (isCompactHeight) 8.dp else 10.dp
-            val btnFontSize = if (isUltraCompact) 11.5.sp else if (isCompactHeight) 13.sp else 14.sp
+            val isCompact = maxWidth < 340.dp
+            val dialogMaxWidth = 400.dp // Official Material 3 Standard Dialog Width
+            val dialogHorizontalPad = 24.dp // Official Material 3 Dialog Screen Margin
+            val innerPad = 24.dp // Official Material 3 Dialog Content Padding
+            val titleSize = 19.sp
+            val messageSize = 15.sp
+            val messageLineHeight = 23.sp
+            val btnVerticalPad = 10.dp
+            val btnFontSize = 14.sp
 
             AnimatedVisibility(
                 visible = isVisible,
