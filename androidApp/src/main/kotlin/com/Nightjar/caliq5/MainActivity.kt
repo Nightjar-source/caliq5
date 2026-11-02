@@ -57,7 +57,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             androidx.compose.runtime.LaunchedEffect(Unit) {
-                kotlinx.coroutines.delay(200) // Small delay to prevent native splash exit flicker on Xiaomi/HyperOS
                 isComposeDrawn = true
             }
             App(
