@@ -1878,49 +1878,39 @@ fun CaliqConfirmationDialog(
 
         ) {
 
-            val isCompact = maxWidth < 340.dp || maxHeight < 500.dp
-
-            val isUltraCompact = maxWidth < 260.dp || maxHeight < 380.dp
+            val isLandscape = maxWidth > maxHeight
+            val isCompactHeight = maxHeight < 500.dp
+            val isUltraCompact = maxWidth < 260.dp || maxHeight < 360.dp
             val isExtremelyNarrow = maxWidth < 240.dp
 
-            val dialogHorizontalPad = if (isUltraCompact) 8.dp else if (isCompact) 14.dp else 24.dp
+            val dialogMaxWidth = when {
+                isLandscape && isCompactHeight -> 520.dp
+                maxWidth >= 840.dp -> 480.dp
+                maxWidth >= 600.dp -> 440.dp
+                else -> 380.dp
+            }
 
-            val innerPad = if (isUltraCompact) 12.dp else if (isCompact) 16.dp else 24.dp
-
-            val titleSize = if (isUltraCompact) 15.sp else if (isCompact) 17.sp else 20.sp
-
-            val messageSize = if (isUltraCompact) 12.sp else if (isCompact) 13.5.sp else 15.sp
-
-            val messageLineHeight = if (isUltraCompact) 18.sp else if (isCompact) 20.sp else 24.sp
-
-            val btnVerticalPad = if (isUltraCompact) 6.dp else if (isCompact) 8.dp else 12.dp
-
-            val btnFontSize = if (isUltraCompact) 11.5.sp else if (isCompact) 13.sp else 14.sp
-
-
+            val dialogHorizontalPad = if (isUltraCompact) 8.dp else if (isLandscape) 16.dp else 24.dp
+            val innerPad = if (isUltraCompact) 10.dp else if (isCompactHeight) 14.dp else 22.dp
+            val titleSize = if (isUltraCompact) 15.sp else if (isCompactHeight) 17.sp else 19.sp
+            val messageSize = if (isUltraCompact) 12.sp else if (isCompactHeight) 13.5.sp else 15.sp
+            val messageLineHeight = if (isUltraCompact) 18.sp else if (isCompactHeight) 20.sp else 23.sp
+            val btnVerticalPad = if (isUltraCompact) 6.dp else if (isCompactHeight) 8.dp else 10.dp
+            val btnFontSize = if (isUltraCompact) 11.5.sp else if (isCompactHeight) 13.sp else 14.sp
 
             AnimatedVisibility(
-
                 visible = isVisible,
-
-                enter = fadeIn(animationSpec = tween(170)) + 
-
-                        scaleIn(initialScale = 0.85f, animationSpec = spring(dampingRatio = 0.68f, stiffness = 380f)),
-
-                exit = fadeOut(animationSpec = tween(150)) + 
-
-                       scaleOut(targetScale = 0.85f, animationSpec = tween(150))
-
+                enter = fadeIn(animationSpec = tween(220, easing = androidx.compose.animation.core.LinearOutSlowInEasing)) + 
+                        scaleIn(initialScale = 0.88f, animationSpec = spring(dampingRatio = 0.72f, stiffness = Spring.StiffnessMediumLow)) +
+                        slideInVertically(animationSpec = spring(dampingRatio = 0.72f, stiffness = Spring.StiffnessMediumLow)) { it / 8 },
+                exit = fadeOut(animationSpec = tween(180, easing = androidx.compose.animation.core.FastOutLinearInEasing)) + 
+                       scaleOut(targetScale = 0.90f, animationSpec = tween(180)) +
+                       slideOutVertically(animationSpec = tween(180)) { it / 10 }
             ) {
-
                 Surface(
-
                     modifier = Modifier
-
                         .padding(horizontal = dialogHorizontalPad)
-
-                        .widthIn(max = 420.dp)
-
+                        .widthIn(max = dialogMaxWidth)
                         .fillMaxWidth()
 
                         .clickable(

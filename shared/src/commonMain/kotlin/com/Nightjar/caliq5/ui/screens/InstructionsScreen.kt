@@ -64,7 +64,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
                 modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().padding(horizontal = 16.dp)
             ) {
-            item(key = "instructions_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+            item(key = "instructions_header") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
                     ExpandableInstructionCard(
                         title = "ضوابط الإعفاء العام والفردي للعام 2024-2025",
@@ -170,7 +170,8 @@ fun InstructionsScreen(viewModel: AppViewModel) {
             }
 
             item(key = "inst_disclaimer", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(6)) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.widthIn(max = 640.dp).fillMaxWidth().popInOnInitialLoad(6)) {
                     ExpandableInstructionCard(title = "🔹 إخلاء مسؤولية") {
                         Text(
                             "هذا التطبيق أداة تعليمية غير رسمية تستند إلى التعليمات الرسمية لوزارة التربية العراقية للتسهيل على الطلاب.",
@@ -179,6 +180,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
+                }
                 }
             }
 

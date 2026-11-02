@@ -146,10 +146,11 @@ fun AboutScreen(viewModel: AppViewModel) {
             }
 
             // Developer Profile
-            item {
+            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-                Surface(
-                    modifier = Modifier.fillMaxWidth().popInOnInitialLoad(3),
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Surface(
+                        modifier = Modifier.widthIn(max = 640.dp).fillMaxWidth().popInOnInitialLoad(3),
                     shape = RoundedCornerShape(20.dp),
                     color = MaterialTheme.colorScheme.surface,
                     border = BorderStroke(
@@ -181,6 +182,7 @@ fun AboutScreen(viewModel: AppViewModel) {
                             )
                         }
                     }
+                }
                 }
             }
 
@@ -303,11 +305,12 @@ fun AboutScreen(viewModel: AppViewModel) {
             }
 
             // 3. Books Download Bot: @Bookiraqbot
-            item(key = "about_bot_books") {
+            item(key = "about_bot_books", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-                Surface(
-                    onClick = { uriHandler.openUri("https://t.me/Bookiraqbot") },
-                    modifier = Modifier.fillMaxWidth().popInOnInitialLoad(7),
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Surface(
+                        onClick = { uriHandler.openUri("https://t.me/Bookiraqbot") },
+                        modifier = Modifier.widthIn(max = 640.dp).fillMaxWidth().popInOnInitialLoad(7),
                     shape = RoundedCornerShape(20.dp),
                     color = MaterialTheme.colorScheme.surface,
                     border = BorderStroke(
@@ -353,6 +356,7 @@ fun AboutScreen(viewModel: AppViewModel) {
                             modifier = Modifier.size(18.dp)
                         )
                     }
+                }
                 }
             }
 

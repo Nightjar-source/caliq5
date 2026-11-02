@@ -152,12 +152,14 @@ class AppViewModel : ViewModel() {
                 closeMenu()
                 return true
             }
-            if (_editingStudentMode.value != null) {
+            if (_currentScreen.value == Screen.MY_GRADES && _editingStudentMode.value != null) {
                 val emitted = _myGradesBackEvents.tryEmit(Unit)
                 if (!emitted) {
                     _editingStudentMode.value = null
                 }
                 return true
+            } else if (_currentScreen.value != Screen.MY_GRADES) {
+                _editingStudentMode.value = null
             }
             if (_currentScreen.value == Screen.EXEMPTION_INPUT) {
                 _isNavigatingBack.value = true

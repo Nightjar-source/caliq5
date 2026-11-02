@@ -58,7 +58,8 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
     val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density) > 0
     androidx.compose.runtime.LaunchedEffect(isImeVisible) {
         if (isImeVisible && overscrollOffset.value > 0f) {
-            val gentleOffset = (overscrollOffset.value * 0.75f).coerceAtLeast(0f)
+            val safeAnchorPx = with(density) { 45.dp.toPx() }
+            val gentleOffset = (overscrollOffset.value * 0.35f).coerceAtMost(safeAnchorPx)
             overscrollOffset.animateTo(
                 targetValue = gentleOffset,
                 animationSpec = spring(
@@ -160,7 +161,7 @@ fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
     LaunchedEffect(Unit) {
         if (!isLoaded) {
             if (index > 0) {
-                kotlinx.coroutines.delay((index * 32L).coerceAtMost(240L))
+                kotlinx.coroutines.delay((index * 60L).coerceAtMost(480L))
             }
             isLoaded = true
         }
@@ -168,8 +169,8 @@ fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
     val animProgress by animateFloatAsState(
         targetValue = if (isLoaded) 1f else 0f,
         animationSpec = spring(
-            dampingRatio = 0.76f,
-            stiffness = Spring.StiffnessLow
+            dampingRatio = 0.80f,
+            stiffness = Spring.StiffnessMediumLow
         ),
         label = "fluidSlide_$index"
     )

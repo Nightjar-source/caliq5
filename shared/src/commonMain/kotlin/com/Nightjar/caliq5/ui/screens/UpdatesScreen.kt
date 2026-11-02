@@ -95,10 +95,10 @@ fun UpdatesScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(2)) {
+            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(2), contentAlignment = Alignment.Center) {
                     Surface(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.widthIn(max = 640.dp).fillMaxWidth(),
                         shape = MaterialTheme.shapes.medium,
                         color = MaterialTheme.colorScheme.surface,
                         border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
