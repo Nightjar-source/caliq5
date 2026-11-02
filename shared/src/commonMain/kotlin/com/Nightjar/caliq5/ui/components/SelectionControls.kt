@@ -1656,6 +1656,7 @@ fun CaliqConfirmationDialog(
         ) {
 
             val isCompact = maxWidth < 340.dp
+            val isExtremelyNarrow = maxWidth < 240.dp
             val dialogMaxWidth = 400.dp // Official Material 3 Standard Dialog Width
             val dialogHorizontalPad = 24.dp // Official Material 3 Dialog Screen Margin
             val innerPad = 24.dp // Official Material 3 Dialog Content Padding
