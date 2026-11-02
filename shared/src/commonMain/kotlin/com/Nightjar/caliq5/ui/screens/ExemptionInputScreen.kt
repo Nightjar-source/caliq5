@@ -1,5 +1,6 @@
 package com.Nightjar.caliq5.ui.screens
 
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -132,7 +133,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                     .widthIn(max = containerMaxWidth)
                     .fillMaxWidth()
                     .imePadding()
-                    .androidx.compose.ui.draw.clipToBounds()
+                    .clipToBounds()
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(
                     top = topSafeInset + 115.dp,

@@ -98,7 +98,7 @@ fun GradeInputField(
             disabledPlaceholderColor = com.Nightjar.caliq5.theme.successColor.copy(alpha = 0.85f),
             cursorColor = MaterialTheme.colorScheme.primary,
             selectionColors = androidx.compose.foundation.text.selection.TextSelectionColors(
-                handleColor = Color.Transparent,
+                handleColor = androidx.compose.ui.graphics.Color.Transparent,
                 backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = if (isDark) 0.40f else 0.30f)
             )
         )

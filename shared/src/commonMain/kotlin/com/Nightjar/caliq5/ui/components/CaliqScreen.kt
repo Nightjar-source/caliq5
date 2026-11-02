@@ -1,5 +1,6 @@
 package com.Nightjar.caliq5.ui.components
 
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -33,7 +34,7 @@ fun CaliqScreen(
         }
     }
     Surface(
-        modifier = Modifier.fillMaxSize().androidx.compose.ui.draw.clipToBounds(),
+        modifier = Modifier.fillMaxSize().clipToBounds(),
         color = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {
@@ -59,7 +60,7 @@ fun CaliqScreen(
                         .fillMaxWidth()
                         .imePadding()
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
-                        .androidx.compose.ui.draw.clipToBounds()
+                        .clipToBounds()
                         .verticalScroll(scrollState)
                         .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,

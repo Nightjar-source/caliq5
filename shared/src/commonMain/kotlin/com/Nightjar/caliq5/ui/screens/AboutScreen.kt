@@ -1,5 +1,6 @@
 package com.Nightjar.caliq5.ui.screens
 
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -67,7 +68,7 @@ fun AboutScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
-                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().androidx.compose.ui.draw.clipToBounds().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().clipToBounds().padding(horizontal = 16.dp)
             ) {
             // App Icon & Animated Shimmer Title
             item(key = "about_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {

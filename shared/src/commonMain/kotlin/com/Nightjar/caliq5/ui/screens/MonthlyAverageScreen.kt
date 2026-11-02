@@ -1,5 +1,6 @@
 package com.Nightjar.caliq5.ui.screens
 
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -76,7 +77,7 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                 state = gridState,
                 columns = gridColumns,
-                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().androidx.compose.ui.draw.clipToBounds().padding(horizontal = 12.dp),
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().clipToBounds().padding(horizontal = 12.dp),
                 contentPadding = PaddingValues(top = topSafeInset + 90.dp, bottom = dynamicBottomPadding, start = 4.dp, end = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
