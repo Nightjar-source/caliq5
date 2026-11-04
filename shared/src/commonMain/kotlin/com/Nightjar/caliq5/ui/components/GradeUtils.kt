@@ -119,6 +119,12 @@ fun Modifier.adaptiveWidth(maxWidth: Dp = 380.dp): Modifier = this.composed {
     this.widthIn(max = maxWidth).fillMaxWidth()
 }
 
-fun Modifier.actionButtonAdaptive(maxWidth: Dp = 380.dp): Modifier = this
+fun Modifier.actionButtonAdaptive(maxWidth: Dp = 340.dp): Modifier = this
     .widthIn(max = maxWidth)
     .fillMaxWidth()
+    .animateContentSize(
+        animationSpec = androidx.compose.animation.core.spring(
+            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioLowBouncy,
+            stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+        )
+    )

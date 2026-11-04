@@ -278,7 +278,7 @@ fun ClassCardButton(
 
             .instantExpressivePress { isInstantPressed.value = it }
 
-            .scale(scale)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
 
             .clip(shape)
 
@@ -550,7 +550,7 @@ fun CaliqPrimaryButton(
 
             .instantExpressivePress(enabled = enabled) { isInstantPressed.value = it }
 
-            .scale(scale)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
 
             .shadow(
 
@@ -910,7 +910,7 @@ fun CaliqToggleChip(
 
             .instantExpressivePress(enabled = enabled) { isInstantPressed.value = it }
 
-            .scale(scale)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
 
     ) {
 
@@ -1024,7 +1024,7 @@ fun CaliqButton(
 
             .instantExpressivePress(enabled = enabled) { isInstantPressed.value = it }
 
-            .scale(scale),
+            .graphicsLayer { scaleX = scale; scaleY = scale },
 
         shape = effectiveShape,
 
@@ -1136,7 +1136,7 @@ fun CaliqOutlinedButton(
 
             .instantExpressivePress(enabled = enabled) { isInstantPressed.value = it }
 
-            .scale(scale),
+            .graphicsLayer { scaleX = scale; scaleY = scale },
 
         shape = effectiveShape,
 
@@ -1256,7 +1256,7 @@ fun CaliqTextButton(
 
             .instantExpressivePress(enabled = enabled) { isInstantPressed.value = it }
 
-            .scale(scale),
+            .graphicsLayer { scaleX = scale; scaleY = scale },
 
         shape = effectiveShape,
 
@@ -1364,7 +1364,7 @@ fun CaliqIconButton(
 
             .size(40.dp)
 
-            .scale(scale)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
 
     ) {
 

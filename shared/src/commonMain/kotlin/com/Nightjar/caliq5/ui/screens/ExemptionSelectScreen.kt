@@ -44,9 +44,17 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                 maxWidth >= 600.dp -> 720.dp
                 else -> maxWidth
             }
+            val isLandscape = maxWidth > maxHeight
+            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
+            val gridColumns = when {
+                isPhoneLandscape -> GridCells.Fixed(2)
+                maxWidth >= 840.dp -> GridCells.Adaptive(minSize = 200.dp)
+                maxWidth >= 600.dp -> GridCells.Adaptive(minSize = 180.dp)
+                else -> GridCells.Adaptive(minSize = 160.dp)
+            }
             LazyVerticalGrid(
                 state = gridState,
-                columns = GridCells.Adaptive(minSize = 160.dp),
+                columns = gridColumns,
                 modifier = Modifier
                     .widthIn(max = containerMaxWidth)
                     .fillMaxWidth()
@@ -105,18 +113,30 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                     }
                 }
             ) { index, className ->
+                val remainder = ClassData.classNames.size % maxLineSpan
+                val isLoneCentered = maxLineSpan > 1 && remainder == 1 && index == ClassData.classNames.lastIndex
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp)
-                        .popInOnInitialLoad(index + 2),
+                        .popInOnInitialLoad(index + 2)
+                        .animateItem(
+                            fadeInSpec = androidx.compose.animation.core.tween(250),
+                            fadeOutSpec = androidx.compose.animation.core.tween(200),
+                            placementSpec = androidx.compose.animation.core.spring(
+                                dampingRatio = androidx.compose.animation.core.Spring.DampingRatioLowBouncy,
+                                stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
+                            )
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     ClassCardButton(
                         text = className,
                         selected = selectedClass == className,
                         onClick = { viewModel.selectClass(className) },
-                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
+                        modifier = Modifier
+                            .widthIn(max = if (isLoneCentered) 200.dp else 380.dp)
+                            .fillMaxWidth()
                     )
                 }
             }

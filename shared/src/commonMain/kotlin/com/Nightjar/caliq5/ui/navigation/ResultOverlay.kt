@@ -106,8 +106,8 @@ fun ResultOverlay(
             val containerMaxWidth = when {
                 maxWidth >= 1400.dp -> 1280.dp
                 maxWidth >= 1100.dp -> 1080.dp
-                maxWidth >= 840.dp -> 960.dp
-                maxWidth >= 600.dp -> 820.dp
+                maxWidth >= 840.dp -> 860.dp
+                maxWidth >= 600.dp -> 720.dp
                 else -> maxWidth
             }
 

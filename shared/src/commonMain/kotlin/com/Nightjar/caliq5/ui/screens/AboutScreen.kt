@@ -49,7 +49,7 @@ fun AboutScreen(viewModel: AppViewModel) {
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 300.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
@@ -126,8 +126,8 @@ fun AboutScreen(viewModel: AppViewModel) {
                 }
             }
 
-            // App Description Card
-            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+            // App Description Card (in 2 columns, pairs with Developer card side-by-side)
+            item(key = "about_desc") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(1), contentAlignment = Alignment.Center) {
                     ResultCard {
                         Text(
@@ -141,22 +141,12 @@ fun AboutScreen(viewModel: AppViewModel) {
                 }
             }
 
-            // Developer Section Header
-            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Text(
-                    text = "المطور والتواصل",
-                    style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold),
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp).popInOnInitialLoad(2),
-                    textAlign = TextAlign.Start
-                )
-            }
-
-            // Developer Profile
-            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+            // Developer Profile (sits side-by-side with description card on wide screens, no empty gaps!)
+            item(key = "about_dev") {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Surface(
-                        modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth().popInOnInitialLoad(3),
+                        modifier = Modifier.widthIn(max = 520.dp).fillMaxWidth().popInOnInitialLoad(2),
                     shape = RoundedCornerShape(20.dp),
                     color = MaterialTheme.colorScheme.surface,
                     border = BorderStroke(

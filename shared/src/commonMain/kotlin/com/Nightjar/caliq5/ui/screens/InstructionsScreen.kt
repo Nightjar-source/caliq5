@@ -44,7 +44,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 300.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
@@ -62,7 +62,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
                 modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().clipToBounds().padding(horizontal = 16.dp)
             ) {
-            item(key = "instructions_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+            item(key = "instructions_header") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
                     ExpandableInstructionCard(
                         title = "ضوابط الإعفاء العام والفردي للعام 2024-2025",
@@ -170,14 +170,21 @@ fun InstructionsScreen(viewModel: AppViewModel) {
             item(
                 key = "inst_disclaimer",
                 span = {
-                    if (maxLineSpan == 2) {
+                    if (maxLineSpan > 1 && 7 % maxLineSpan == 1) {
                         androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)
                     } else {
                         androidx.compose.foundation.lazy.grid.GridItemSpan(1)
                     }
                 }
             ) {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(6), contentAlignment = Alignment.Center) {
+                val isLoneCentered = maxLineSpan > 1 && 7 % maxLineSpan == 1
+                Box(
+                    modifier = Modifier
+                        .widthIn(max = if (isLoneCentered) 520.dp else androidx.compose.ui.unit.Dp.Unspecified)
+                        .fillMaxWidth()
+                        .popInOnInitialLoad(6),
+                    contentAlignment = Alignment.Center
+                ) {
                     ExpandableInstructionCard(title = "🔹 إخلاء مسؤولية") {
                         Text(
                             "هذا التطبيق أداة تعليمية غير رسمية تستند إلى التعليمات الرسمية لوزارة التربية العراقية للتسهيل على الطلاب.",
