@@ -1,5 +1,7 @@
 package com.Nightjar.caliq5.ui.components
 
+import androidx.compose.animation.animateContentSize
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
@@ -123,7 +125,7 @@ fun Modifier.actionButtonAdaptive(maxWidth: Dp = 340.dp): Modifier = this
     .widthIn(max = maxWidth)
     .fillMaxWidth()
     .animateContentSize(
-        animationSpec = androidx.compose.animation.core.spring(
+        animationSpec = androidx.compose.animation.core.spring<androidx.compose.ui.unit.IntSize>(
             dampingRatio = androidx.compose.animation.core.Spring.DampingRatioLowBouncy,
             stiffness = androidx.compose.animation.core.Spring.StiffnessLow
         )

@@ -177,14 +177,13 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                     }
                 }
             ) {
-                val isLoneCentered = maxLineSpan > 1 && 7 % maxLineSpan == 1
                 Box(
                     modifier = Modifier
-                        .widthIn(max = if (isLoneCentered) 520.dp else androidx.compose.ui.unit.Dp.Unspecified)
                         .fillMaxWidth()
                         .popInOnInitialLoad(6),
                     contentAlignment = Alignment.Center
                 ) {
+                    Box(modifier = Modifier.widthIn(max = 520.dp).fillMaxWidth()) {
                     ExpandableInstructionCard(title = "🔹 إخلاء مسؤولية") {
                         Text(
                             "هذا التطبيق أداة تعليمية غير رسمية تستند إلى التعليمات الرسمية لوزارة التربية العراقية للتسهيل على الطلاب.",
@@ -192,6 +191,7 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                             textAlign = TextAlign.Justify,
                             modifier = Modifier.fillMaxWidth()
                         )
+                    }
                     }
                 }
             }

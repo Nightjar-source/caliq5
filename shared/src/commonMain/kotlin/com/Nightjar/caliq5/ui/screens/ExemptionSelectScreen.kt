@@ -113,8 +113,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                     }
                 }
             ) { index, className ->
-                val remainder = ClassData.classNames.size % maxLineSpan
-                val isLoneCentered = maxLineSpan > 1 && remainder == 1 && index == ClassData.classNames.lastIndex
+                val isLastItem = index == ClassData.classNames.lastIndex
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -135,7 +134,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                         selected = selectedClass == className,
                         onClick = { viewModel.selectClass(className) },
                         modifier = Modifier
-                            .widthIn(max = if (isLoneCentered) 200.dp else 380.dp)
+                            .widthIn(max = if (isLastItem) 200.dp else 380.dp)
                             .fillMaxWidth()
                     )
                 }
