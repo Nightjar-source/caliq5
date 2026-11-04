@@ -130,4 +130,4 @@ jobs:
             *تطبيق تعليمي آمن ومجاني 100% وموقع رقمياً بشهادة رسمية معتمدة.*
           draft: false
           prerelease: false
-          generate_release_notes: true
+          generate_release_notes: false
