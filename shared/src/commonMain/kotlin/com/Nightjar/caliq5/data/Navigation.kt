@@ -60,7 +60,7 @@ data class NavItem(
 
 object AppVersion {
     var versionName: String = "5.14.71"
-    var versionCode: Int = 51472
+    var versionCode: Int = 51473
     val GITHUB_RELEASES_URL: String
         get() = "https://github.com/Nightjar-source/caliq5/releases/tag/v$versionName"
     val FULL_DISPLAY: String

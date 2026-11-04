@@ -39,6 +39,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
             .calculateTopPadding()
 
         BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            val screenWidth = maxWidth
             val containerMaxWidth = when {
                 maxWidth >= 1400.dp -> 1280.dp
                 maxWidth >= 1100.dp -> 1080.dp
@@ -116,7 +117,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        val cardWidth = if (maxWidth < 360.dp) 145.dp else 165.dp
+                        val cardWidth = if (screenWidth < 360.dp) 145.dp else 165.dp
                         ClassData.classNames.forEachIndexed { index, className ->
                             ClassCardButton(
                                 text = className,
