@@ -61,11 +61,13 @@ fun Term2Screen(viewModel: AppViewModel) {
                 modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().clipToBounds().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
-                    FeatureExplanationCard(
+                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                        FeatureExplanationCard(
                         icon = "task_alt",
                         text = "أدخل درجتك في الفصل الأول ونصف السنة لتعرف بالضبط كم تحتاج في الفصل الثاني لتصل إلى سعي 75% (إعفاء عام) أو 90% (إعفاء فردي)."
                     )
+                    }
                 }
             }
 

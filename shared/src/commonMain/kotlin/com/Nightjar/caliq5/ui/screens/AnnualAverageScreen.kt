@@ -61,11 +61,13 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                 modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().clipToBounds().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
-                    FeatureExplanationCard(
+                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                        FeatureExplanationCard(
                         icon = "calculate",
                         text = "تستخدم هذه الأداة لحساب السعي السنوي لمادة معينة (مجموع الفصل الأول ونصف السنة والفصل الثاني مقسوماً على 3) مع تطبيق قاعدة جبر الكسور تلقائياً."
                     )
+                    }
                 }
             }
 

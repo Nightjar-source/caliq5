@@ -137,14 +137,16 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             ) {
                 // Explanation Card (Static container, text animates internally)
                 item(key = "header_explanation", span = { GridItemSpan(maxLineSpan) }) {
-                    Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
-                        FeatureExplanationCard(
+                    Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
+                        Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                            FeatureExplanationCard(
                             icon = "school",
                             text = if (selectedTab == 0)
                                 "أدخل درجة السعي السنوي النهائية مباشرة لكل مادة."
                             else
                                 "أدخل درجات الفصل الأول، نصف السنة، والفصل الثاني وسنستخرج السعي تلقائياً.",
                         )
+                        }
                     }
                 }
 

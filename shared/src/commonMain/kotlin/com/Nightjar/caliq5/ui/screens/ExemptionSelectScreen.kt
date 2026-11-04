@@ -4,6 +4,8 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -69,11 +71,13 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
             item(span = { GridItemSpan(maxLineSpan) }, key = "select_explanation") {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0)) {
-                    FeatureExplanationCard(
-                        icon = "school",
-                        text = "لمعرفة ما إذا كنت مؤهلاً للإعفاء العام أو الفردي، قم باختيار صفك الدراسي أولاً لتهيئة المواد المخصصة لك.",
-                    )
+                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                        FeatureExplanationCard(
+                            icon = "school",
+                            text = "لمعرفة ما إذا كنت مؤهلاً للإعفاء العام أو الفردي، قم باختيار صفك الدراسي أولاً لتهيئة المواد المخصصة لك.",
+                        )
+                    }
                 }
             }
 
@@ -84,7 +88,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                         .popInOnInitialLoad(1),
                     contentAlignment = Alignment.Center
                 ) {
-                    Box(modifier = Modifier.widthIn(max = 680.dp).fillMaxWidth()) {
+                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
                         Text(
                             text = "اختر صفك الدراسي",
                             style = MaterialTheme.typography.titleMedium.copy(
@@ -101,42 +105,29 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                 }
             }
 
-            itemsIndexed(
-                items = ClassData.classNames,
-                key = { _, name -> "class_$name" },
-                span = { index, _ ->
-                    val remainder = ClassData.classNames.size % maxLineSpan
-                    if (maxLineSpan > 1 && remainder == 1 && index == ClassData.classNames.lastIndex) {
-                        GridItemSpan(maxLineSpan)
-                    } else {
-                        GridItemSpan(1)
-                    }
-                }
-            ) { index, className ->
-                val isLastItem = index == ClassData.classNames.lastIndex
+            @OptIn(ExperimentalLayoutApi::class)
+            item(span = { GridItemSpan(maxLineSpan) }, key = "classes_flow_grid") {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(2.dp)
-                        .popInOnInitialLoad(index + 2)
-                        .animateItem(
-                            fadeInSpec = androidx.compose.animation.core.tween(250),
-                            fadeOutSpec = androidx.compose.animation.core.tween(200),
-                            placementSpec = androidx.compose.animation.core.spring(
-                                dampingRatio = androidx.compose.animation.core.Spring.DampingRatioLowBouncy,
-                                stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
-                            )
-                        ),
+                    modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    ClassCardButton(
-                        text = className,
-                        selected = selectedClass == className,
-                        onClick = { viewModel.selectClass(className) },
-                        modifier = Modifier
-                            .widthIn(max = if (isLastItem) 200.dp else 380.dp)
-                            .fillMaxWidth()
-                    )
+                    FlowRow(
+                        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        val cardWidth = if (maxWidth < 360.dp) 145.dp else 165.dp
+                        ClassData.classNames.forEachIndexed { index, className ->
+                            ClassCardButton(
+                                text = className,
+                                selected = selectedClass == className,
+                                onClick = { viewModel.selectClass(className) },
+                                modifier = Modifier
+                                    .width(cardWidth)
+                                    .popInOnInitialLoad(index + 2)
+                            )
+                        }
+                    }
                 }
             }
 

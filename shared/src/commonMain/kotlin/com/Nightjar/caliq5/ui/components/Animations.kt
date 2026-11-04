@@ -157,23 +157,19 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
  * Replays smoothly on every navigation with an elegant, moist (Fluid) spring motion.
  */
 fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
-    var isLoaded by rememberSaveable { mutableStateOf(false) }
-    val animProgress = remember { Animatable(if (isLoaded) 1f else 0f) }
+    val animProgress = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        if (!isLoaded) {
-            if (index > 0) {
-                kotlinx.coroutines.delay((index * 55L).coerceAtMost(440L))
-            }
-            isLoaded = true
-            animProgress.animateTo(
-                targetValue = 1f,
-                animationSpec = spring(
-                    dampingRatio = 0.80f,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-            )
+        if (index > 0) {
+            kotlinx.coroutines.delay((index * 42L).coerceAtMost(360L))
         }
+        animProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = spring(
+                dampingRatio = 0.80f,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        )
     }
 
     this.graphicsLayer {

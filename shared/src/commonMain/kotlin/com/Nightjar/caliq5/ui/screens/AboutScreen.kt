@@ -126,68 +126,70 @@ fun AboutScreen(viewModel: AppViewModel) {
                 }
             }
 
-            // App Description Card (in 2 columns, pairs with Developer card side-by-side)
-            item(key = "about_desc") {
+            // App Description Card (dedicated at the top, max width 600.dp)
+            item(key = "about_desc", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(1), contentAlignment = Alignment.Center) {
-                    ResultCard {
-                        Text(
-                            text = "تطبيق شامل ومطور خصيصاً لمساعدة الطلبة في العراق لحساب الإعفاء العام والفردي، السعي السنوي، المعدل الفصلي، ومتابعة الدرجات بدقة عالية وحفظها عبر ميزة (السجل الشامل).",
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Start,
-                            lineHeight = 24.sp,
-                            color = MaterialTheme.colorScheme.onSurface 
-                        )
+                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                        ResultCard {
+                            Text(
+                                text = "تطبيق شامل ومطور خصيصاً لمساعدة الطلبة في العراق لحساب الإعفاء العام والفردي، السعي السنوي، المعدل الفصلي، ومتابعة الدرجات بدقة عالية وحفظها عبر ميزة (السجل الشامل).",
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Start,
+                                lineHeight = 24.sp,
+                                color = MaterialTheme.colorScheme.onSurface 
+                            )
+                        }
                     }
                 }
             }
 
-            // Developer Profile (sits side-by-side with description card on wide screens, no empty gaps!)
-            item(key = "about_dev") {
+            // Developer Profile (dedicated card, max width 600.dp, centered)
+            item(key = "about_dev", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(2), contentAlignment = Alignment.Center) {
                     Surface(
-                        modifier = Modifier.widthIn(max = 520.dp).fillMaxWidth().popInOnInitialLoad(2),
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    border = BorderStroke(
-                        1.dp,
-                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.25f else 0.45f)
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.25f else 0.45f)
+                        )
                     ) {
-                        Surface(
-                            modifier = Modifier.size(54.dp).clip(CircleShape),
-                            shape = CircleShape,
-                            shadowElevation = 3.dp,
-                            color = MaterialTheme.colorScheme.surfaceVariant
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            org.jetbrains.compose.resources.painterResource(Res.drawable.developer_karber)?.let { painter ->
-                                androidx.compose.foundation.Image(
-                                    painter = painter,
-                                    contentDescription = "KarBer",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                            Surface(
+                                modifier = Modifier.size(54.dp).clip(CircleShape),
+                                shape = CircleShape,
+                                shadowElevation = 3.dp,
+                                color = MaterialTheme.colorScheme.surfaceVariant
+                            ) {
+                                org.jetbrains.compose.resources.painterResource(Res.drawable.developer_karber)?.let { painter ->
+                                    androidx.compose.foundation.Image(
+                                        painter = painter,
+                                        contentDescription = "KarBer",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                    )
+                                }
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "KarBer",
+                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                                    textAlign = TextAlign.Start
+                                )
+                                Text(
+                                    text = "مطور التطبيق",
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.secondary),
+                                    textAlign = TextAlign.Start
                                 )
                             }
                         }
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "KarBer",
-                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                textAlign = TextAlign.Start
-                            )
-                            Text(
-                                text = "مطور التطبيق",
-                                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.secondary),
-                                textAlign = TextAlign.Start
-                            )
-                        }
                     }
-                }
                 }
             }
 
