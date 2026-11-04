@@ -133,6 +133,10 @@ fun AppNavigation(
     val adaptiveWindowSizeClass = adaptiveInfo.windowSizeClass
     val isTabletop = adaptiveInfo.windowPosture.isTabletop
 
+    val navTrigger by viewModel.navigationTrigger.collectAsState()
+    CompositionLocalProvider(
+        com.Nightjar.caliq5.ui.components.LocalScreenNavigationTrigger provides navTrigger
+    ) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val windowInfo = LocalWindowInfo.current
         val density = LocalDensity.current
@@ -515,6 +519,7 @@ fun AppNavigation(
                 }
             }
         }
+    }
     }
 
 }

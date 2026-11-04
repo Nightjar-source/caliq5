@@ -156,20 +156,33 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
  * Fluid staggered sliding animation on screen load and quick navigations.
  * Replays smoothly on every navigation with an elegant, moist (Fluid) spring motion.
  */
-fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
-    val animProgress = remember { Animatable(0f) }
+val LocalScreenNavigationTrigger = androidx.compose.runtime.compositionLocalOf { 0L }
 
-    LaunchedEffect(Unit) {
-        if (index > 0) {
-            kotlinx.coroutines.delay((index * 42L).coerceAtMost(360L))
-        }
-        animProgress.animateTo(
-            targetValue = 1f,
-            animationSpec = spring(
-                dampingRatio = 0.80f,
-                stiffness = Spring.StiffnessMediumLow
+/**
+ * Fluid staggered sliding animation on screen load and quick navigations.
+ * Replays smoothly on every navigation with an elegant, moist (Fluid) spring motion,
+ * while preserving lazy scroll stability without re-triggering during scrolling.
+ */
+fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
+    val currentNavTrigger = LocalScreenNavigationTrigger.current
+    var lastTrigger by rememberSaveable { mutableStateOf(-1L) }
+    val alreadyAnimated = lastTrigger == currentNavTrigger
+    val animProgress = remember(currentNavTrigger) { Animatable(if (alreadyAnimated) 1f else 0f) }
+
+    LaunchedEffect(currentNavTrigger) {
+        if (!alreadyAnimated) {
+            if (index > 0) {
+                kotlinx.coroutines.delay((index * 38L).coerceAtMost(300L))
+            }
+            lastTrigger = currentNavTrigger
+            animProgress.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = 0.80f,
+                    stiffness = Spring.StiffnessMediumLow
+                )
             )
-        )
+        }
     }
 
     this.graphicsLayer {

@@ -62,13 +62,12 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                 contentPadding = PaddingValues(top = topSafeInset + 65.dp, bottom = 145.dp + bottomSafeInset),
                 modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().clipToBounds().padding(horizontal = 16.dp)
             ) {
-            item(key = "instructions_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+            item(key = "instructions_header") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
-                        ExpandableInstructionCard(
-                            title = "ضوابط الإعفاء العام والفردي للعام 2024-2025",
-                            initiallyExpanded = true
-                        ) {
+                    ExpandableInstructionCard(
+                        title = "ضوابط الإعفاء العام والفردي للعام 2024-2025",
+                        initiallyExpanded = true
+                    ) {
                         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                             Text(
                                 "وفقاً لتوجيهات وزارة التربية العراقية، تكون ضوابط الإعفاء للعام الدراسي 2024 / 2025 كالآتي:",
@@ -118,7 +117,6 @@ fun InstructionsScreen(viewModel: AppViewModel) {
                                 modifier = Modifier.background(MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.15f), RoundedCornerShape(12.dp)).padding(12.dp)
                             )
                         }
-                    }
                     }
                 }
             }
