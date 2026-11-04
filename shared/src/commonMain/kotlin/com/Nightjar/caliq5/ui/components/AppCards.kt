@@ -78,7 +78,7 @@ fun Modifier.interactive3DTilt(
                 }
             }
         }
-        .zIndex(if (rotX != 0f || rotY != 0f) 60f else 30f)
+        .zIndex(if (targetRotX != 0f || targetRotY != 0f) 60f else 30f)
         .graphicsLayer {
             rotationX = rotX
             rotationY = rotY
@@ -98,11 +98,7 @@ fun ResultCard(
     val titleColor = MaterialTheme.colorScheme.primary
     val textColor = MaterialTheme.colorScheme.onSurface
 
-    var isHovered by remember { mutableStateOf(false) }
-    val elevation by animateDpAsState(
-        targetValue = if (isHovered) 8.dp else 5.dp,
-        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.6f, stiffness = androidx.compose.animation.core.Spring.StiffnessLow)
-    )
+
     
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val surfaceColor = MaterialTheme.colorScheme.surface

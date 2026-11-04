@@ -158,32 +158,37 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
  */
 fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
     var isLoaded by rememberSaveable { mutableStateOf(false) }
+    val animProgress = remember { Animatable(if (isLoaded) 1f else 0f) }
+
     LaunchedEffect(Unit) {
         if (!isLoaded) {
             if (index > 0) {
-                kotlinx.coroutines.delay((index * 60L).coerceAtMost(480L))
+                kotlinx.coroutines.delay((index * 55L).coerceAtMost(440L))
             }
             isLoaded = true
+            animProgress.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = 0.80f,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            )
         }
     }
-    val animProgress by animateFloatAsState(
-        targetValue = if (isLoaded) 1f else 0f,
-        animationSpec = spring(
-            dampingRatio = 0.80f,
-            stiffness = Spring.StiffnessMediumLow
-        ),
-        label = "fluidSlide_$index"
-    )
-    if (animProgress >= 1f) {
-        Modifier
-    } else {
-        this.graphicsLayer {
-            val progress = animProgress.coerceIn(0f, 1f)
+
+    this.graphicsLayer {
+        val progress = animProgress.value.coerceIn(0f, 1f)
+        if (progress < 1f) {
             this.alpha = progress
             this.translationY = (1f - progress) * 22.dp.toPx()
             this.scaleX = 0.96f + 0.04f * progress
             this.scaleY = 0.96f + 0.04f * progress
             this.clip = false
+        } else {
+            this.alpha = 1f
+            this.translationY = 0f
+            this.scaleX = 1f
+            this.scaleY = 1f
         }
     }
 }
