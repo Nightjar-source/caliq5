@@ -32,40 +32,74 @@ fun Term2ResultContent(state: ResultDisplayState.Term2Result) {
     val term1 = data.grades.find { it.name == "الفصل الأول" }?.grade ?: 0.0
     val mid = data.grades.find { it.name == "نصف السنة" }?.grade ?: 0.0
 
-    @OptIn(ExperimentalLayoutApi::class)
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Box(modifier = Modifier.widthIn(min = 280.dp, max = 500.dp).weight(1f)) {
-            Term2RequirementCard(
-                title = "لتحقيق معدل سعي سنوي 75% (الإعفاء العام)",
-                required = data.requiredFor75,
-                target = 75,
-                totalRequired = 225,
-                term1 = term1,
-                midYear = mid,
-                subjectName = data.subjName,
-                targetName = "الإعفاء العام",
-                initialExpanded = state.is75Expanded,
-                onExpandedChange = { state.is75Expanded = it }
-            )
-        }
-        
-        Box(modifier = Modifier.widthIn(min = 280.dp, max = 500.dp).weight(1f)) {
-            Term2RequirementCard(
-                title = "لتحقيق معدل سعي سنوي 90% (الإعفاء الفردي)",
-                required = data.requiredFor90,
-                target = 90,
-                totalRequired = 270,
-                term1 = term1,
-                midYear = mid,
-                subjectName = data.subjName,
-                targetName = "الإعفاء الفردي",
-                initialExpanded = state.is90Expanded,
-                onExpandedChange = { state.is90Expanded = it }
-            )
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+        val isWide = maxWidth >= 600.dp
+        if (isWide) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    Term2RequirementCard(
+                        title = "لتحقيق معدل سعي سنوي 75% (الإعفاء العام)",
+                        required = data.requiredFor75,
+                        target = 75,
+                        totalRequired = 225,
+                        term1 = term1,
+                        midYear = mid,
+                        subjectName = data.subjName,
+                        targetName = "الإعفاء العام",
+                        initialExpanded = state.is75Expanded,
+                        onExpandedChange = { state.is75Expanded = it }
+                    )
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    Term2RequirementCard(
+                        title = "لتحقيق معدل سعي سنوي 90% (الإعفاء الفردي)",
+                        required = data.requiredFor90,
+                        target = 90,
+                        totalRequired = 270,
+                        term1 = term1,
+                        midYear = mid,
+                        subjectName = data.subjName,
+                        targetName = "الإعفاء الفردي",
+                        initialExpanded = state.is90Expanded,
+                        onExpandedChange = { state.is90Expanded = it }
+                    )
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Term2RequirementCard(
+                    title = "لتحقيق معدل سعي سنوي 75% (الإعفاء العام)",
+                    required = data.requiredFor75,
+                    target = 75,
+                    totalRequired = 225,
+                    term1 = term1,
+                    midYear = mid,
+                    subjectName = data.subjName,
+                    targetName = "الإعفاء العام",
+                    initialExpanded = state.is75Expanded,
+                    onExpandedChange = { state.is75Expanded = it }
+                )
+                Term2RequirementCard(
+                    title = "لتحقيق معدل سعي سنوي 90% (الإعفاء الفردي)",
+                    required = data.requiredFor90,
+                    target = 90,
+                    totalRequired = 270,
+                    term1 = term1,
+                    midYear = mid,
+                    subjectName = data.subjName,
+                    targetName = "الإعفاء الفردي",
+                    initialExpanded = state.is90Expanded,
+                    onExpandedChange = { state.is90Expanded = it }
+                )
+            }
         }
     }
 }

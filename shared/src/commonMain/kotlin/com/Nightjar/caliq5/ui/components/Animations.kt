@@ -112,7 +112,7 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                     val target = (current + delta * resistance).coerceAtMost(maxPull)
                     snapJob?.cancel()
                     snapJob = scope.launch { overscrollOffset.snapTo(target) }
-                    return Offset(0f, delta)
+                    return Offset.Zero
                 }
 
                 return Offset.Zero

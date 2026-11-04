@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import caliq5.shared.generated.resources.Res
 import caliq5.shared.generated.resources.icon
+import caliq5.shared.generated.resources.developer_karber
 import com.Nightjar.caliq5.ui.components.*
 import com.Nightjar.caliq5.viewmodel.AppViewModel
 
@@ -111,9 +112,16 @@ fun AboutScreen(viewModel: AppViewModel) {
                     Text(
                         text = com.Nightjar.caliq5.data.AppVersion.FULL_DISPLAY,
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
                         ),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                uriHandler.openUri(com.Nightjar.caliq5.data.AppVersion.GITHUB_RELEASES_URL)
+                            }
+                            .padding(horizontal = 12.dp, vertical = 4.dp)
                     )
                 }
             }
@@ -161,15 +169,24 @@ fun AboutScreen(viewModel: AppViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = null,
-                            modifier = Modifier.size(40.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        Surface(
+                            modifier = Modifier.size(54.dp).clip(CircleShape),
+                            shape = CircleShape,
+                            shadowElevation = 3.dp,
+                            color = MaterialTheme.colorScheme.surfaceVariant
+                        ) {
+                            org.jetbrains.compose.resources.painterResource(Res.drawable.developer_karber)?.let { painter ->
+                                androidx.compose.foundation.Image(
+                                    painter = painter,
+                                    contentDescription = "KarBer",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                )
+                            }
+                        }
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "عبودي",
+                                text = "KarBer",
                                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                                 textAlign = TextAlign.Start
                             )
@@ -246,6 +263,7 @@ fun AboutScreen(viewModel: AppViewModel) {
                         )
                     }
                 }
+                }
             }
 
             // 2. Books & Guides Channel: https://t.me/bookiraqi
@@ -303,18 +321,31 @@ fun AboutScreen(viewModel: AppViewModel) {
             }
 
             // 3. Books Download Bot: @Bookiraqbot
-            item(key = "about_bot_books") {
+            item(
+                key = "about_bot_books",
+                span = {
+                    if (maxLineSpan == 2) {
+                        androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)
+                    } else {
+                        androidx.compose.foundation.lazy.grid.GridItemSpan(1)
+                    }
+                }
+            ) {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
-                Surface(
-                    onClick = { uriHandler.openUri("https://t.me/Bookiraqbot") },
-                    modifier = Modifier.fillMaxWidth().popInOnInitialLoad(7),
-                    shape = RoundedCornerShape(20.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    border = BorderStroke(
-                        1.dp,
-                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.25f else 0.45f)
-                    )
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
+                    Surface(
+                        onClick = { uriHandler.openUri("https://t.me/Bookiraqbot") },
+                        modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth().popInOnInitialLoad(7),
+                        shape = RoundedCornerShape(20.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.25f else 0.45f)
+                        )
+                    ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,

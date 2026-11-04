@@ -71,17 +71,13 @@ fun CaliqScreen(
                     Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
                 }
             } else {
-                CompositionLocalProvider(
-                    androidx.compose.foundation.LocalOverscrollConfiguration provides null
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.TopCenter
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        content()
-                    }
+                    content()
                 }
             }
         }

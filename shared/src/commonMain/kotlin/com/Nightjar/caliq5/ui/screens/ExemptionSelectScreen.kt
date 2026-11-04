@@ -97,7 +97,8 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                 items = ClassData.classNames,
                 key = { _, name -> "class_$name" },
                 span = { index, _ ->
-                    if (maxLineSpan > 1 && ClassData.classNames.size % maxLineSpan == 1 && index == ClassData.classNames.lastIndex) {
+                    val remainder = ClassData.classNames.size % maxLineSpan
+                    if (maxLineSpan > 1 && remainder == 1 && index == ClassData.classNames.lastIndex) {
                         GridItemSpan(maxLineSpan)
                     } else {
                         GridItemSpan(1)

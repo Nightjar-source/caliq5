@@ -32,6 +32,8 @@ class MainActivity : ComponentActivity() {
         window.statusBarColor = android.graphics.Color.TRANSPARENT
         window.navigationBarColor = android.graphics.Color.TRANSPARENT
         super.onCreate(savedInstanceState)
+        com.Nightjar.caliq5.data.AppVersion.versionName = BuildConfig.VERSION_NAME
+        com.Nightjar.caliq5.data.AppVersion.versionCode = BuildConfig.VERSION_CODE
         
         if (savedInstanceState != null) {
             val savedUri = savedInstanceState.getString("savedDeepLinkUri")
@@ -139,7 +141,7 @@ class MainActivity : ComponentActivity() {
                 put("alternateName", "حاسبة كالك")
                 put("applicationCategory", "EducationalApplication")
                 put("operatingSystem", "Android")
-                put("version", com.Nightjar.caliq5.data.AppVersion.VERSION_NAME)
+                put("version", com.Nightjar.caliq5.data.AppVersion.versionName)
                 put("description", "حاسبة درجات ومعدلات وإعفاء نظام التعليم العراقي")
                 put("url", currentUri)
             }
@@ -150,7 +152,7 @@ class MainActivity : ComponentActivity() {
     override fun onProvideAssistData(data: Bundle?) {
         super.onProvideAssistData(data)
         data?.putString("appName", "Caliq")
-        data?.putString("version", com.Nightjar.caliq5.data.AppVersion.VERSION_NAME)
+        data?.putString("version", com.Nightjar.caliq5.data.AppVersion.versionName)
         data?.putString("activeRoute", deepLinkUri.value ?: "caliq://exemption")
         data?.putString("targetCountry", "Iraq")
         data?.putString("systemStandard", "Iraqi Educational System")

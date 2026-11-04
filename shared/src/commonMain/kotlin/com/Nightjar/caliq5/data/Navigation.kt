@@ -59,8 +59,10 @@ data class NavItem(
 )
 
 object AppVersion {
-    const val VERSION_NAME = "5.14.40"
-    const val VERSION_CODE = 51440
-    const val EDITION = "Material 3 Expressive"
-    val FULL_DISPLAY = "الإصدار $VERSION_NAME ($EDITION)"
+    var versionName: String = "5.14.68"
+    var versionCode: Int = 51468
+    val GITHUB_RELEASES_URL: String
+        get() = "https://github.com/Nightjar-source/caliq5/releases/tag/v$versionName"
+    val FULL_DISPLAY: String
+        get() = "الإصدار الرسمي v$versionName"
 }

@@ -103,11 +103,19 @@ fun ResultOverlay(
                 color = MaterialTheme.colorScheme.background.copy(alpha = 0.98f),
             ) {}
 
+            val containerMaxWidth = when {
+                maxWidth >= 1400.dp -> 1280.dp
+                maxWidth >= 1100.dp -> 1080.dp
+                maxWidth >= 840.dp -> 960.dp
+                maxWidth >= 600.dp -> 820.dp
+                else -> maxWidth
+            }
+
             // Scrollable Content - Pure Edge-to-Edge with safeDrawing insets applied strictly to inner content
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .widthIn(max = 680.dp)
+                    .widthIn(max = containerMaxWidth)
                     .fillMaxWidth()
                     .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
                     .verticalScroll(rememberScrollState())
@@ -132,7 +140,10 @@ fun ResultOverlay(
                         }
                     }
                 }
-                val bottomSafePadding = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding()
+                val bottomSafePadding = WindowInsets.navigationBars
+                    .union(WindowInsets.captionBar)
+                    .asPaddingValues()
+                    .calculateBottomPadding()
                 Spacer(modifier = Modifier.height(95.dp + bottomSafePadding))
             }
 

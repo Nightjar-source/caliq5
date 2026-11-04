@@ -1592,31 +1592,22 @@ fun CaliqConfirmationDialog(
 ) {
 
     var isVisible by remember { mutableStateOf(false) }
-
+    var isDismissing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-
-
     LaunchedEffect(Unit) {
-
         isVisible = true
-
     }
 
-
-
     val dismissWithAnim: (action: () -> Unit) -> Unit = { action ->
-
-        coroutineScope.launch {
-
-            isVisible = false
-
-            delay(170)
-
-            action()
-
+        if (!isDismissing) {
+            isDismissing = true
+            coroutineScope.launch {
+                isVisible = false
+                delay(175)
+                action()
+            }
         }
-
     }
 
 
@@ -1668,12 +1659,10 @@ fun CaliqConfirmationDialog(
 
             AnimatedVisibility(
                 visible = isVisible,
-                enter = fadeIn(animationSpec = tween(220, easing = androidx.compose.animation.core.LinearOutSlowInEasing)) + 
-                        scaleIn(initialScale = 0.88f, animationSpec = spring(dampingRatio = 0.72f, stiffness = Spring.StiffnessMediumLow)) +
-                        slideInVertically(animationSpec = spring(dampingRatio = 0.72f, stiffness = Spring.StiffnessMediumLow)) { it / 8 },
-                exit = fadeOut(animationSpec = tween(180, easing = androidx.compose.animation.core.FastOutLinearInEasing)) + 
-                       scaleOut(targetScale = 0.90f, animationSpec = tween(180)) +
-                       slideOutVertically(animationSpec = tween(180)) { it / 10 }
+                enter = fadeIn(animationSpec = tween(180, easing = androidx.compose.animation.core.LinearOutSlowInEasing)) + 
+                        scaleIn(initialScale = 0.90f, animationSpec = spring(dampingRatio = 0.80f, stiffness = Spring.StiffnessMediumLow)),
+                exit = fadeOut(animationSpec = tween(150, easing = androidx.compose.animation.core.FastOutLinearInEasing)) + 
+                       scaleOut(targetScale = 0.92f, animationSpec = tween(150, easing = androidx.compose.animation.core.FastOutLinearInEasing))
             ) {
                 Surface(
                     modifier = Modifier
