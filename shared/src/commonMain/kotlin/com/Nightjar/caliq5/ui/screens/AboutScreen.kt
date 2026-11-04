@@ -263,7 +263,6 @@ fun AboutScreen(viewModel: AppViewModel) {
                         )
                     }
                 }
-                }
             }
 
             // 2. Books & Guides Channel: https://t.me/bookiraqi
@@ -385,6 +384,7 @@ fun AboutScreen(viewModel: AppViewModel) {
                         )
                     }
                 }
+            }
             }
 
             // Golden Spiritual Card placed at the very bottom with compact size and shimmering calligraphy
