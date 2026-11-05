@@ -73,7 +73,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
             ) {
             item(span = { GridItemSpan(maxLineSpan) }, key = "select_explanation") {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                    Box(modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
                         FeatureExplanationCard(
                             icon = "school",
                             text = "لمعرفة ما إذا كنت مؤهلاً للإعفاء العام أو الفردي، قم باختيار صفك الدراسي أولاً لتهيئة المواد المخصصة لك.",
@@ -89,7 +89,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                         .popInOnInitialLoad(1),
                     contentAlignment = Alignment.Center
                 ) {
-                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                    Box(modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
                         Text(
                             text = "اختر صفك الدراسي",
                             style = MaterialTheme.typography.titleMedium.copy(

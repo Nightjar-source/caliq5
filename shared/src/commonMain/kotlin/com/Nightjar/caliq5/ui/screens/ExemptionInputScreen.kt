@@ -138,7 +138,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 // Explanation Card (Static container, text animates internally)
                 item(key = "header_explanation", span = { GridItemSpan(maxLineSpan) }) {
                     Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
-                        Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                        Box(modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
                             FeatureExplanationCard(
                             icon = "school",
                             text = if (selectedTab == 0)

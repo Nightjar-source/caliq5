@@ -79,7 +79,7 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                    Box(modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
                         FeatureExplanationCard(
                         icon = "calendar_today",
                         text = "لحساب معدل فصل دراسي واحد (أشهر). أدخل اسم المادة ودرجات الأشهر وسنقوم بجمعها وقسمتها على عددها مع جبر الكسور."

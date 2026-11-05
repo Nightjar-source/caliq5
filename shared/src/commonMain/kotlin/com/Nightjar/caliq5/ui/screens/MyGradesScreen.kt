@@ -259,7 +259,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                     ) {
                 item(key = "mygrades_list_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                     Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
-                        Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                        Box(modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
                             FeatureExplanationCard(
                             icon = "person_add",
                             text = "1. اضغط \"إضافة سجل صف / طالب\" وأدخل الاسم والصف.\n2. اختر نوع الإدخال (فصلي أم شهريات) لكل فصل.\n3. إذا كان الطالب معفى، سيتم قفل حقل الامتحان النهائي تلقائياً وتلوينه بالأخضر.\n4. اضغط 📄 لإنشاء ملف PDF أنيق!",
