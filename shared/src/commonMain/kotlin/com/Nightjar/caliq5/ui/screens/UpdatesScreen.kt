@@ -55,7 +55,7 @@ fun UpdatesScreen(viewModel: AppViewModel) {
             ) {
             item(key = "updates_header", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth().popInOnInitialLoad(0)) {
+                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth().popInOnInitialLoad(0)) {
                         ResultCard {
                             Column(
                                 modifier = Modifier.fillMaxWidth(),

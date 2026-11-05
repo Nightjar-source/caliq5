@@ -83,7 +83,7 @@ fun StatisticsScreen(viewModel: AppViewModel) {
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth()) {
+                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
                         FeatureExplanationCard(
                             icon = "school",
                             text = "هنا تجد جميع النتائج التي قمت بحسابها وحفظها مسبقاً."
