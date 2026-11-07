@@ -53,47 +53,31 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
     val scope = rememberCoroutineScope()
     var snapJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
 
-    // When keyboard appears, stay in place without jumping back to original position (0)!
-    // It stays in place and shifts only slightly for the active input element to remain visible.
+    // When keyboard appears, smoothly reset reachability offset to 0 so fields are never obscured
     val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density) > 0
     androidx.compose.runtime.LaunchedEffect(isImeVisible) {
         if (isImeVisible && overscrollOffset.value > 0f) {
-            // Keep reachability position in place without jumping by large amounts to 0!
-            val gentleOffset = (overscrollOffset.value * 0.85f).coerceAtLeast(0f)
+            isRestingInReachability = false
             overscrollOffset.animateTo(
-                targetValue = gentleOffset,
+                targetValue = 0f,
                 animationSpec = spring(
                     dampingRatio = 0.85f,
-                    stiffness = Spring.StiffnessLow
+                    stiffness = Spring.StiffnessMediumLow
                 )
             )
         }
     }
 
     val maxRestingTarget = with(density) {
-        val calculated = if (componentHeight > 0) componentHeight * 0.32f else 220.dp.toPx()
-        calculated.coerceIn(160.dp.toPx(), 260.dp.toPx())
+        val calculated = if (componentHeight > 0) componentHeight * 0.30f else 200.dp.toPx()
+        calculated.coerceIn(150.dp.toPx(), 240.dp.toPx())
     }
-    val triggerThreshold = maxRestingTarget * 0.38f
+    val triggerThreshold = maxRestingTarget * 0.35f
 
     val nestedScrollConnection = remember(componentHeight, maxRestingTarget) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val current = overscrollOffset.value
-                val delta = available.y
-
-                // If currently displaced downwards and user scrolls UP (delta < 0):
-                if (current > 0f && delta < 0f && source == NestedScrollSource.UserInput) {
-                    val newOffset = (current + delta).coerceAtLeast(0f)
-                    val consumedY = newOffset - current
-                    snapJob?.cancel()
-                    snapJob = scope.launch { overscrollOffset.snapTo(newOffset) }
-                    if (newOffset == 0f) {
-                        isRestingInReachability = false
-                    }
-                    return Offset(0f, consumedY)
-                }
-
+                // Do not intercept user scroll in onPreScroll so scrolling down/up within list remains 100% fluid with 0 friction!
                 return Offset.Zero
             }
 
@@ -103,18 +87,30 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                 source: NestedScrollSource
             ): Offset {
                 val delta = available.y
-                // When pulling down at the top of the list (available.y > 0):
-                if (source == NestedScrollSource.UserInput && delta > 0f) {
+                if (source == NestedScrollSource.UserInput) {
                     val current = overscrollOffset.value
-                    val maxPull = maxRestingTarget * 1.30f
-                    val progress = (current / maxPull).coerceIn(0f, 1f)
-                    val resistance = 0.55f * (1f - progress * 0.65f)
-                    val target = (current + delta * resistance).coerceAtMost(maxPull)
-                    snapJob?.cancel()
-                    snapJob = scope.launch { overscrollOffset.snapTo(target) }
-                    return Offset.Zero
+                    // When pulling down at the top of the list (available.y > 0):
+                    if (delta > 0f) {
+                        val maxPull = maxRestingTarget * 1.25f
+                        val progress = (current / maxPull).coerceIn(0f, 1f)
+                        val resistance = 0.60f * (1f - progress * 0.60f)
+                        val target = (current + delta * resistance).coerceAtMost(maxPull)
+                        snapJob?.cancel()
+                        snapJob = scope.launch { overscrollOffset.snapTo(target) }
+                        return Offset(0f, delta)
+                    }
+                    // When scrolling up and child list has reached top (available.y < 0):
+                    else if (delta < 0f && current > 0f) {
+                        val newOffset = (current + delta).coerceAtLeast(0f)
+                        val consumedY = newOffset - current
+                        snapJob?.cancel()
+                        snapJob = scope.launch { overscrollOffset.snapTo(newOffset) }
+                        if (newOffset == 0f) {
+                            isRestingInReachability = false
+                        }
+                        return Offset(0f, consumedY)
+                    }
                 }
-
                 return Offset.Zero
             }
 
@@ -122,9 +118,9 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                 val current = overscrollOffset.value
                 if (current > 0f) {
                     val shouldRest = if (isRestingInReachability) {
-                        available.y > -250f && current > triggerThreshold * 0.5f
+                        available.y > -200f && current > triggerThreshold * 0.4f
                     } else {
-                        current >= triggerThreshold || available.y > 250f
+                        current >= triggerThreshold || available.y > 200f
                     }
 
                     val targetValue = if (shouldRest) maxRestingTarget else 0f
@@ -133,8 +129,8 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                     overscrollOffset.animateTo(
                         targetValue = targetValue,
                         animationSpec = spring(
-                            dampingRatio = 0.78f, // Fluid liquid spring
-                            stiffness = Spring.StiffnessLow
+                            dampingRatio = 0.82f, // Pure fluid liquid spring without harsh rebound
+                            stiffness = Spring.StiffnessMediumLow
                         )
                     )
                     return available

@@ -62,10 +62,9 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1280.dp
-                maxWidth >= 1100.dp -> 1080.dp
+                maxWidth >= 1400.dp -> 1320.dp
+                maxWidth >= 1100.dp -> 1160.dp
                 maxWidth >= 840.dp -> 960.dp
-                maxWidth >= 600.dp -> 720.dp
                 else -> maxWidth
             }
 
@@ -120,16 +119,16 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
 
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .popInOnInitialLoad(index + 2)
                         .animateItem(
-                            fadeInSpec = androidx.compose.animation.core.tween(350, easing = androidx.compose.animation.core.FastOutSlowInEasing),
-                            fadeOutSpec = androidx.compose.animation.core.tween(250, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+                            fadeInSpec = androidx.compose.animation.core.tween(300, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+                            fadeOutSpec = androidx.compose.animation.core.tween(220, easing = androidx.compose.animation.core.FastOutSlowInEasing),
                             placementSpec = androidx.compose.animation.core.spring(
                                 dampingRatio = androidx.compose.animation.core.Spring.DampingRatioLowBouncy,
                                 stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
                             )
-                        ),
+                        )
+                        .fillMaxWidth()
+                        .popInOnInitialLoad(index + 2),
                     contentAlignment = Alignment.Center
                 ) {
                     MonthRowItem(

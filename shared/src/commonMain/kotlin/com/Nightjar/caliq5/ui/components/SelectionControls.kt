@@ -550,19 +550,13 @@ fun CaliqPrimaryButton(
 
             .instantExpressivePress(enabled = enabled) { isInstantPressed.value = it }
 
-            .graphicsLayer { scaleX = scale; scaleY = scale }
-
-            .shadow(
-
-                elevation = elevation,
-
-                shape = animatedShape,
-
-                ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
-
-                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.50f)
-
-            ),
+            .graphicsLayer { scaleX = scale; scaleY = scale },
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 1.5.dp,
+            pressedElevation = 0.dp,
+            hoveredElevation = 2.dp,
+            focusedElevation = 1.dp
+        ),
 
         shape = animatedShape,
 
@@ -1610,26 +1604,22 @@ fun CaliqConfirmationDialog(
         }
     }
 
-
+    val scrimAlpha by animateFloatAsState(
+        targetValue = if (isVisible) 0.50f else 0.0f,
+        animationSpec = tween(durationMillis = 170, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+        label = "dialog_scrim_fade"
+    )
 
     androidx.compose.ui.window.Dialog(
-
         onDismissRequest = { dismissWithAnim(onDismiss) },
-
         properties = androidx.compose.ui.window.DialogProperties(
-
             usePlatformDefaultWidth = false
-
         )
-
     ) {
-
         BoxWithConstraints(
-
             modifier = Modifier
-
                 .fillMaxSize()
-
+                .background(Color.Black.copy(alpha = scrimAlpha))
                 .windowInsetsPadding(WindowInsets.safeDrawing)
 
                 .clickable(

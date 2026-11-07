@@ -88,13 +88,11 @@ fun AboutScreen(viewModel: AppViewModel) {
                         color = Color.Transparent
                     ) {
                         Box(contentAlignment = Alignment.Center) {
-                            org.jetbrains.compose.resources.painterResource(Res.drawable.icon)?.let { painter ->
-                                androidx.compose.foundation.Image(
-                                    painter = painter,
-                                    contentDescription = "أيقونة التطبيق",
-                                    modifier = Modifier.size(90.dp),
-                                )
-                            }
+                            androidx.compose.foundation.Image(
+                                painter = org.jetbrains.compose.resources.painterResource(Res.drawable.icon),
+                                contentDescription = "أيقونة التطبيق",
+                                modifier = Modifier.size(90.dp),
+                            )
                         }
                     }
                     
@@ -167,14 +165,12 @@ fun AboutScreen(viewModel: AppViewModel) {
                                 shadowElevation = 3.dp,
                                 color = MaterialTheme.colorScheme.surfaceVariant
                             ) {
-                                org.jetbrains.compose.resources.painterResource(Res.drawable.developer_karber)?.let { painter ->
-                                    androidx.compose.foundation.Image(
-                                        painter = painter,
-                                        contentDescription = "KarBer",
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                                    )
-                                }
+                                androidx.compose.foundation.Image(
+                                    painter = org.jetbrains.compose.resources.painterResource(Res.drawable.developer_karber),
+                                    contentDescription = "KarBer",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                )
                             }
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(

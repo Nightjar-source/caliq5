@@ -238,14 +238,14 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                     val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
                     val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 300.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
                     val containerMaxWidth = when {
-                        maxWidth >= 1400.dp -> 1100.dp
-                        maxWidth >= 1100.dp -> 960.dp
-                        maxWidth >= 840.dp -> 820.dp
+                        maxWidth >= 1400.dp -> 1320.dp
+                        maxWidth >= 1100.dp -> 1160.dp
+                        maxWidth >= 840.dp -> 960.dp
                         else -> maxWidth
                     }
 
@@ -687,13 +687,13 @@ fun StudentEditView(
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 300.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1340.dp
-                maxWidth >= 1100.dp -> 1140.dp
+                maxWidth >= 1400.dp -> 1360.dp
+                maxWidth >= 1100.dp -> 1180.dp
                 maxWidth >= 840.dp -> 960.dp
                 else -> maxWidth
             }
@@ -1476,7 +1476,6 @@ fun SubjectGradeEditCard(
     ) {
         Box(
             modifier = Modifier
-                .widthIn(max = 440.dp)
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
                 .shadow(

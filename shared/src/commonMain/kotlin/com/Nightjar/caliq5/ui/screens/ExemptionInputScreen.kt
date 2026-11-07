@@ -97,7 +97,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             // Official Compose Adaptive Layout: Dynamic multi-column adaptation without locking to 2 columns
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 300.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 275.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
             val topSafeInset = WindowInsets.statusBars
@@ -113,8 +113,8 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             )
             
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1340.dp
-                maxWidth >= 1100.dp -> 1120.dp
+                maxWidth >= 1400.dp -> 1360.dp
+                maxWidth >= 1100.dp -> 1180.dp
                 maxWidth >= 840.dp -> 960.dp
                 else -> maxWidth
             }
@@ -169,8 +169,6 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                     )
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .popInOnInitialLoad(index + 1)
                             .animateItem(
                                 fadeInSpec = androidx.compose.animation.core.tween(250),
                                 fadeOutSpec = androidx.compose.animation.core.tween(200),
@@ -178,7 +176,9 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                                     dampingRatio = Spring.DampingRatioLowBouncy,
                                     stiffness = Spring.StiffnessMediumLow
                                 )
-                            ),
+                            )
+                            .fillMaxWidth()
+                            .popInOnInitialLoad(index + 1),
                         contentAlignment = Alignment.Center
                     ) {
                         SubjectInputRow(
@@ -191,7 +191,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                                 viewModel.updateSubjectDetailGrades(subject.name, t1, mid, t2)
                             },
                             onSkipToggle = { viewModel.toggleSkipSubject(subject.name) },
-                            modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
@@ -212,8 +212,6 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 ) { index, subject ->
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .popInOnInitialLoad(predefinedSubjects.size + index + 1)
                             .animateItem(
                                 fadeInSpec = androidx.compose.animation.core.tween(300),
                                 fadeOutSpec = androidx.compose.animation.core.tween(200),
@@ -221,7 +219,9 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                                     dampingRatio = Spring.DampingRatioLowBouncy,
                                     stiffness = Spring.StiffnessMediumLow
                                 )
-                            ),
+                            )
+                            .fillMaxWidth()
+                            .popInOnInitialLoad(predefinedSubjects.size + index + 1),
                         contentAlignment = Alignment.Center
                     ) {
                         CustomSubjectRow(
@@ -232,7 +232,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                             onGradeChange = { viewModel.updateCustomSubjectGrade(index, it) },
                             onDetailChange = { t1, mid, t2 -> viewModel.updateCustomSubjectDetailGrades(index, t1, mid, t2) },
                             onRemove = { viewModel.removeCustomSubject(index) },
-                            modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

@@ -31,13 +31,24 @@ fun AnnualResultContent(state: ResultDisplayState.AnnualResult) {
     val showRounded = hasFraction && (data.finalAverage.toDouble() != data.realAverage)
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        MainGradeBox(
-            title = "السعي السنوي${if (data.subjectName.isNotEmpty()) " لمادة ${data.subjectName}" else ""}",
-            grade = "${com.Nightjar.caliq5.ui.components.formatDecimalGrade(data.realAverage)}%",
-            subtitle = if (showRounded) "السعي المقرب: ${data.finalAverage}%" else "",
-        )
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                MainGradeBox(
+                    title = "السعي السنوي${if (data.subjectName.isNotEmpty()) " لمادة ${data.subjectName}" else ""}",
+                    grade = "${com.Nightjar.caliq5.ui.components.formatDecimalGrade(data.realAverage)}%",
+                    subtitle = if (showRounded) "السعي المقرب: ${data.finalAverage}%" else "",
+                )
+            }
+        }
 
-        ResultCard(title = "النتيجة النهائية بعد الجبر") {
+        @OptIn(ExperimentalLayoutApi::class)
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(modifier = Modifier.widthIn(min = 320.dp).weight(1f)) {
+                ResultCard(title = "النتيجة النهائية بعد الجبر") {
             val wasRounded = data.finalAverage > kotlin.math.floor(data.realAverage)
             val message = when {
                 !hasFraction -> "المعدل تام وبدون كسور عشرية وهو ${data.finalAverage}%."
@@ -146,12 +157,16 @@ fun AnnualResultContent(state: ResultDisplayState.AnnualResult) {
             }
         }
 
-        ResultCard(title = "تفاصيل الفصول والامتحانات") {
-            data.grades.forEach { grade ->
-                com.Nightjar.caliq5.ui.components.GradeDetailRow(
-                    subjectName = grade.name,
-                    grade = grade.grade,
-                )
+            }
+            Box(modifier = Modifier.widthIn(min = 320.dp).weight(1f)) {
+                ResultCard(title = "تفاصيل الفصول والامتحانات") {
+                    data.grades.forEach { grade ->
+                        com.Nightjar.caliq5.ui.components.GradeDetailRow(
+                            subjectName = grade.name,
+                            grade = grade.grade,
+                        )
+                    }
+                }
             }
         }
     }

@@ -42,14 +42,16 @@ fun Term2Screen(viewModel: AppViewModel) {
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 300.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 260.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1200.dp -> 640.dp
-                maxWidth >= 540.dp -> 600.dp
-                else -> 480.dp
+                maxWidth >= 1400.dp -> 1180.dp
+                maxWidth >= 1100.dp -> 1040.dp
+                maxWidth >= 840.dp -> 900.dp
+                maxWidth >= 600.dp -> 740.dp
+                else -> 520.dp
             }
 
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(

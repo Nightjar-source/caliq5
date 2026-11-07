@@ -47,9 +47,11 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1200.dp -> 760.dp
-                maxWidth >= 680.dp -> 720.dp
-                else -> 480.dp
+                maxWidth >= 1400.dp -> 1200.dp
+                maxWidth >= 1100.dp -> 1060.dp
+                maxWidth >= 840.dp -> 920.dp
+                maxWidth >= 680.dp -> 760.dp
+                else -> 520.dp
             }
 
             androidx.compose.foundation.lazy.grid.LazyVerticalGrid(

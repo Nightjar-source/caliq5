@@ -31,12 +31,16 @@ fun ExemptionResultContent(state: ResultDisplayState.ExemptionResult) {
     val data = state.data
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        // Main grade box (Fixed: matches web .main-grade-box)
-        MainGradeBox(
-            title = "المعدل العام للسعي السنوي",
-            grade = "${com.Nightjar.caliq5.ui.components.formatDecimalGrade(data.finalAverage)}%",
-            subtitle = "المعدل العام لا يخضع لقاعدة جبر الكسور (85% هو الحد الأدنى)",
-        )
+        // Main grade box centered alone at top with max 600dp
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                MainGradeBox(
+                    title = "المعدل العام للسعي السنوي",
+                    grade = "${com.Nightjar.caliq5.ui.components.formatDecimalGrade(data.finalAverage)}%",
+                    subtitle = "المعدل العام لا يخضع لقاعدة جبر الكسور (85% هو الحد الأدنى)",
+                )
+            }
+        }
 
         @OptIn(ExperimentalLayoutApi::class)
         FlowRow(
