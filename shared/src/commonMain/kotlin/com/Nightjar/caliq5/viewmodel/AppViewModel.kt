@@ -162,6 +162,7 @@ class AppViewModel : ViewModel() {
                 _editingStudentMode.value = null
             }
             if (_currentScreen.value == Screen.EXEMPTION_INPUT) {
+                _navigationTrigger.value++
                 _isNavigatingBack.value = true
                 _backStack.value = listOf(Screen.EXEMPTION_SELECT)
                 _currentScreen.value = Screen.EXEMPTION_SELECT
@@ -238,6 +239,7 @@ class AppViewModel : ViewModel() {
         try {
             val currentStack = _backStack.value
             if (currentStack.size > 1) {
+                _navigationTrigger.value++
                 _isNavigatingBack.value = true
                 val newStack = currentStack.dropLast(1)
                 _backStack.value = newStack

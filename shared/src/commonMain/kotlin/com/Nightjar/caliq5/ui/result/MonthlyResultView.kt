@@ -33,7 +33,7 @@ fun MonthlyResultContent(state: ResultDisplayState.MonthlyResult) {
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+            Box(modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
                 MainGradeBox(
                     title = "المعدل الفصلي${if (data.subjectName.isNotEmpty()) " لمادة ${data.subjectName}" else ""}",
                     grade = "${com.Nightjar.caliq5.ui.components.formatDecimalGrade(data.realAverage)}%",

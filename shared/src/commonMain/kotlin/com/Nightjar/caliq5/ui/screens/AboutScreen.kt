@@ -127,7 +127,7 @@ fun AboutScreen(viewModel: AppViewModel) {
             // App Description Card (dedicated at the top, max width 600.dp)
             item(key = "about_desc", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(1), contentAlignment = Alignment.Center) {
-                    Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+                    Box(modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
                         ResultCard {
                             Text(
                                 text = "تطبيق شامل ومطور خصيصاً لمساعدة الطلبة في العراق لحساب الإعفاء العام والفردي، السعي السنوي، المعدل الفصلي، ومتابعة الدرجات بدقة عالية وحفظها عبر ميزة (السجل الشامل).",
@@ -146,7 +146,7 @@ fun AboutScreen(viewModel: AppViewModel) {
                 val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(2), contentAlignment = Alignment.Center) {
                     Surface(
-                        modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth(),
+                        modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         color = MaterialTheme.colorScheme.surface,
                         border = BorderStroke(

@@ -117,19 +117,23 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
             override suspend fun onPreFling(available: Velocity): Velocity {
                 val current = overscrollOffset.value
                 if (current > 0f) {
-                    val shouldRest = if (isRestingInReachability) {
-                        available.y > -200f && current > triggerThreshold * 0.4f
+                    // Fluid Samsung One UI Reachability:
+                    // If pulled downward, stay smoothly at the pulled position or resting target without any artificial threshold snap.
+                    // If flung upward, smoothly return to 0.
+                    val targetValue = if (available.y < -150f) {
+                        0f
+                    } else if (available.y > 200f) {
+                        maxRestingTarget
                     } else {
-                        current >= triggerThreshold || available.y > 200f
+                        // Stay comfortably at the current pull position or maxRestingTarget (no forced snapping jump)
+                        if (current > maxRestingTarget) maxRestingTarget else current
                     }
-
-                    val targetValue = if (shouldRest) maxRestingTarget else 0f
-                    isRestingInReachability = shouldRest
+                    isRestingInReachability = targetValue > 0f
 
                     overscrollOffset.animateTo(
                         targetValue = targetValue,
                         animationSpec = spring(
-                            dampingRatio = 0.82f, // Pure fluid liquid spring without harsh rebound
+                            dampingRatio = 0.86f, // Silky fluid liquid spring without abrupt jumps
                             stiffness = Spring.StiffnessMediumLow
                         )
                     )
@@ -168,7 +172,7 @@ fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
     LaunchedEffect(currentNavTrigger) {
         if (!alreadyAnimated) {
             if (index > 0) {
-                kotlinx.coroutines.delay((index * 38L).coerceAtMost(300L))
+                kotlinx.coroutines.delay((index * 48L).coerceAtMost(380L))
             }
             lastTrigger = currentNavTrigger
             animProgress.animateTo(

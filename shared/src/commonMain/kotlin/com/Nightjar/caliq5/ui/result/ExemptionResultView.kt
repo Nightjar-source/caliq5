@@ -33,7 +33,7 @@ fun ExemptionResultContent(state: ResultDisplayState.ExemptionResult) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         // Main grade box centered alone at top with max 600dp
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Box(modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth()) {
+            Box(modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
                 MainGradeBox(
                     title = "المعدل العام للسعي السنوي",
                     grade = "${com.Nightjar.caliq5.ui.components.formatDecimalGrade(data.finalAverage)}%",

@@ -665,7 +665,7 @@ private fun MainContent(
                         modifier = Modifier.size(iconBtnSize)
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "رجوع",
                             modifier = Modifier.size(iconInnerSize)
                         )
