@@ -40,8 +40,11 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
 
         BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
-            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
+            val isCompactWindow = maxWidth < 520.dp
+            val isPhoneLandscape = isLandscape && (maxHeight < 500.dp && maxWidth >= 520.dp)
             val gridColumns = when {
+                isCompactWindow -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+                isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(3)
                 maxWidth >= 680.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(3)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }

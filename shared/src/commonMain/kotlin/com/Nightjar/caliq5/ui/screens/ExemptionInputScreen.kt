@@ -93,9 +93,11 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             val isWide = maxWidth >= 600.dp
             val isLandscape = maxWidth > maxHeight
-            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
-            // Official Compose Adaptive Layout: Dynamic multi-column adaptation without locking to 2 columns
+            // In split-screen / narrow windows (width < 500dp or height < 400dp in portrait), always single column (Fixed 1)
+            val isCompactWindow = maxWidth < 520.dp
+            val isPhoneLandscape = isLandscape && (maxHeight < 500.dp && maxWidth >= 520.dp)
             val gridColumns = when {
+                isCompactWindow -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                 maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 275.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
@@ -224,6 +226,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                             .popInOnInitialLoad(predefinedSubjects.size + index + 1),
                         contentAlignment = Alignment.Center
                     ) {
+                        val isLone = (predefinedSubjects.size + customSubjects.size) % 2 == 1 && index == customSubjects.lastIndex
                         CustomSubjectRow(
                             index = index,
                             entry = subject,
@@ -232,7 +235,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                             onGradeChange = { viewModel.updateCustomSubjectGrade(index, it) },
                             onDetailChange = { t1, mid, t2 -> viewModel.updateCustomSubjectDetailGrades(index, t1, mid, t2) },
                             onRemove = { viewModel.removeCustomSubject(index) },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = if (isLone) Modifier.widthIn(max = 380.dp).fillMaxWidth() else Modifier.fillMaxWidth()
                         )
                     }
                 }

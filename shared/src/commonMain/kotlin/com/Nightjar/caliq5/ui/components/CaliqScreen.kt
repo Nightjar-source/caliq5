@@ -29,7 +29,7 @@ fun CaliqScreen(
 ) {
 
     Surface(
-        modifier = Modifier.fillMaxSize().clipToBounds(),
+        modifier = Modifier.fillMaxSize(),
         color = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {
@@ -55,7 +55,6 @@ fun CaliqScreen(
                         .fillMaxWidth()
                         .imePadding()
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
-                        .clipToBounds()
                         .verticalScroll(scrollState)
                         .padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,

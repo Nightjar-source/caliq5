@@ -53,15 +53,17 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
     val scope = rememberCoroutineScope()
     var snapJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
 
-    // When keyboard appears, smoothly reset reachability offset to 0 so fields are never obscured
+    // Keep reachability position fluid when keyboard appears - imePadding handles the focused field elevation smoothly
     val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density) > 0
+    val imeBottom = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density)
     androidx.compose.runtime.LaunchedEffect(isImeVisible) {
         if (isImeVisible && overscrollOffset.value > 0f) {
-            isRestingInReachability = false
+            // Instead of an abrupt jump to 0, gently ease with a fluid spring only if overscrolled past safe space
+            val safeOffset = (overscrollOffset.value * 0.5f).coerceAtLeast(0f)
             overscrollOffset.animateTo(
-                targetValue = 0f,
+                targetValue = safeOffset,
                 animationSpec = spring(
-                    dampingRatio = 0.85f,
+                    dampingRatio = 0.86f,
                     stiffness = Spring.StiffnessMediumLow
                 )
             )

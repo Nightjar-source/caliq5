@@ -52,12 +52,14 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
         
         BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
-            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
+            val isCompactWindow = maxWidth < 520.dp
+            val isPhoneLandscape = isLandscape && (maxHeight < 500.dp && maxWidth >= 520.dp)
             val gridColumns = when {
+                isCompactWindow -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                 maxWidth >= 1050.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 250.dp)
                 maxWidth >= 720.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
-                maxWidth >= 540.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
@@ -76,8 +78,8 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
+            item(key = "monthly_explanation", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Box(modifier = Modifier.fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)).popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
                     Box(modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
                         FeatureExplanationCard(
                         icon = "calendar_today",
@@ -87,8 +89,8 @@ fun MonthlyAverageScreen(viewModel: AppViewModel) {
                 }
             }
 
-            item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
-                Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(1), contentAlignment = Alignment.Center) {
+            item(key = "monthly_name_field", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                Box(modifier = Modifier.fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)).popInOnInitialLoad(1), contentAlignment = Alignment.Center) {
                     GradeInputField(
                         label = "اسم المادة:",
                         value = subjectName,

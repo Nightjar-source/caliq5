@@ -1620,7 +1620,6 @@ fun CaliqConfirmationDialog(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = scrimAlpha))
-                .windowInsetsPadding(WindowInsets.safeDrawing)
 
                 .clickable(
 
