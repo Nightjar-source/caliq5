@@ -586,20 +586,22 @@ private fun MainContent(
                     .padding(contentPadding),
                 contentAlignment = Alignment.TopCenter
             ) {
-                when (screen) {
-                    Screen.EXEMPTION_SELECT -> ExemptionSelectScreen(viewModel)
-                    Screen.EXEMPTION_INPUT  -> ExemptionInputScreen(viewModel)
-                    Screen.ANNUAL_AVERAGE   -> AnnualAverageScreen(viewModel)
-                    Screen.MONTHLY_AVERAGE  -> MonthlyAverageScreen(viewModel)
-                    Screen.TERM2_CALCULATION -> Term2Screen(viewModel)
-                    Screen.STATISTICS       -> StatisticsScreen(viewModel)
-                    Screen.MY_GRADES        -> MyGradesScreen(viewModel)
-                    Screen.INSTRUCTIONS     -> InstructionsScreen(viewModel)
-                    Screen.ABOUT            -> AboutScreen(viewModel)
-                    Screen.NEWS             -> NewsScreen(viewModel)
-                    Screen.UPDATES          -> UpdatesScreen(viewModel)
-                    Screen.WIDGET           -> WidgetScreen(viewModel)
-                    Screen.APPEARANCE       -> AppearanceScreen(viewModel)
+                CompositionLocalProvider(com.Nightjar.caliq5.ui.components.LocalScreenNavigationTrigger provides navTrigger) {
+                    when (screen) {
+                        Screen.EXEMPTION_SELECT -> ExemptionSelectScreen(viewModel)
+                        Screen.EXEMPTION_INPUT  -> ExemptionInputScreen(viewModel)
+                        Screen.ANNUAL_AVERAGE   -> AnnualAverageScreen(viewModel)
+                        Screen.MONTHLY_AVERAGE  -> MonthlyAverageScreen(viewModel)
+                        Screen.TERM2_CALCULATION -> Term2Screen(viewModel)
+                        Screen.STATISTICS       -> StatisticsScreen(viewModel)
+                        Screen.MY_GRADES        -> MyGradesScreen(viewModel)
+                        Screen.INSTRUCTIONS     -> InstructionsScreen(viewModel)
+                        Screen.ABOUT            -> AboutScreen(viewModel)
+                        Screen.NEWS             -> NewsScreen(viewModel)
+                        Screen.UPDATES          -> UpdatesScreen(viewModel)
+                        Screen.WIDGET           -> WidgetScreen(viewModel)
+                        Screen.APPEARANCE       -> AppearanceScreen(viewModel)
+                    }
                 }
             }
         }
@@ -788,8 +790,8 @@ fun CaliqBottomNav(
         val navTotalWidth = maxWidth
         val isUltraCompact = navTotalWidth < 280.dp
         val isCompact = navTotalWidth < 360.dp
-        val barHeight = if (isUltraCompact) 40.dp else if (isCompact) 46.dp else 54.dp
-        val squircleSize = if (isUltraCompact) 32.dp else if (isCompact) 38.dp else 48.dp
+        val barHeight = if (isUltraCompact) 38.dp else if (isCompact) 44.dp else 48.dp
+        val squircleSize = if (isUltraCompact) 32.dp else if (isCompact) 38.dp else 44.dp
 
         // Neutral flat liquid indicator color (Material 3 Expressive flat pill that never clashes with icons or bar)
         val indicatorColor = if (isDark) {
@@ -818,7 +820,7 @@ fun CaliqBottomNav(
                 val tabWidthPx = with(LocalDensity.current) { tabWidth.toPx() }
                 val safeTabWidthPx = tabWidthPx.coerceAtLeast(1f)
                 val pillWidth = (tabWidth - 4.dp).coerceIn(18.dp, 62.dp)
-                val innerPillHeight = if (isUltraCompact) 32.dp else if (isCompact) 36.dp else 42.dp
+                val innerPillHeight = if (isUltraCompact) 30.dp else if (isCompact) 34.dp else 38.dp
 
                 var dragOffset by remember { mutableStateOf<Float?>(null) }
                 var lastValidIndex by remember { mutableIntStateOf(if (selectedIndex in 0..3) selectedIndex else 0) }

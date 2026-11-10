@@ -62,7 +62,7 @@ fun Term2Screen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
-                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().clipToBounds().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {

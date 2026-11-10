@@ -49,24 +49,36 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
     val density = androidx.compose.ui.platform.LocalDensity.current
     var componentHeight by remember { mutableStateOf(0f) }
     val overscrollOffset = remember { Animatable(0f) }
-    var isRestingInReachability by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var snapJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    var savedReachabilityOffset by remember { mutableStateOf(0f) }
 
     // Keep reachability position fluid when keyboard appears - imePadding handles the focused field elevation smoothly
     val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density) > 0
-    val imeBottom = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density)
     androidx.compose.runtime.LaunchedEffect(isImeVisible) {
-        if (isImeVisible && overscrollOffset.value > 0f) {
-            // Instead of an abrupt jump to 0, gently ease with a fluid spring only if overscrolled past safe space
-            val safeOffset = (overscrollOffset.value * 0.5f).coerceAtLeast(0f)
-            overscrollOffset.animateTo(
-                targetValue = safeOffset,
-                animationSpec = spring(
-                    dampingRatio = 0.86f,
-                    stiffness = Spring.StiffnessMediumLow
+        if (isImeVisible) {
+            if (overscrollOffset.value > 0f) {
+                savedReachabilityOffset = overscrollOffset.value
+                val targetOffset = (overscrollOffset.value * 0.45f).coerceAtLeast(0f)
+                overscrollOffset.animateTo(
+                    targetValue = targetOffset,
+                    animationSpec = spring(
+                        dampingRatio = 0.85f,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
                 )
-            )
+            }
+        } else {
+            if (savedReachabilityOffset > 0f) {
+                overscrollOffset.animateTo(
+                    targetValue = savedReachabilityOffset,
+                    animationSpec = spring(
+                        dampingRatio = 0.85f,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+                savedReachabilityOffset = 0f
+            }
         }
     }
 
@@ -74,12 +86,20 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
         val calculated = if (componentHeight > 0) componentHeight * 0.30f else 200.dp.toPx()
         calculated.coerceIn(150.dp.toPx(), 240.dp.toPx())
     }
-    val triggerThreshold = maxRestingTarget * 0.35f
 
     val nestedScrollConnection = remember(componentHeight, maxRestingTarget) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                // Do not intercept user scroll in onPreScroll so scrolling down/up within list remains 100% fluid with 0 friction!
+                if (source == NestedScrollSource.UserInput) {
+                    val current = overscrollOffset.value
+                    if (current > 0f && available.y < 0f) {
+                        val newOffset = (current + available.y).coerceAtLeast(0f)
+                        val consumedY = newOffset - current
+                        snapJob?.cancel()
+                        snapJob = scope.launch { overscrollOffset.snapTo(newOffset) }
+                        return Offset(0f, consumedY)
+                    }
+                }
                 return Offset.Zero
             }
 
@@ -91,25 +111,25 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                 val delta = available.y
                 if (source == NestedScrollSource.UserInput) {
                     val current = overscrollOffset.value
-                    // When pulling down at the top of the list (available.y > 0):
+                    // When pulling down at the top of the list:
                     if (delta > 0f) {
-                        val maxPull = maxRestingTarget * 1.25f
-                        val progress = (current / maxPull).coerceIn(0f, 1f)
-                        val resistance = 0.60f * (1f - progress * 0.60f)
-                        val target = (current + delta * resistance).coerceAtMost(maxPull)
-                        snapJob?.cancel()
-                        snapJob = scope.launch { overscrollOffset.snapTo(target) }
-                        return Offset(0f, delta)
+                        val maxPull = maxRestingTarget * 1.35f
+                        if (current < maxPull) {
+                            val progress = (current / maxPull).coerceIn(0f, 1f)
+                            val resistance = (1f - progress * 0.5f).coerceIn(0.45f, 1f)
+                            val target = (current + delta * resistance).coerceAtMost(maxPull)
+                            snapJob?.cancel()
+                            snapJob = scope.launch { overscrollOffset.snapTo(target) }
+                            return Offset(0f, delta)
+                        }
+                        return Offset.Zero
                     }
-                    // When scrolling up and child list has reached top (available.y < 0):
+                    // When scrolling up and child list has unconsumed delta (at the top):
                     else if (delta < 0f && current > 0f) {
                         val newOffset = (current + delta).coerceAtLeast(0f)
                         val consumedY = newOffset - current
                         snapJob?.cancel()
                         snapJob = scope.launch { overscrollOffset.snapTo(newOffset) }
-                        if (newOffset == 0f) {
-                            isRestingInReachability = false
-                        }
                         return Offset(0f, consumedY)
                     }
                 }
@@ -119,23 +139,16 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
             override suspend fun onPreFling(available: Velocity): Velocity {
                 val current = overscrollOffset.value
                 if (current > 0f) {
-                    // Fluid Samsung One UI Reachability:
-                    // If pulled downward, stay smoothly at the pulled position or resting target without any artificial threshold snap.
-                    // If flung upward, smoothly return to 0.
-                    val targetValue = if (available.y < -150f) {
+                    val targetValue = if (available.y < -1200f) {
                         0f
-                    } else if (available.y > 200f) {
-                        maxRestingTarget
                     } else {
-                        // Stay comfortably at the current pull position or maxRestingTarget (no forced snapping jump)
                         if (current > maxRestingTarget) maxRestingTarget else current
                     }
-                    isRestingInReachability = targetValue > 0f
 
                     overscrollOffset.animateTo(
                         targetValue = targetValue,
                         animationSpec = spring(
-                            dampingRatio = 0.86f, // Silky fluid liquid spring without abrupt jumps
+                            dampingRatio = 0.88f,
                             stiffness = Spring.StiffnessMediumLow
                         )
                     )
@@ -174,14 +187,14 @@ fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
     LaunchedEffect(currentNavTrigger) {
         if (!alreadyAnimated) {
             if (index > 0) {
-                kotlinx.coroutines.delay((index * 48L).coerceAtMost(380L))
+                kotlinx.coroutines.delay((index * 65L).coerceAtMost(450L))
             }
             lastTrigger = currentNavTrigger
             animProgress.animateTo(
                 targetValue = 1f,
                 animationSpec = spring(
-                    dampingRatio = 0.80f,
-                    stiffness = Spring.StiffnessMediumLow
+                    dampingRatio = 0.84f,
+                    stiffness = Spring.StiffnessLow
                 )
             )
         }
@@ -191,7 +204,7 @@ fun Modifier.popInOnInitialLoad(index: Int = 0): Modifier = composed {
         val progress = animProgress.value.coerceIn(0f, 1f)
         if (progress < 1f) {
             this.alpha = progress
-            this.translationY = (1f - progress) * 22.dp.toPx()
+            this.translationY = (1f - progress) * 26.dp.toPx()
             this.scaleX = 0.96f + 0.04f * progress
             this.scaleY = 0.96f + 0.04f * progress
             this.clip = false

@@ -63,7 +63,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = dynamicBottomPadding, top = topSafeInset + 65.dp),
-                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().clipToBounds().padding(horizontal = 16.dp)
+                modifier = Modifier.widthIn(max = containerMaxWidth).fillMaxWidth().imePadding().padding(horizontal = 16.dp)
             ) {
             item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().popInOnInitialLoad(0), contentAlignment = Alignment.Center) {
@@ -96,7 +96,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                         label = "الفصل الأول:",
                         value = term1,
                         onValueChange = { viewModel.updateAnnualField("term1", it) },
-                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
@@ -107,7 +107,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                         label = "نصف السنة:",
                         value = midYear,
                         onValueChange = { viewModel.updateAnnualField("midYear", it) },
-                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
@@ -118,7 +118,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                         label = "الفصل الثاني:",
                         value = term2,
                         onValueChange = { viewModel.updateAnnualField("term2", it) },
-                        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

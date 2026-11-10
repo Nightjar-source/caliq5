@@ -128,7 +128,6 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                     .widthIn(max = containerMaxWidth)
                     .fillMaxWidth()
                     .imePadding()
-                    .clipToBounds()
                     .padding(horizontal = 16.dp),
                 contentPadding = PaddingValues(
                     top = topSafeInset + 115.dp,
@@ -235,7 +234,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                             onGradeChange = { viewModel.updateCustomSubjectGrade(index, it) },
                             onDetailChange = { t1, mid, t2 -> viewModel.updateCustomSubjectDetailGrades(index, t1, mid, t2) },
                             onRemove = { viewModel.removeCustomSubject(index) },
-                            modifier = if (isLone) Modifier.widthIn(max = 380.dp).fillMaxWidth() else Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

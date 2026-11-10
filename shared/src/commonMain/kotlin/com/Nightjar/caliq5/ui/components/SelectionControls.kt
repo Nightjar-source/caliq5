@@ -552,10 +552,10 @@ fun CaliqPrimaryButton(
 
             .graphicsLayer { scaleX = scale; scaleY = scale },
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 1.5.dp,
+            defaultElevation = 0.dp,
             pressedElevation = 0.dp,
-            hoveredElevation = 2.dp,
-            focusedElevation = 1.dp
+            hoveredElevation = 0.dp,
+            focusedElevation = 0.dp
         ),
 
         shape = animatedShape,
@@ -948,7 +948,7 @@ fun CaliqButton(
 
     colors: ButtonColors = ButtonDefaults.buttonColors(),
 
-    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp, hoveredElevation = 0.dp, focusedElevation = 0.dp),
 
     border: BorderStroke? = null,
 
@@ -1598,17 +1598,11 @@ fun CaliqConfirmationDialog(
             isDismissing = true
             coroutineScope.launch {
                 isVisible = false
-                delay(175)
+                delay(180)
                 action()
             }
         }
     }
-
-    val scrimAlpha by animateFloatAsState(
-        targetValue = if (isVisible) 0.50f else 0.0f,
-        animationSpec = tween(durationMillis = 170, easing = androidx.compose.animation.core.FastOutSlowInEasing),
-        label = "dialog_scrim_fade"
-    )
 
     androidx.compose.ui.window.Dialog(
         onDismissRequest = { dismissWithAnim(onDismiss) },
@@ -1619,20 +1613,12 @@ fun CaliqConfirmationDialog(
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = scrimAlpha))
-
                 .clickable(
-
                     interactionSource = remember { MutableInteractionSource() },
-
                     indication = null,
-
                     onClick = { dismissWithAnim(onDismiss) }
-
                 ),
-
             contentAlignment = Alignment.Center
-
         ) {
 
             val isCompact = maxWidth < 340.dp
@@ -1651,7 +1637,7 @@ fun CaliqConfirmationDialog(
                 enter = fadeIn(animationSpec = tween(180, easing = androidx.compose.animation.core.LinearOutSlowInEasing)) + 
                         scaleIn(initialScale = 0.90f, animationSpec = spring(dampingRatio = 0.80f, stiffness = Spring.StiffnessMediumLow)),
                 exit = fadeOut(animationSpec = tween(150, easing = androidx.compose.animation.core.FastOutLinearInEasing)) + 
-                       scaleOut(targetScale = 0.92f, animationSpec = tween(150, easing = androidx.compose.animation.core.FastOutLinearInEasing))
+                       scaleOut(targetScale = 0.92f, animationSpec = spring(dampingRatio = 0.85f, stiffness = Spring.StiffnessMediumLow))
             ) {
                 Surface(
                     modifier = Modifier

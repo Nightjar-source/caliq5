@@ -46,8 +46,10 @@ fun AboutScreen(viewModel: AppViewModel) {
     CaliqScreen(title = "حول التطبيق", onBack = { viewModel.goBack() }, scrollable = false) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
-            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
+            val isCompactWindow = maxWidth < 520.dp
+            val isPhoneLandscape = isLandscape && (maxHeight < 500.dp && maxWidth >= 520.dp)
             val gridColumns = when {
+                isCompactWindow -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                 maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 340.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)

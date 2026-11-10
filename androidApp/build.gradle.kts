@@ -17,8 +17,8 @@ android {
         applicationId = "com.Nightjar.caliq5"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 51479
-        versionName = "5.14.79"
+        versionCode = 51480
+        versionName = "5.14.80"
     }
 
     buildFeatures {
@@ -43,9 +43,9 @@ android {
         FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
     }
 
-    val admobAppId = keystoreProperties.getProperty("ADMOB_APP_ID") ?: "ca-app-pub-3593249939342878~2941058294"
-    val admobBannerId = keystoreProperties.getProperty("ADMOB_BANNER_ID") ?: "ca-app-pub-3593249939342878/3220355352"
-    val admobInterstitialId = keystoreProperties.getProperty("ADMOB_INTERSTITIAL_ID") ?: "ca-app-pub-3593249939342878/3723093244"
+    val admobAppId = keystoreProperties.getProperty("ADMOB_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713"
+    val admobBannerId = keystoreProperties.getProperty("ADMOB_BANNER_ID") ?: "ca-app-pub-3940256099942544/9214589741"
+    val admobInterstitialId = keystoreProperties.getProperty("ADMOB_INTERSTITIAL_ID") ?: "ca-app-pub-3940256099942544/1033173712"
 
     defaultConfig {
         manifestPlaceholders["ADMOB_APP_ID"] = admobAppId

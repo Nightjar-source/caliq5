@@ -235,12 +235,14 @@ fun MyGradesScreen(viewModel: AppViewModel) {
             CaliqScreen(title = "درجاتي (السجل الشامل)", onBack = { viewModel.goBack() }, scrollable = false, oneUiReachabilityEnabled = true) {
                 BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                     val isLandscape = maxWidth > maxHeight
-                    val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
+                    val isCompactWindow = maxWidth < 520.dp
+                    val isPhoneLandscape = isLandscape && (maxHeight < 500.dp && maxWidth >= 520.dp)
                     val gridColumns = when {
-                isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
-                else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
-            }
+                        isCompactWindow -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+                        isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
+                        maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
+                        else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
+                    }
 
                     val containerMaxWidth = when {
                         maxWidth >= 1400.dp -> 1320.dp
@@ -684,8 +686,10 @@ fun StudentEditView(
     CaliqScreen(title = if (student == null) "إضافة سجل درجاتي (السجل الشامل)" else "تعديل سجل درجاتي (السجل الشامل)", onBack = { if (hasUnsavedChanges) showUnsavedDialog = true else onCancel() }, scrollable = false, oneUiReachabilityEnabled = true) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
-            val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
+            val isCompactWindow = maxWidth < 520.dp
+            val isPhoneLandscape = isLandscape && (maxHeight < 500.dp && maxWidth >= 520.dp)
             val gridColumns = when {
+                isCompactWindow -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
                 maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 280.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
