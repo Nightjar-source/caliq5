@@ -2,6 +2,7 @@ package com.Nightjar.caliq5.ads
 
 import android.app.Activity
 import android.content.Context
+import android.view.ViewGroup
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -39,8 +40,73 @@ object CaliqAdsManager {
     private var isAdLoading = false
     private var calculationCount = 0
 
-    // Official Google Mobile Ads Test Interstitial ID fallback
+    // Cached Banner AdView instance to prevent ad reloading on keyboard toggle or navigation
+    private var cachedAdView: AdView? = null
+    var isBannerLoaded = false
+        private set
+
+    // Official Google Mobile Ads Test Unit IDs fallback
     private const val FALLBACK_TEST_INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712"
+    private const val FALLBACK_TEST_BANNER = "ca-app-pub-3940256099942544/9214589741"
+
+    /**
+     * Reuses the existing loaded Banner AdView to guarantee that the ad NEVER reloads
+     * every time the virtual keyboard opens or closes.
+     */
+    fun getOrCreateBannerAdView(context: Context, onLoadedChange: (Boolean) -> Unit): AdView {
+        val existing = cachedAdView
+        if (existing != null) {
+            (existing.parent as? ViewGroup)?.removeView(existing)
+            onLoadedChange(isBannerLoaded)
+            return existing
+        }
+
+        val adView = AdView(context)
+        val bannerId = try {
+            BuildConfig.ADMOB_BANNER_ID.ifBlank { FALLBACK_TEST_BANNER }
+        } catch (_: Throwable) {
+            FALLBACK_TEST_BANNER
+        }
+        adView.adUnitId = bannerId
+
+        val displayMetrics = context.resources.displayMetrics
+        val widthPixels = displayMetrics.widthPixels.toFloat()
+        val density = displayMetrics.density
+        val rawWidth = (widthPixels / density).toInt()
+
+        val adSize = if (rawWidth >= 728) {
+            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, 728)
+        } else if (rawWidth >= 600) {
+            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, rawWidth.coerceAtMost(640))
+        } else {
+            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, rawWidth)
+        }
+        adView.setAdSize(adSize)
+
+        adView.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                isBannerLoaded = true
+                onLoadedChange(true)
+            }
+            override fun onAdFailedToLoad(error: LoadAdError) {
+                isBannerLoaded = false
+                onLoadedChange(false)
+            }
+        }
+
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+        cachedAdView = adView
+        return adView
+    }
+
+    fun destroyBanner() {
+        try {
+            cachedAdView?.destroy()
+            cachedAdView = null
+            isBannerLoaded = false
+        } catch (_: Throwable) {}
+    }
 
     fun loadInterstitial(context: Context) {
         if (interstitialAd != null || isAdLoading) return
@@ -109,7 +175,7 @@ object CaliqAdsManager {
 /**
  * Material 3 Expressive Adaptive Banner Ad:
  * - Fluid oval/capsule shape (CircleShape).
- * - AndroidView is always composed so ad loads reliably in the background without Compose lifecycle traps.
+ * - Preserved across virtual keyboard toggles without re-requesting ads.
  * - Zero height & zero alpha while loading so no empty gap or blank border is shown.
  * - Graceful fade-in once loaded without jumping or layout shift.
  */
@@ -117,7 +183,7 @@ object CaliqAdsManager {
 fun CaliqAdaptiveBanner(
     modifier: Modifier = Modifier
 ) {
-    var isAdLoaded by remember { mutableStateOf(false) }
+    var isAdLoaded by remember { mutableStateOf(CaliqAdsManager.isBannerLoaded) }
     val isDark = isSystemInDarkTheme()
 
     val alphaAnim by animateFloatAsState(
@@ -157,45 +223,16 @@ fun CaliqAdaptiveBanner(
                 AndroidView(
                     modifier = Modifier.wrapContentSize(),
                     factory = { context ->
-                        val adView = AdView(context)
-                        val bannerId = try {
-                            BuildConfig.ADMOB_BANNER_ID.ifBlank { "ca-app-pub-3940256099942544/9214589741" }
-                        } catch (_: Throwable) {
-                            "ca-app-pub-3940256099942544/9214589741"
+                        CaliqAdsManager.getOrCreateBannerAdView(context) { loaded ->
+                            isAdLoaded = loaded
                         }
-                        adView.adUnitId = bannerId
-
-                        val displayMetrics = context.resources.displayMetrics
-                        val widthPixels = displayMetrics.widthPixels.toFloat()
-                        val density = displayMetrics.density
-                        val rawWidth = (widthPixels / density).toInt()
-
-                        val adSize = if (rawWidth >= 728) {
-                            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, 728)
-                        } else if (rawWidth >= 600) {
-                            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, rawWidth.coerceAtMost(640))
-                        } else {
-                            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, rawWidth)
-                        }
-
-                        adView.setAdSize(adSize)
-                        adView.adListener = object : AdListener() {
-                            override fun onAdLoaded() {
-                                isAdLoaded = true
-                            }
-                            override fun onAdFailedToLoad(error: LoadAdError) {
-                                isAdLoaded = false
-                            }
-                        }
-                        val adRequest = AdRequest.Builder().build()
-                        adView.loadAd(adRequest)
-                        adView
                     },
                     update = {
-                        // Keep ad active
+                        // View stays active without reloading
                     },
                     onRelease = { adView ->
-                        adView.destroy()
+                        (adView.parent as? ViewGroup)?.removeView(adView)
+                        // Preserved in memory across keyboard & navigation states
                     }
                 )
             }

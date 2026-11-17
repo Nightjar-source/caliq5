@@ -196,6 +196,7 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         try {
+            com.Nightjar.caliq5.ads.CaliqAdsManager.destroyBanner()
             CaliqCleanupService.purgeAppCache(applicationContext)
             com.Nightjar.caliq5.utils.MemoryManager.deepPurgeMemory(this)
         } catch (_: Throwable) {}
