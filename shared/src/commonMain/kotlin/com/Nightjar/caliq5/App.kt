@@ -29,6 +29,7 @@ fun App(
     deepLinkUri: String? = null,
     isRestoredFromProcessDeath: Boolean = false,
     adBanner: @Composable () -> Unit = {},
+    onShowInterstitial: (() -> Unit)? = null,
     onSplashFinishedAction: (() -> Unit)? = null,
     onDeepLinkConsumed: (() -> Unit)? = null
 ) {
@@ -87,7 +88,11 @@ fun App(
                         }
                     )
                 } else {
-                    AppNavigation(viewModel = viewModel, adBanner = adBanner)
+                    AppNavigation(
+                        viewModel = viewModel,
+                        adBanner = adBanner,
+                        onShowInterstitial = onShowInterstitial
+                    )
                 }
             }
         }

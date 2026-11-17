@@ -46,13 +46,17 @@ class MainActivity : ComponentActivity() {
             startService(android.content.Intent(this, CaliqCleanupService::class.java))
         } catch (_: Throwable) {}
 
-        // Initialize Google Mobile Ads SDK & sync widget theme asynchronously
+        // Initialize Google Mobile Ads SDK on main thread as required by AdMob SDK
+        try {
+            com.google.android.gms.ads.MobileAds.initialize(this) {
+                com.Nightjar.caliq5.ads.CaliqAdsManager.loadInterstitial(this@MainActivity)
+            }
+        } catch (_: Throwable) {}
+
+        // Baseline Profile installer & widget theme sync asynchronously on background
         kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
             try {
-                // AOT Baseline Profile installer: compile DEX profile ahead of time to eliminate initial animation stutter
                 androidx.profileinstaller.ProfileInstaller.writeProfile(this@MainActivity)
-                com.google.android.gms.ads.MobileAds.initialize(this@MainActivity) {}
-                com.Nightjar.caliq5.ads.CaliqAdsManager.loadInterstitial(this@MainActivity)
                 com.Nightjar.caliq5.widget.updateAppWidget()
             } catch (_: Throwable) {}
         }
@@ -66,6 +70,9 @@ class MainActivity : ComponentActivity() {
                 isRestoredFromProcessDeath = savedInstanceState != null,
                 adBanner = {
                     com.Nightjar.caliq5.ads.CaliqAdaptiveBanner()
+                },
+                onShowInterstitial = {
+                    com.Nightjar.caliq5.ads.CaliqAdsManager.onCalculationResultShown(this@MainActivity)
                 },
                 onDeepLinkConsumed = { deepLinkUri.value = null },
                 onSplashFinishedAction = {

@@ -75,6 +75,7 @@ fun AppNavigation(
     viewModel: AppViewModel,
     isTablet: Boolean = false,
     adBanner: @Composable () -> Unit = {},
+    onShowInterstitial: (() -> Unit)? = null
 ) {
     val currentScreen by viewModel.currentScreen.collectAsState()
     val showSideMenu by viewModel.showSideMenu.collectAsState()
@@ -82,6 +83,13 @@ fun AppNavigation(
     val snackbarMessage by viewModel.snackbarMessage.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val canGoBack by viewModel.canGoBack.collectAsState()
+
+    // Trigger interstitial ad once calculation result appears
+    LaunchedEffect(resultState) {
+        if (resultState != null) {
+            onShowInterstitial?.invoke()
+        }
+    }
 
     val editingStudentMode by viewModel.editingStudentMode.collectAsState()
 
@@ -239,46 +247,50 @@ fun AppNavigation(
 
             // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively at bottom center)
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
-            if (isWideScreen && resultState == null) {
+            if (isWideScreen && resultState == null && !isImeVisible) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .zIndex(10f)
                         .windowInsetsPadding(safeBottomInsets)
-                        .padding(bottom = 4.dp)
+                        .padding(bottom = 6.dp)
                 ) {
                     adBanner()
                 }
             }
 
             // Dynamic Adaptive Bottom Navigation (Phone Portrait)
+            // Anchored securely UNDER virtual keyboard; hides smoothly when keyboard appears so it never rises above it
             val isMainTab = currentScreen in listOf(
                 Screen.EXEMPTION_SELECT,
                 Screen.ANNUAL_AVERAGE,
                 Screen.MONTHLY_AVERAGE,
                 Screen.TERM2_CALCULATION
             )
-            val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen && resultState == null
+            val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen && resultState == null && !isImeVisible
 
-            // Decoupled phone banner vertical offset: sits cleanly above CaliqBottomNav when visible, slides to bottom when hidden
-            val phoneBannerBottomOffset by animateDpAsState(
-                targetValue = if (isBottomNavVisible) 68.dp else 8.dp,
-                animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
-                label = "phone_banner_bottom_offset"
-            )
+            // Banner visibility strictly synchronized with the navigation bar:
+            // Hides and slides down together whenever the navigation bar hides or keyboard appears
+            val isBannerVisible = !isWideScreen && resultState == null && !isImeVisible && isBottomNavVisible
 
-            // Persistent AdMob Adaptive Banner across all main & sub-screens (Phone Portrait)
-            // Independent of bottom nav container to guarantee ZERO jumping/re-measurement jitter
+            // Persistent AdMob Adaptive Banner docked directly above CaliqBottomNav (Phone Portrait)
+            // Synchronized slide and fade animation with CaliqBottomNav
             AnimatedVisibility(
-                visible = resultState == null && !isWideScreen,
-                enter = fadeIn(tween(250)),
-                exit = fadeOut(tween(150)),
+                visible = isBannerVisible,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeIn(animationSpec = tween(250)),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
+                ) + fadeOut(animationSpec = tween(200)),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .zIndex(10f)
                     .fillMaxWidth()
                     .windowInsetsPadding(safeBottomInsets)
-                    .padding(bottom = phoneBannerBottomOffset)
+                    .padding(bottom = 68.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -291,7 +303,7 @@ fun AppNavigation(
             }
 
             // Dynamic Adaptive Bottom Navigation (Phone Portrait)
-            // Pinned securely to BottomCenter with safeBottomInsets, remaining completely anchored under keyboard with zero jitter
+            // Stays anchored under the keyboard with safeBottomInsets, sliding down when keyboard opens
             AnimatedVisibility(
                 visible = isBottomNavVisible,
                 enter = slideInVertically(

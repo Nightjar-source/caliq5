@@ -47,10 +47,15 @@
 -keep class com.google.android.gms.internal.ads.** { *; }
 -keep interface com.google.android.gms.internal.ads.** { *; }
 -keep class com.Nightjar.caliq5.ads.** { *; }
+-keepclassmembers class com.Nightjar.caliq5.ads.** { *; }
 -keepclassmembers class com.google.android.gms.ads.** { *; }
+-keepclassmembers class * extends com.google.android.gms.ads.AdListener { *; }
+-keepclassmembers class * extends com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback { *; }
+-keepclassmembers class * extends com.google.android.gms.ads.FullScreenContentCallback { *; }
 -keepclassmembers class * extends android.webkit.WebViewClient { *; }
 -keepclassmembers class * extends android.webkit.WebChromeClient { *; }
 -dontwarn com.google.android.gms.ads.**
+-dontwarn com.google.android.gms.internal.ads.**
 
 # 7. Compose Animations, Transitions, Spring Physics & Specular Graphics Layer Effects
 # Preserves Jetpack Compose animation runtime, spring specifications, and custom graphics modifiers
