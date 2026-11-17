@@ -245,7 +245,7 @@ fun AppNavigation(
                 .exclude(WindowInsets.ime)
                 .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
 
-            // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively on main tabs only)
+            // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively across all screens)
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             val isMainTab = currentScreen in listOf(
                 Screen.EXEMPTION_SELECT,
@@ -255,11 +255,10 @@ fun AppNavigation(
             )
             val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen && resultState == null && !isImeVisible
 
-            // Banner visibility strictly synchronized with the navigation bar:
-            // Only visible on main screens when navigation bar is active;
-            // Smoothly hides and slides down on all secondary screens, result screen, or when keyboard opens!
-            val isBannerVisible = !isWideScreen && resultState == null && !isImeVisible && isBottomNavVisible
-            val isWideBannerVisible = isWideScreen && resultState == null && !isImeVisible && isMainTab && !isNavHidden
+            // Banner is visible across ALL screens (main & sub-screens),
+            // smoothly hides only when keyboard is open or when result overlay is displayed
+            val isBannerVisible = !isWideScreen && resultState == null && !isImeVisible
+            val isWideBannerVisible = isWideScreen && resultState == null && !isImeVisible
 
             if (isWideBannerVisible) {
                 Box(
@@ -273,8 +272,17 @@ fun AppNavigation(
                 }
             }
 
-            // Persistent AdMob Adaptive Banner docked directly above CaliqBottomNav (Phone Portrait)
-            // Minimal height, seamlessly paired with CaliqBottomNav lifecycle
+            // Dynamic adaptive bottom offset for phone banner:
+            // Sits at 62.dp when CaliqBottomNav is present;
+            // Smoothly glides down to 4.dp on sub-screens where CaliqBottomNav is hidden!
+            val phoneBannerBottomOffset by animateDpAsState(
+                targetValue = if (isBottomNavVisible) 62.dp else 4.dp,
+                animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
+                label = "phone_banner_bottom_offset"
+            )
+
+            // Persistent AdMob Adaptive Banner (Phone Portrait)
+            // Sits above navigation bar on main tabs, and rests at bottom on all sub-screens
             AnimatedVisibility(
                 visible = isBannerVisible,
                 enter = slideInVertically(
@@ -290,7 +298,7 @@ fun AppNavigation(
                     .zIndex(10f)
                     .fillMaxWidth()
                     .windowInsetsPadding(safeBottomInsets)
-                    .padding(bottom = 62.dp)
+                    .padding(bottom = phoneBannerBottomOffset)
             ) {
                 Box(
                     modifier = Modifier
