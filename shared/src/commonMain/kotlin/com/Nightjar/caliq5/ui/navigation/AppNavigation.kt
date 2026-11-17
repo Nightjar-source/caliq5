@@ -245,22 +245,8 @@ fun AppNavigation(
                 .exclude(WindowInsets.ime)
                 .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
 
-            // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively at bottom center)
+            // Adaptive AdMob Banner in Wide Screens / Landscape (Docked non-intrusively on main tabs only)
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
-            if (isWideScreen && resultState == null && !isImeVisible) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .zIndex(10f)
-                        .windowInsetsPadding(safeBottomInsets)
-                        .padding(bottom = 6.dp)
-                ) {
-                    adBanner()
-                }
-            }
-
-            // Dynamic Adaptive Bottom Navigation (Phone Portrait)
-            // Anchored securely UNDER virtual keyboard; hides smoothly when keyboard appears so it never rises above it
             val isMainTab = currentScreen in listOf(
                 Screen.EXEMPTION_SELECT,
                 Screen.ANNUAL_AVERAGE,
@@ -270,11 +256,25 @@ fun AppNavigation(
             val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen && resultState == null && !isImeVisible
 
             // Banner visibility strictly synchronized with the navigation bar:
-            // Hides and slides down together whenever the navigation bar hides or keyboard appears
+            // Only visible on main screens when navigation bar is active;
+            // Smoothly hides and slides down on all secondary screens, result screen, or when keyboard opens!
             val isBannerVisible = !isWideScreen && resultState == null && !isImeVisible && isBottomNavVisible
+            val isWideBannerVisible = isWideScreen && resultState == null && !isImeVisible && isMainTab && !isNavHidden
+
+            if (isWideBannerVisible) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .zIndex(10f)
+                        .windowInsetsPadding(safeBottomInsets)
+                        .padding(bottom = 4.dp)
+                ) {
+                    adBanner()
+                }
+            }
 
             // Persistent AdMob Adaptive Banner docked directly above CaliqBottomNav (Phone Portrait)
-            // Synchronized slide and fade animation with CaliqBottomNav
+            // Minimal height, seamlessly paired with CaliqBottomNav lifecycle
             AnimatedVisibility(
                 visible = isBannerVisible,
                 enter = slideInVertically(
@@ -290,7 +290,7 @@ fun AppNavigation(
                     .zIndex(10f)
                     .fillMaxWidth()
                     .windowInsetsPadding(safeBottomInsets)
-                    .padding(bottom = 68.dp)
+                    .padding(bottom = 62.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -360,8 +360,7 @@ fun AppNavigation(
                     title = result.title,
                     content = result,
                     onClose = { viewModel.hideResult() },
-                    onExportPdf = { viewModel.exportToPdf(viewModel.resultState.value ?: result) },
-                    adBanner = adBanner,
+                    onExportPdf = { viewModel.exportToPdf(viewModel.resultState.value ?: result) }
                 )
             }
         }

@@ -196,7 +196,7 @@ fun CaliqAdaptiveBanner(
         modifier = modifier
             .fillMaxWidth()
             .then(
-                if (isAdLoaded) Modifier.padding(vertical = 3.dp)
+                if (isAdLoaded) Modifier.padding(vertical = 1.dp)
                 else Modifier.height(1.dp).graphicsLayer { alpha = 0f }
             ),
         contentAlignment = Alignment.Center
@@ -205,7 +205,7 @@ fun CaliqAdaptiveBanner(
             shape = CircleShape,
             color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.88f else 0.94f),
             border = BorderStroke(
-                width = 1.dp,
+                width = 0.8.dp,
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.28f else 0.40f)
             ),
             shadowElevation = 0.dp,
@@ -216,7 +216,7 @@ fun CaliqAdaptiveBanner(
         ) {
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
+                    .padding(horizontal = 4.dp, vertical = 0.5.dp)
                     .wrapContentSize(),
                 contentAlignment = Alignment.Center
             ) {

@@ -45,7 +45,6 @@ fun ResultOverlay(
     content: ResultDisplayState,
     onClose: () -> Unit,
     onExportPdf: () -> Unit,
-    adBanner: @Composable () -> Unit = {},
 ) {
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
     LaunchedEffect(Unit) {
@@ -247,17 +246,6 @@ fun ResultOverlay(
                         modifier = Modifier.size(iconInnerSize)
                     )
                 }
-            }
-
-            // 4. Persistent AdMob Adaptive Banner at bottom center of Result Screen
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)),
-                contentAlignment = Alignment.Center
-            ) {
-                adBanner()
             }
         }
     }
