@@ -18,9 +18,9 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Dmg, TargetFormat.Deb)
-            packageName = "Caliq 5"
+            packageName = "Caliq5"
             packageVersion = "5.14.86"
-            description = "حاسبة الإعفاء والسعي لطلاب وطالبات العراق - كاليك 5"
+            description = "Caliq 5 - Iraqi School Exemption and GPA Calculator"
             vendor = "Nightjar"
 
             windows {

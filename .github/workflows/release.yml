@@ -143,8 +143,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build Windows Installer (MSI & Distributable)
-        run: ./gradlew :desktopApp:packageMsi :desktopApp:createDistributable --no-daemon --stacktrace
+      - name: Build Windows Standalone App (EXE & Distributable)
+        run: ./gradlew :desktopApp:createDistributable --no-daemon --stacktrace
 
       - name: Package Portable Windows ZIP
         shell: pwsh
@@ -158,17 +158,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: caliq5-windows-desktop
-          path: |
-            desktopApp/build/compose/binaries/main/msi/*.msi
-            caliq5-windows-portable.zip
+          path: caliq5-windows-portable.zip
 
       - name: Attach Windows Build to Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            desktopApp/build/compose/binaries/main/msi/*.msi
-            caliq5-windows-portable.zip
+          files: caliq5-windows-portable.zip
 
   build-pwa:
     name: Build PWA Web App (WasmJs)

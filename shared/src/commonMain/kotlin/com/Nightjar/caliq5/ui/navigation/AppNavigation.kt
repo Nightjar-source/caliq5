@@ -137,10 +137,12 @@ fun AppNavigation(
         viewModel.handleTopBarBack()
     }
 
-    // Official Material 3 Adaptive Window & Posture Calculation
+    // Official Material 3 Adaptive Window & Posture Calculation (Foldables & Flex Mode)
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val adaptiveWindowSizeClass = adaptiveInfo.windowSizeClass
     val isTabletop = adaptiveInfo.windowPosture.isTabletop
+    val horizontalHinge = adaptiveInfo.windowPosture.hingeList.firstOrNull { !it.isVertical }
+    val verticalHinge = adaptiveInfo.windowPosture.hingeList.firstOrNull { it.isVertical && it.isSeparating }
 
     val navTrigger by viewModel.navigationTrigger.collectAsState()
     CompositionLocalProvider(
@@ -151,8 +153,11 @@ fun AppNavigation(
         val density = LocalDensity.current
         val containerWidth = if (maxWidth > 0.dp) maxWidth else with(density) { windowInfo.containerSize.width.toDp() }.coerceAtLeast(1.dp)
         val containerHeight = if (maxHeight > 0.dp) maxHeight else with(density) { windowInfo.containerSize.height.toDp() }.coerceAtLeast(1.dp)
-        val isWideScreen = containerWidth >= 600.dp
+        val isWideScreen = containerWidth >= 600.dp || verticalHinge != null
         val isLandscape = containerWidth > containerHeight && containerHeight < 500.dp
+        val tabletopBottomReserve = if (isTabletop && horizontalHinge != null) {
+            with(density) { (horizontalHinge.bounds.bottom - horizontalHinge.bounds.top).toDp() }.coerceAtLeast(16.dp)
+        } else 0.dp
         val targetRailWidth = when {
             containerWidth >= 840.dp -> 72.dp
             containerWidth >= 600.dp -> 64.dp
@@ -195,7 +200,8 @@ fun AppNavigation(
                 viewModel = viewModel,
                 contentPadding = PaddingValues(
                     start = contentStartPad.coerceAtLeast(0.dp),
-                    end = contentEndPad.coerceAtLeast(0.dp)
+                    end = contentEndPad.coerceAtLeast(0.dp),
+                    bottom = tabletopBottomReserve
                 ),
                 isWideScreen = isWideScreen
             )
