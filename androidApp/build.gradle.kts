@@ -17,8 +17,8 @@ android {
         applicationId = "com.Nightjar.caliq5"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 51485
-        versionName = "5.14.85"
+        versionCode = 51486
+        versionName = "5.14.86"
     }
 
     buildFeatures {
@@ -43,9 +43,18 @@ android {
         FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
     }
 
-    val admobAppId = keystoreProperties.getProperty("ADMOB_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713"
-    val admobBannerId = keystoreProperties.getProperty("ADMOB_BANNER_ID") ?: "ca-app-pub-3940256099942544/9214589741"
-    val admobInterstitialId = keystoreProperties.getProperty("ADMOB_INTERSTITIAL_ID") ?: "ca-app-pub-3940256099942544/1033173712"
+    val admobAppId = System.getenv("ADMOB_APP_ID")
+        ?: keystoreProperties.getProperty("ADMOB_APP_ID")
+        ?: (project.findProperty("ADMOB_APP_ID") as? String)
+        ?: "ca-app-pub-3940256099942544~3347511713"
+    val admobBannerId = System.getenv("ADMOB_BANNER_ID")
+        ?: keystoreProperties.getProperty("ADMOB_BANNER_ID")
+        ?: (project.findProperty("ADMOB_BANNER_ID") as? String)
+        ?: "ca-app-pub-3940256099942544/9214589741"
+    val admobInterstitialId = System.getenv("ADMOB_INTERSTITIAL_ID")
+        ?: keystoreProperties.getProperty("ADMOB_INTERSTITIAL_ID")
+        ?: (project.findProperty("ADMOB_INTERSTITIAL_ID") as? String)
+        ?: "ca-app-pub-3940256099942544/1033173712"
 
     defaultConfig {
         manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
@@ -91,6 +100,10 @@ android {
     kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
+            optIn.addAll(
+                "androidx.compose.foundation.layout.ExperimentalLayoutApi",
+                "androidx.compose.material3.ExperimentalMaterial3Api"
+            )
         }
     }
 
@@ -102,8 +115,11 @@ android {
 
 dependencies {
     implementation(project(":shared"))
-    implementation(compose.material3)
-    implementation(compose.foundation)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.navigation3.runtime)
@@ -111,9 +127,9 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive)
     implementation(libs.androidx.compose.material3.adaptive.layout)
     implementation(libs.androidx.compose.material3.adaptive.navigation)
-    implementation("androidx.glance:glance-appwidget:1.1.0")
-    implementation("androidx.glance:glance-material3:1.1.0")
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.profileinstaller) // Baseline Profile installer for Android 7-9
-    implementation("com.google.android.gms:play-services-ads:23.6.0")
+    implementation(libs.play.services.ads)
 }
 

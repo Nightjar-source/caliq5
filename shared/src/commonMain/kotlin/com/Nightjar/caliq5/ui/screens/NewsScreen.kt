@@ -38,8 +38,7 @@ fun NewsScreen(viewModel: AppViewModel) {
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1340.dp
-                maxWidth >= 1100.dp -> 1140.dp
+                maxWidth >= 1200.dp -> maxWidth
                 maxWidth >= 840.dp -> 960.dp
                 else -> maxWidth
             }

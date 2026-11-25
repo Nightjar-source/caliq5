@@ -42,13 +42,15 @@ fun MonthlyResultContent(state: ResultDisplayState.MonthlyResult) {
             }
         }
 
-        @OptIn(ExperimentalLayoutApi::class)
-        FlowRow(
+        FlexBox(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            config = FlexBoxConfig {
+                direction(FlexDirection.Row)
+                wrap(FlexWrap.Wrap)
+                gap(16.dp)
+            }
         ) {
-            Box(modifier = Modifier.widthIn(min = 320.dp).weight(1f)) {
+            Box(modifier = Modifier.widthIn(min = 320.dp).flex { grow(1f) }) {
                 ResultCard(title = "النتيجة النهائية بعد الجبر") {
             val wasRounded = data.finalAverage > kotlin.math.floor(data.realAverage)
             val message = when {
@@ -157,7 +159,7 @@ fun MonthlyResultContent(state: ResultDisplayState.MonthlyResult) {
         }
 
             }
-            Box(modifier = Modifier.widthIn(min = 320.dp).weight(1f)) {
+            Box(modifier = Modifier.widthIn(min = 320.dp).flex { grow(1f) }) {
                 ResultCard(title = "تفاصيل الدرجات المدخلة") {
                     data.grades.forEach { grade ->
                         GradeDetailRow(

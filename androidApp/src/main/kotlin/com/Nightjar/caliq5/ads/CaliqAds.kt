@@ -10,7 +10,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -174,7 +176,8 @@ object CaliqAdsManager {
 
 /**
  * Material 3 Expressive Adaptive Banner Ad:
- * - Fluid oval/capsule shape (CircleShape).
+ * - Fluid rounded card container (RoundedCornerShape 12dp) showing entire ad with zero edge clipping.
+ * - Sits naturally at the bottom underneath the keyboard layer without shifting or jumping.
  * - Preserved across virtual keyboard toggles without re-requesting ads.
  * - Zero height & zero alpha while loading so no empty gap or blank border is shown.
  * - Graceful fade-in once loaded without jumping or layout shift.
@@ -196,13 +199,13 @@ fun CaliqAdaptiveBanner(
         modifier = modifier
             .fillMaxWidth()
             .then(
-                if (isAdLoaded) Modifier.padding(vertical = 1.dp)
+                if (isAdLoaded) Modifier.wrapContentHeight().padding(vertical = 1.dp)
                 else Modifier.height(1.dp).graphicsLayer { alpha = 0f }
             ),
         contentAlignment = Alignment.Center
     ) {
         Surface(
-            shape = CircleShape,
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
             color = MaterialTheme.colorScheme.surface.copy(alpha = if (isDark) 0.88f else 0.94f),
             border = BorderStroke(
                 width = 0.8.dp,
@@ -210,13 +213,12 @@ fun CaliqAdaptiveBanner(
             ),
             shadowElevation = 0.dp,
             modifier = Modifier
-                .clip(CircleShape)
                 .graphicsLayer { alpha = alphaAnim }
                 .padding(horizontal = 4.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 4.dp, vertical = 0.5.dp)
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
                     .wrapContentSize(),
                 contentAlignment = Alignment.Center
             ) {

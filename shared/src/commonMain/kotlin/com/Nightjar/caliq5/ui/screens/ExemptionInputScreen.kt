@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -115,8 +116,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             )
             
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1360.dp
-                maxWidth >= 1100.dp -> 1180.dp
+                maxWidth >= 1200.dp -> maxWidth
                 maxWidth >= 840.dp -> 960.dp
                 else -> maxWidth
             }
@@ -426,7 +426,7 @@ private fun SubjectInputRow(
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                             Icon(
-                                imageVector = Icons.Default.MenuBook,
+                                imageVector = Icons.AutoMirrored.Filled.MenuBook,
                                 contentDescription = null,
                                 tint = if (isSkipped) errorColor else MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)

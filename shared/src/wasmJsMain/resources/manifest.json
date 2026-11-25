@@ -1,0 +1,13 @@
+{
+  "name": "Caliq 5 - حاسبة الإعفاء والسعي",
+  "short_name": "Caliq 5",
+  "description": "حاسبة الإعفاء العام والفردي والسعي السنوي لطلاب وطالبات العراق",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "dir": "rtl",
+  "lang": "ar",
+  "theme_color": "#0F172A",
+  "background_color": "#0F172A"
+}

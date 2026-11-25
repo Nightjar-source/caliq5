@@ -44,12 +44,12 @@ fun Term2Screen(viewModel: AppViewModel) {
             val gridColumns = when {
                 isCompactWindow -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(2)
-                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 260.dp)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 240.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1180.dp
+                maxWidth >= 1200.dp -> maxWidth
                 maxWidth >= 1100.dp -> 1040.dp
                 maxWidth >= 840.dp -> 900.dp
                 maxWidth >= 600.dp -> 740.dp
@@ -91,14 +91,23 @@ fun Term2Screen(viewModel: AppViewModel) {
 
             item(key = "t2_inputs_row", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
                 Box(modifier = Modifier.fillMaxWidth().animateItem(placementSpec = androidx.compose.animation.core.spring(dampingRatio = 0.82f, stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)), contentAlignment = Alignment.Center) {
-                    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
-                    androidx.compose.foundation.layout.FlowRow(
+                    FlexBox(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        config = FlexBoxConfig {
+                            direction(FlexDirection.Row)
+                            wrap(FlexWrap.Wrap)
+                            gap(16.dp)
+                            justifyContent(FlexJustifyContent.Center)
+                            alignItems(FlexAlignItems.Center)
+                        }
                     ) {
-                        val isWideInput = this@BoxWithConstraints.maxWidth >= 600.dp
-                        Box(modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth(if (isWideInput) 0.48f else 1f).popInOnInitialLoad(2), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .widthIn(min = 260.dp, max = 380.dp)
+                                .flex { grow(1f); basis(260.dp) }
+                                .popInOnInitialLoad(2),
+                            contentAlignment = Alignment.Center
+                        ) {
                             GradeInputField(
                                 label = "الفصل الأول:",
                                 value = term1,
@@ -106,7 +115,13 @@ fun Term2Screen(viewModel: AppViewModel) {
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
-                        Box(modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth(if (isWideInput) 0.48f else 1f).popInOnInitialLoad(3), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .widthIn(min = 260.dp, max = 380.dp)
+                                .flex { grow(1f); basis(260.dp) }
+                                .popInOnInitialLoad(3),
+                            contentAlignment = Alignment.Center
+                        ) {
                             GradeInputField(
                                 label = "نصف السنة:",
                                 value = midYear,

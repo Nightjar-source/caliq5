@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -245,8 +246,7 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                     }
 
                     val containerMaxWidth = when {
-                        maxWidth >= 1400.dp -> 1320.dp
-                        maxWidth >= 1100.dp -> 1160.dp
+                        maxWidth >= 1200.dp -> maxWidth
                         maxWidth >= 840.dp -> 960.dp
                         else -> maxWidth
                     }
@@ -580,7 +580,7 @@ fun StudentEditView(
                         }
                     }
                     clearPersistentDraft()
-                    onSave(StudentRecord(student?.id ?: "st_${System.currentTimeMillis()}", name, selectedClassName, subjectsList.associate { it.name to it.record }), hasEmptyGrades)
+                    onSave(StudentRecord(student?.id ?: "st_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}", name, selectedClassName, subjectsList.associate { it.name to it.record }), hasEmptyGrades)
                 }
             },
             onDismiss = {
@@ -696,8 +696,7 @@ fun StudentEditView(
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1360.dp
-                maxWidth >= 1100.dp -> 1180.dp
+                maxWidth >= 1200.dp -> maxWidth
                 maxWidth >= 840.dp -> 960.dp
                 else -> maxWidth
             }
@@ -1158,53 +1157,55 @@ Box(modifier = Modifier.fillMaxWidth()) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Spacer(modifier = Modifier.height(16.dp))
-                        @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
-                        androidx.compose.foundation.layout.FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        CaliqOutlinedButton(
-                            onClick = { if (hasUnsavedChanges) showUnsavedDialog = true else onCancel() },
-                            modifier = Modifier.weight(1f),
-                            contentPadding = PaddingValues(14.dp)
+                        FlexBox(
+                            modifier = Modifier.fillMaxWidth(),
+                            config = FlexBoxConfig {
+                                direction(FlexDirection.Row)
+                                wrap(FlexWrap.Wrap)
+                                gap(8.dp)
+                            }
                         ) {
-                            Text("إلغاء")
-                        }
-
-                        if (student != null) {
-                            CaliqButton(
-                                onClick = { showDeleteConfirm = true },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                            CaliqOutlinedButton(
+                                onClick = { if (hasUnsavedChanges) showUnsavedDialog = true else onCancel() },
+                                modifier = Modifier.flex { grow(1f); basis(100.dp) },
                                 contentPadding = PaddingValues(14.dp)
                             ) {
-                                Icon(Icons.Default.Delete, null)
-                                Spacer(Modifier.width(8.dp))
-                                Text("حذف")
+                                Text("إلغاء")
                             }
-                        }
 
-                        CaliqButton(
-                            onClick = {
-                                if (name.isBlank() || selectedClassName.isEmpty()) {
-                                    onShowError("الرجاء إدخال اسم الطالب واختيار الصف")
-                                } else {
-                                    val hasEmptyGrades = subjectsMap.values.any { sub ->
-                                        if (sub.t1Val == "SKIPPED") false
-                                        else {
-                                            val t1Done = if (sub.t1Mode == TermMode.TERM) sub.t1Val.isNotBlank() else sub.t1Months.any { it.isNotBlank() }
-                                            val midDone = sub.midVal.isNotBlank()
-                                            val t2Done = if (sub.t2Mode == TermMode.TERM) sub.t2Val.isNotBlank() else sub.t2Months.any { it.isNotBlank() }
-                                            !t1Done || !midDone || !t2Done
-                                        }
-                                    }
-                                    onSave(StudentRecord(student?.id ?: "st_${System.currentTimeMillis()}", name, selectedClassName, subjectsMap.toMap()), hasEmptyGrades)
+                            if (student != null) {
+                                CaliqButton(
+                                    onClick = { showDeleteConfirm = true },
+                                    modifier = Modifier.flex { grow(1f); basis(100.dp) },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                                    contentPadding = PaddingValues(14.dp)
+                                ) {
+                                    Icon(Icons.Default.Delete, null)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("حذف")
                                 }
-                            },
-                            modifier = Modifier.weight(if (student != null) 1f else 2f),
-                            contentPadding = PaddingValues(14.dp)
-                        ) {
+                            }
+
+                            CaliqButton(
+                                onClick = {
+                                    if (name.isBlank() || selectedClassName.isEmpty()) {
+                                        onShowError("الرجاء إدخال اسم الطالب واختيار الصف")
+                                    } else {
+                                        val hasEmptyGrades = subjectsMap.values.any { sub ->
+                                            if (sub.t1Val == "SKIPPED") false
+                                            else {
+                                                val t1Done = if (sub.t1Mode == TermMode.TERM) sub.t1Val.isNotBlank() else sub.t1Months.any { it.isNotBlank() }
+                                                val midDone = sub.midVal.isNotBlank()
+                                                val t2Done = if (sub.t2Mode == TermMode.TERM) sub.t2Val.isNotBlank() else sub.t2Months.any { it.isNotBlank() }
+                                                !t1Done || !midDone || !t2Done
+                                            }
+                                        }
+                                        onSave(StudentRecord(student?.id ?: "st_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}", name, selectedClassName, subjectsMap.toMap()), hasEmptyGrades)
+                                    }
+                                },
+                                modifier = Modifier.flex { grow(if (student != null) 1f else 2f); basis(130.dp) },
+                                contentPadding = PaddingValues(14.dp)
+                            ) {
                             Icon(Icons.Default.Add, null)
                             Spacer(Modifier.width(8.dp))
                             Text("حفظ البيانات", fontWeight = FontWeight.Bold)
@@ -1239,12 +1240,12 @@ fun MonthlyGradesInputList(
     var animatingDeleteId by remember { mutableStateOf<String?>(null) }
     
     // Stable ID tracking for each month entry so animations never mismatch
-    var idList by remember { mutableStateOf(List(months.size) { "m_${it}_${System.currentTimeMillis()}" }) }
+    var idList by remember { mutableStateOf(List(months.size) { "m_${it}_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}" }) }
     
     LaunchedEffect(months.size) {
         if (idList.size < months.size) {
             val needed = months.size - idList.size
-            idList = idList + List(needed) { "m_${idList.size + it}_${System.currentTimeMillis()}" }
+            idList = idList + List(needed) { "m_${idList.size + it}_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}" }
         } else if (idList.size > months.size) {
             idList = idList.take(months.size)
         }
@@ -1554,7 +1555,7 @@ fun SubjectGradeEditCard(
                         ) {
                             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                                 Icon(
-                                    imageVector = if (isExempt) Icons.Default.Stars else Icons.Default.MenuBook,
+                                    imageVector = if (isExempt) Icons.Default.Stars else Icons.AutoMirrored.Filled.MenuBook,
                                     contentDescription = null,
                                     tint = if (isSkipped) errorColor else if (isExempt) com.Nightjar.caliq5.theme.successColor else MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(18.dp)

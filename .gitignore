@@ -15,6 +15,7 @@
 *.txt
 !fastlane/**/*.txt
 *.html
+!shared/src/wasmJsMain/resources/index.html
 old_animations.kt
 old_animations.txt
 

@@ -43,57 +43,60 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
 /**
- * Elastic bounce/overscroll effect on vertical scrolling.
+ * Elastic bounce/overscroll and Samsung One UI Reachability handler on vertical scrolling.
+ * - Bidirectional overscroll stretch (top pull-down and bottom pull-up) across all phone screens.
+ * - Samsung One UI Reachability with smooth resistance curve (no harsh threshold barrier).
+ * - Immediate collapse to 0f on virtual keyboard (IME) open so input fields stay visible.
  */
-fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = composed {
+fun Modifier.elasticOverscroll(
+    oneUiReachabilityEnabled: Boolean = true,
+    maxStretchRatio: Float = 0.10f
+): Modifier = composed {
     val density = androidx.compose.ui.platform.LocalDensity.current
     var componentHeight by remember { mutableStateOf(0f) }
     val overscrollOffset = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
     var snapJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
-    var savedReachabilityOffset by remember { mutableStateOf(0f) }
 
-    // Keep reachability position fluid when keyboard appears - imePadding handles the focused field elevation smoothly
+    // When virtual keyboard appears, reachability MUST immediately collapse to 0f
     val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(density) > 0
     androidx.compose.runtime.LaunchedEffect(isImeVisible) {
         if (isImeVisible) {
-            if (overscrollOffset.value > 0f) {
-                savedReachabilityOffset = overscrollOffset.value
-                val targetOffset = (overscrollOffset.value * 0.45f).coerceAtLeast(0f)
-                overscrollOffset.animateTo(
-                    targetValue = targetOffset,
-                    animationSpec = spring(
-                        dampingRatio = 0.85f,
-                        stiffness = Spring.StiffnessMediumLow
-                    )
+            snapJob?.cancel()
+            overscrollOffset.animateTo(
+                targetValue = 0f,
+                animationSpec = spring(
+                    dampingRatio = 0.85f,
+                    stiffness = Spring.StiffnessMedium
                 )
-            }
-        } else {
-            if (savedReachabilityOffset > 0f) {
-                overscrollOffset.animateTo(
-                    targetValue = savedReachabilityOffset,
-                    animationSpec = spring(
-                        dampingRatio = 0.85f,
-                        stiffness = Spring.StiffnessMediumLow
-                    )
-                )
-                savedReachabilityOffset = 0f
-            }
+            )
         }
     }
 
     val maxRestingTarget = with(density) {
-        val calculated = if (componentHeight > 0) componentHeight * 0.30f else 200.dp.toPx()
-        calculated.coerceIn(150.dp.toPx(), 240.dp.toPx())
+        val calculated = if (componentHeight > 0) componentHeight * 0.28f else 180.dp.toPx()
+        calculated.coerceIn(140.dp.toPx(), 220.dp.toPx())
     }
+    val maxAllowedPull = maxRestingTarget * 1.35f
+    val maxBottomStretch = with(density) { 75.dp.toPx() }
+    val reachabilityThreshold = maxRestingTarget * 0.45f
 
-    val nestedScrollConnection = remember(componentHeight, maxRestingTarget) {
+    val nestedScrollConnection = remember(componentHeight, maxRestingTarget, isImeVisible, oneUiReachabilityEnabled) {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 if (source == NestedScrollSource.UserInput) {
                     val current = overscrollOffset.value
+                    // If we have top overscroll/reachability (current > 0) and user scrolls up (available.y < 0):
                     if (current > 0f && available.y < 0f) {
                         val newOffset = (current + available.y).coerceAtLeast(0f)
+                        val consumedY = newOffset - current
+                        snapJob?.cancel()
+                        snapJob = scope.launch { overscrollOffset.snapTo(newOffset) }
+                        return Offset(0f, consumedY)
+                    }
+                    // If we have bottom stretch (current < 0) and user scrolls down (available.y > 0):
+                    if (current < 0f && available.y > 0f) {
+                        val newOffset = (current + available.y).coerceAtMost(0f)
                         val consumedY = newOffset - current
                         snapJob?.cancel()
                         snapJob = scope.launch { overscrollOffset.snapTo(newOffset) }
@@ -109,28 +112,26 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
                 source: NestedScrollSource
             ): Offset {
                 val delta = available.y
-                if (source == NestedScrollSource.UserInput) {
+                if (source == NestedScrollSource.UserInput && !isImeVisible) {
                     val current = overscrollOffset.value
-                    // When pulling down at the top of the list:
+
+                    // 1. Top pull-down (Overscroll Stretch & Samsung One UI Reachability)
                     if (delta > 0f) {
-                        val maxPull = maxRestingTarget * 1.35f
-                        if (current < maxPull) {
-                            val progress = (current / maxPull).coerceIn(0f, 1f)
-                            val resistance = (1f - progress * 0.5f).coerceIn(0.45f, 1f)
-                            val target = (current + delta * resistance).coerceAtMost(maxPull)
-                            snapJob?.cancel()
-                            snapJob = scope.launch { overscrollOffset.snapTo(target) }
-                            return Offset(0f, delta)
-                        }
-                        return Offset.Zero
-                    }
-                    // When scrolling up and child list has unconsumed delta (at the top):
-                    else if (delta < 0f && current > 0f) {
-                        val newOffset = (current + delta).coerceAtLeast(0f)
-                        val consumedY = newOffset - current
+                        val pullProgress = (current / maxAllowedPull).coerceIn(0f, 1f)
+                        val resistance = (0.55f * (1f - pullProgress * pullProgress)).coerceIn(0.12f, 0.55f)
+                        val target = (current + delta * resistance).coerceAtMost(maxAllowedPull)
                         snapJob?.cancel()
-                        snapJob = scope.launch { overscrollOffset.snapTo(newOffset) }
-                        return Offset(0f, consumedY)
+                        snapJob = scope.launch { overscrollOffset.snapTo(target) }
+                        return Offset(0f, delta)
+                    }
+                    // 2. Bottom stretch upwards (when content reached end and user pulls up)
+                    else if (delta < 0f && current <= 0f) {
+                        val stretchProgress = (-current / maxBottomStretch).coerceIn(0f, 1f)
+                        val resistance = (0.45f * (1f - stretchProgress * stretchProgress)).coerceIn(0.10f, 0.45f)
+                        val target = (current + delta * resistance).coerceAtLeast(-maxBottomStretch)
+                        snapJob?.cancel()
+                        snapJob = scope.launch { overscrollOffset.snapTo(target) }
+                        return Offset(0f, delta)
                     }
                 }
                 return Offset.Zero
@@ -139,16 +140,27 @@ fun Modifier.elasticOverscroll(maxStretchRatio: Float = 0.10f): Modifier = compo
             override suspend fun onPreFling(available: Velocity): Velocity {
                 val current = overscrollOffset.value
                 if (current > 0f) {
-                    val targetValue = if (available.y < -1200f) {
+                    val targetValue = if (!oneUiReachabilityEnabled || isImeVisible || available.y < -350f) {
                         0f
+                    } else if (available.y > 600f || current >= reachabilityThreshold) {
+                        maxRestingTarget
                     } else {
-                        if (current > maxRestingTarget) maxRestingTarget else current
+                        0f
                     }
 
                     overscrollOffset.animateTo(
                         targetValue = targetValue,
                         animationSpec = spring(
-                            dampingRatio = 0.88f,
+                            dampingRatio = 0.82f,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    )
+                    return available
+                } else if (current < 0f) {
+                    overscrollOffset.animateTo(
+                        targetValue = 0f,
+                        animationSpec = spring(
+                            dampingRatio = 0.80f,
                             stiffness = Spring.StiffnessMediumLow
                         )
                     )

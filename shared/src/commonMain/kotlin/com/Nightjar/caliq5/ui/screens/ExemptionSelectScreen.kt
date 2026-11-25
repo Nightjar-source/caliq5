@@ -4,8 +4,6 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -41,8 +39,7 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val screenWidth = maxWidth
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1340.dp
-                maxWidth >= 1100.dp -> 1180.dp
+                maxWidth >= 1200.dp -> maxWidth
                 maxWidth >= 840.dp -> 960.dp
                 else -> maxWidth
             }
@@ -50,7 +47,6 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {
                 isPhoneLandscape -> GridCells.Fixed(2)
-                maxWidth >= 840.dp -> GridCells.Adaptive(minSize = 200.dp)
                 maxWidth >= 600.dp -> GridCells.Adaptive(minSize = 180.dp)
                 else -> GridCells.Adaptive(minSize = 160.dp)
             }
@@ -105,16 +101,20 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
                 }
             }
 
-            @OptIn(ExperimentalLayoutApi::class)
-            item(span = { GridItemSpan(maxLineSpan) }, key = "classes_flow_grid") {
+            item(span = { GridItemSpan(maxLineSpan) }, key = "classes_flex_grid") {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    FlowRow(
+                    FlexBox(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        config = FlexBoxConfig {
+                            direction(FlexDirection.Row)
+                            wrap(FlexWrap.Wrap)
+                            gap(12.dp)
+                            justifyContent(FlexJustifyContent.Center)
+                            alignItems(FlexAlignItems.Center)
+                        }
                     ) {
                         val cardWidth = if (screenWidth < 360.dp) 145.dp else 165.dp
                         ClassData.classNames.forEachIndexed { index, className ->

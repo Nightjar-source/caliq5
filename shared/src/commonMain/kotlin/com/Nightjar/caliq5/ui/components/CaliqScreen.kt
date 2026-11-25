@@ -33,11 +33,7 @@ fun CaliqScreen(
         color = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onBackground
     ) {
-        val outerModifier = if (oneUiReachabilityEnabled) {
-            Modifier.fillMaxSize().elasticOverscroll()
-        } else {
-            Modifier.fillMaxSize()
-        }
+        val outerModifier = Modifier.fillMaxSize().elasticOverscroll(oneUiReachabilityEnabled = oneUiReachabilityEnabled)
 
         BoxWithConstraints(modifier = outerModifier) {
             val isWide = maxWidth >= 600.dp
@@ -51,7 +47,7 @@ fun CaliqScreen(
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .widthIn(max = 840.dp)
+                        .widthIn(max = if (maxWidth >= 1200.dp) maxWidth else 840.dp)
                         .fillMaxWidth()
                         .imePadding()
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))

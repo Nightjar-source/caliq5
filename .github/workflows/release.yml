@@ -43,10 +43,10 @@ jobs:
           else
             echo "::warning::KEYSTORE_BASE64 secret is not set!"
           fi
-          # Official Google AdMob Test Unit IDs for verified testing in GitHub Releases
-          echo "ADMOB_APP_ID=ca-app-pub-3940256099942544~3347511713" >> local.properties
-          echo "ADMOB_BANNER_ID=ca-app-pub-3940256099942544/9214589741" >> local.properties
-          echo "ADMOB_INTERSTITIAL_ID=ca-app-pub-3940256099942544/1033173712" >> local.properties
+          # Official Google AdMob Unit IDs from GitHub Secrets (fallback to test IDs if not configured)
+          echo "ADMOB_APP_ID=${{ secrets.ADMOB_APP_ID || 'ca-app-pub-3940256099942544~3347511713' }}" >> local.properties
+          echo "ADMOB_BANNER_ID=${{ secrets.ADMOB_BANNER_ID || 'ca-app-pub-3940256099942544/9214589741' }}" >> local.properties
+          echo "ADMOB_INTERSTITIAL_ID=${{ secrets.ADMOB_INTERSTITIAL_ID || 'ca-app-pub-3940256099942544/1033173712' }}" >> local.properties
 
       - name: Build Official Release APK
         run: ./gradlew :androidApp:assembleRelease --no-daemon --stacktrace
@@ -126,3 +126,85 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: false
+
+  build-windows:
+    name: Build Windows Desktop App
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Windows Installer (MSI & Distributable)
+        run: ./gradlew :desktopApp:packageMsi :desktopApp:createDistributable --no-daemon --stacktrace
+
+      - name: Package Portable Windows ZIP
+        shell: pwsh
+        run: |
+          $distDir = "desktopApp/build/compose/binaries/main/app"
+          if (Test-Path $distDir) {
+            Compress-Archive -Path "$distDir/*" -DestinationPath "caliq5-windows-portable.zip" -Force
+          }
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: caliq5-windows-desktop
+          path: |
+            desktopApp/build/compose/binaries/main/msi/*.msi
+            caliq5-windows-portable.zip
+
+      - name: Attach Windows Build to Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            desktopApp/build/compose/binaries/main/msi/*.msi
+            caliq5-windows-portable.zip
+
+  build-pwa:
+    name: Build PWA Web App (WasmJs)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build Production PWA Distribution
+        run: ./gradlew :shared:wasmJsBrowserDistribution --no-daemon --stacktrace
+
+      - name: Package PWA ZIP
+        run: |
+          cd shared/build/dist/wasmJs/productionExecutable
+          zip -r ../../../../../caliq5-pwa-web.zip .
+
+      - name: Upload PWA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: caliq5-pwa-web
+          path: caliq5-pwa-web.zip
+
+      - name: Attach PWA Build to Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: caliq5-pwa-web.zip

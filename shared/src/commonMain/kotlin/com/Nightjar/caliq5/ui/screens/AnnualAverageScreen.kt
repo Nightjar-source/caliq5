@@ -45,12 +45,12 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
             val gridColumns = when {
                 isCompactWindow -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
                 isPhoneLandscape -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(3)
-                maxWidth >= 680.dp -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(3)
+                maxWidth >= 600.dp -> androidx.compose.foundation.lazy.grid.GridCells.Adaptive(minSize = 220.dp)
                 else -> androidx.compose.foundation.lazy.grid.GridCells.Fixed(1)
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1200.dp
+                maxWidth >= 1200.dp -> maxWidth
                 maxWidth >= 1100.dp -> 1060.dp
                 maxWidth >= 840.dp -> 920.dp
                 maxWidth >= 680.dp -> 760.dp

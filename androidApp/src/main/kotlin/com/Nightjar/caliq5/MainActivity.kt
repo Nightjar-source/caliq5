@@ -16,6 +16,12 @@ class MainActivity : ComponentActivity() {
     private var isComposeDrawn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Prevent re-launching splash screen when opened from launcher if already running
+        if (!isTaskRoot && intent.hasCategory(android.content.Intent.CATEGORY_LAUNCHER) && intent.action == android.content.Intent.ACTION_MAIN) {
+            finish()
+            return
+        }
+
         window.setBackgroundDrawableResource(R.drawable.splash_background)
         val splashScreen = installSplashScreen()
 

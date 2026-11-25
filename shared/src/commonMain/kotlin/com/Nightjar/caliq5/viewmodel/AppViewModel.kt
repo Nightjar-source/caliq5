@@ -542,10 +542,10 @@ class AppViewModel : ViewModel() {
             result.fold(
                 onSuccess = { data ->
                     val finalData = data.copy(className = className)
-                    viewModelScope.launch(Dispatchers.IO) {
+                    viewModelScope.launch(Dispatchers.Default) {
                         saveHistory(
                             HistoryItem(
-                                id = "h_${System.currentTimeMillis()}",
+                                id = "h_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}",
                                 type = ResultType.EXEMPTION,
                                 title = "نتيجة الاعفاء العام والفردي للصف $className",
                                 date = getCurrentDateString(),
@@ -603,10 +603,10 @@ class AppViewModel : ViewModel() {
             val result = withContext(Dispatchers.Default) {
                 GradeCalculator.calculateAnnualAverage(name, t1, mid, t2)
             }
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.Default) {
                 saveHistory(
                     HistoryItem(
-                        id = "h_${System.currentTimeMillis()}",
+                        id = "h_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}",
                         type = ResultType.ANNUAL,
                         title = "نتيجة معدل السعي السنوي لمادة $name",
                         date = getCurrentDateString(),
@@ -669,10 +669,10 @@ class AppViewModel : ViewModel() {
             val result = withContext(Dispatchers.Default) {
                 GradeCalculator.calculateMonthlyAverage(name, grades)
             }
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.Default) {
                 saveHistory(
                     HistoryItem(
-                        id = "h_${System.currentTimeMillis()}",
+                        id = "h_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}",
                         type = ResultType.MONTHLY,
                         title = "نتيجة المعدل الفصلي لمادة $name",
                         date = getCurrentDateString(),
@@ -720,10 +720,10 @@ class AppViewModel : ViewModel() {
             val result = withContext(Dispatchers.Default) {
                 GradeCalculator.calculateTerm2Required(name, t1, mid)
             }
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.Default) {
                 saveHistory(
                     HistoryItem(
-                        id = "h_${System.currentTimeMillis()}",
+                        id = "h_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}",
                         type = ResultType.TERM2,
                         title = "نتيجة درجة الفصل الثاني لمادة $name",
                         date = getCurrentDateString(),
@@ -810,7 +810,7 @@ class AppViewModel : ViewModel() {
     fun exportToPdf(result: ResultDisplayState) {
         viewModelScope.launch {
             showAlert("جارٍ إنشاء ملف PDF...", isError = false)
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Default) {
                 com.Nightjar.caliq5.export.PdfExporter.export(result)
             }
             showAlert("تم تنزيل الملف على هاتفك")
@@ -876,7 +876,7 @@ class AppViewModel : ViewModel() {
     private val prefSaveJobs = mutableMapOf<String, kotlinx.coroutines.Job>()
     private fun savePreference(key: String, value: String, immediate: Boolean = false) {
         prefSaveJobs[key]?.cancel()
-        prefSaveJobs[key] = viewModelScope.launch(Dispatchers.IO) {
+        prefSaveJobs[key] = viewModelScope.launch(Dispatchers.Default) {
             if (!immediate) delay(500)
             DataRepository.savePreference(key, value)
         }
@@ -884,7 +884,7 @@ class AppViewModel : ViewModel() {
 
     // ===== Initialization =====
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Default) {
             // Load history
             _history.value = DataRepository.loadHistory()
             // Load students

@@ -63,6 +63,7 @@
             android:name=".MainActivity"
             android:label="@string/launcher_app_name"
             android:exported="true"
+            android:launchMode="singleTask"
             android:resizeableActivity="true"
             android:supportsPictureInPicture="true"
             android:theme="@style/Theme.Caliq.Splash"

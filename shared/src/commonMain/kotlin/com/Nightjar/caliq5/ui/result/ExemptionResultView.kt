@@ -42,13 +42,15 @@ fun ExemptionResultContent(state: ResultDisplayState.ExemptionResult) {
             }
         }
 
-        @OptIn(ExperimentalLayoutApi::class)
-        FlowRow(
+        FlexBox(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            config = FlexBoxConfig {
+                direction(FlexDirection.Row)
+                wrap(FlexWrap.Wrap)
+                gap(16.dp)
+            }
         ) {
-            Box(modifier = Modifier.widthIn(min = 280.dp).weight(1f)) {
+            Box(modifier = Modifier.widthIn(min = 280.dp).flex { grow(1f) }) {
                 // Exemption status card
                 ResultCard(title = "حالة الإعفاء${if (data.className.isNotEmpty()) " (${data.className})" else ""}") {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -96,7 +98,7 @@ fun ExemptionResultContent(state: ResultDisplayState.ExemptionResult) {
 
             // Individual exemptions card (90%+)
             if (data.individualExemptions.isNotEmpty()) {
-                Box(modifier = Modifier.widthIn(min = 280.dp).weight(1f)) {
+                Box(modifier = Modifier.widthIn(min = 280.dp).flex { grow(1f) }) {
                     ResultCard(
                         title = "مواد الإعفاء الفردي (90% فأكثر)"
                     ) {

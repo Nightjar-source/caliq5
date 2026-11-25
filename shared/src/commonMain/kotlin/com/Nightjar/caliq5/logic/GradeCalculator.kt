@@ -21,7 +21,7 @@ object GradeCalculator {
      * - Otherwise: no rounding (return original)
      */
     fun applyExemptionRounding(num: Double): ExemptionRoundingResult {
-        val raw = Math.round(num * 100).toDouble() / 100.0  // 2 decimal precision
+        val raw = kotlin.math.round(num * 100.0) / 100.0  // 2 decimal precision
         val floorVal = floor(raw).toInt()
         val decimalPart = ((raw - floorVal) * 10).roundToInt()
 
@@ -47,7 +47,7 @@ object GradeCalculator {
      * Rounds up if decimal >= 0.6, otherwise rounds down.
      */
     fun simpleCustomRound(num: Double): Int {
-        val raw = Math.round(num * 100).toDouble() / 100.0
+        val raw = kotlin.math.round(num * 100.0) / 100.0
         val decimalPart = ((raw - floor(raw)) * 10).roundToInt()
         return if (decimalPart >= 6) ceil(raw).toInt() else floor(raw).toInt()
     }

@@ -153,9 +153,9 @@ fun AppNavigation(
         val containerHeight = if (maxHeight > 0.dp) maxHeight else with(density) { windowInfo.containerSize.height.toDp() }.coerceAtLeast(1.dp)
         val isWideScreen = containerWidth >= 600.dp
         val isLandscape = containerWidth > containerHeight && containerHeight < 500.dp
-        val targetRailWidth = when (adaptiveWindowSizeClass.windowWidthSizeClass) {
-            WindowWidthSizeClass.EXPANDED -> 72.dp
-            WindowWidthSizeClass.MEDIUM -> 64.dp
+        val targetRailWidth = when {
+            containerWidth >= 840.dp -> 72.dp
+            containerWidth >= 600.dp -> 64.dp
             else -> if (isLandscape) 56.dp else 64.dp
         }
         val railWidth by animateDpAsState(
@@ -255,50 +255,40 @@ fun AppNavigation(
             )
             val isBottomNavVisible = isMainTab && !isNavHidden && !isWideScreen && resultState == null && !isImeVisible
 
-            // Banner is visible across ALL screens (main & sub-screens),
-            // smoothly hides only when keyboard is open or when result overlay is displayed
-            val isBannerVisible = !isWideScreen && resultState == null && !isImeVisible
-            val isWideBannerVisible = isWideScreen && resultState == null && !isImeVisible
-
-            if (isWideBannerVisible) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .zIndex(10f)
-                        .windowInsetsPadding(safeBottomInsets)
-                        .padding(bottom = 4.dp)
-                ) {
-                    adBanner()
-                }
-            }
-
-            // Dynamic adaptive bottom offset for phone banner:
-            // Sits at 62.dp when CaliqBottomNav is present;
-            // Smoothly glides down to 4.dp on sub-screens where CaliqBottomNav is hidden!
+            // Persistent AdMob Adaptive Banner Layer:
+            // Sits at 62.dp when CaliqBottomNav is present on phones;
+            // Smoothly glides down to 4.dp on sub-screens and wide displays!
+            // Kept continuously mounted in the composition hierarchy as a bottom layer under the keyboard
+            // so that it NEVER unmounts, never reloads, and never jumps above the keyboard or input fields.
+            val bannerTargetBottomOffset = if (isWideScreen) 4.dp else if (isBottomNavVisible) 62.dp else 4.dp
             val phoneBannerBottomOffset by animateDpAsState(
-                targetValue = if (isBottomNavVisible) 62.dp else 4.dp,
+                targetValue = bannerTargetBottomOffset,
                 animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow),
-                label = "phone_banner_bottom_offset"
+                label = "banner_bottom_offset"
             )
 
-            // Persistent AdMob Adaptive Banner (Phone Portrait)
-            // Sits above navigation bar on main tabs, and rests at bottom on all sub-screens
-            AnimatedVisibility(
-                visible = isBannerVisible,
-                enter = slideInVertically(
-                    initialOffsetY = { it },
-                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
-                ) + fadeIn(animationSpec = tween(250)),
-                exit = slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = spring(dampingRatio = 0.78f, stiffness = Spring.StiffnessMediumLow)
-                ) + fadeOut(animationSpec = tween(200)),
+            val showBanner = resultState == null
+            val bannerAlpha by animateFloatAsState(
+                targetValue = if (showBanner) 1f else 0f,
+                animationSpec = tween(durationMillis = 200),
+                label = "persistent_banner_alpha"
+            )
+
+            Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .zIndex(10f)
+                    .zIndex(1f)
                     .fillMaxWidth()
-                    .windowInsetsPadding(safeBottomInsets)
+                    .windowInsetsPadding(
+                        WindowInsets.navigationBars
+                            .union(WindowInsets.captionBar)
+                            .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
+                    )
                     .padding(bottom = phoneBannerBottomOffset)
+                    .graphicsLayer {
+                        alpha = bannerAlpha
+                    },
+                contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier

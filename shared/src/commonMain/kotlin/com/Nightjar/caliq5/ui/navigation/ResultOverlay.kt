@@ -53,7 +53,9 @@ fun ResultOverlay(
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         BoxWithConstraints(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .elasticOverscroll(oneUiReachabilityEnabled = false),
             contentAlignment = Alignment.TopCenter
         ) {
             val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
@@ -103,8 +105,7 @@ fun ResultOverlay(
             ) {}
 
             val containerMaxWidth = when {
-                maxWidth >= 1400.dp -> 1340.dp
-                maxWidth >= 1100.dp -> 1180.dp
+                maxWidth >= 1200.dp -> maxWidth
                 maxWidth >= 840.dp -> 960.dp
                 else -> maxWidth
             }

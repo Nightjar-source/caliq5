@@ -1,33 +1,48 @@
 [versions]
 agp = "9.1.0"
 kotlin = "2.4.20"
-compose-multiplatform = "1.12.2"
+compose-multiplatform = "1.13.0-rc01"
+compose-bom = "2026.11.01"
+material3 = "1.5.0"
 compileSdk = "37"
 minSdk = "24"
 targetSdk = "37"
-androidx-activity-compose = "1.10.1"
-androidx-lifecycle = "2.8.7"
-datastore = "1.1.4"
-coroutines = "1.10.2"
-kotlinx-serialization = "1.8.1"
-core-splashscreen = "1.0.1"
+androidx-activity-compose = "1.13.0"
+androidx-lifecycle = "2.11.1"
+jetbrains-lifecycle = "2.11.0"
+datastore = "1.3.0"
+coroutines = "1.11.0"
+kotlinx-serialization = "1.13.0"
+core-splashscreen = "1.2.0"
 kotlinx-datetime = "0.6.2"
 material-kolor = "2.1.1"
-navigation3 = "1.2.0"
+navigation3 = "1.2.2"
+jetbrains-navigation3 = "1.2.0"
 adaptive = "1.3.0"
-compose-material3-windowsizeclass = "1.7.3"
+compose-material3-windowsizeclass = "1.13.0-rc01"
+androidx-glance = "1.2.0"
+play-services-ads = "25.5.0"
+androidx-profileinstaller = "1.4.1"
 
 [libraries]
-# AndroidX
+# Compose BOM 2026.11.01 (Jetpack Compose 1.13 & Material 3 1.5.0)
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
+androidx-compose-foundation-layout = { module = "androidx.compose.foundation:foundation-layout" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+
+# AndroidX & JetBrains KMP Lifecycle
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
-androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "jetbrains-lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "jetbrains-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrains-lifecycle" }
 # DataStore
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 # Coroutines
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 # Serialization
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 # Splash screen API
@@ -38,11 +53,18 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "material-kolor" }
 
 # Profile Installer (Mandatory for Baseline Profiles on Android 7 to 9)
-androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version = "1.4.1" }
+androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "androidx-profileinstaller" }
 
-# Navigation 3 (Official Release 1.2.0 - developer.android.com/jetpack/androidx/releases/navigation3#1.2.0)
+# Glance & Play Services Ads (Official Latest Stable)
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "androidx-glance" }
+androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "androidx-glance" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "play-services-ads" }
+
+# Navigation 3 (AndroidX 1.2.2 & JetBrains KMP 1.2.0)
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+jetbrains-navigation3-runtime = { module = "org.jetbrains.androidx.navigation3:navigation3-runtime", version.ref = "jetbrains-navigation3" }
+jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "jetbrains-navigation3" }
 
 # WindowSizeClass for Common Multiplatform
 compose-material3-windowsizeclass = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "compose-material3-windowsizeclass" }
