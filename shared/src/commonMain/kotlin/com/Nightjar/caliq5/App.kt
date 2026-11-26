@@ -33,7 +33,7 @@ fun App(
     onSplashFinishedAction: (() -> Unit)? = null,
     onDeepLinkConsumed: (() -> Unit)? = null
 ) {
-    val viewModel: AppViewModel = viewModel()
+    val viewModel: AppViewModel = viewModel { AppViewModel() }
     
     LaunchedEffect(isRestoredFromProcessDeath) {
         viewModel.initLaunchState(isRestoredFromProcessDeath)
