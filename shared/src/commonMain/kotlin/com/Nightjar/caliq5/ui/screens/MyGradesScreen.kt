@@ -249,7 +249,6 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                     }
 
                     val containerMaxWidth = when {
-                        maxWidth >= 1200.dp -> maxWidth
                         maxWidth >= 840.dp -> 960.dp
                         else -> maxWidth
                     }
@@ -702,7 +701,6 @@ fun StudentEditView(
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1200.dp -> maxWidth
                 maxWidth >= 840.dp -> 960.dp
                 else -> maxWidth
             }

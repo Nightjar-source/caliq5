@@ -10,7 +10,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         state = windowState,
-        title = "Caliq 5 - حاسبة الإعفاء والسعي"
+        title = "حاسبة الإعفاء والسعي لطلاب العراق"
     ) {
         App()
     }

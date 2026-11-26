@@ -53,8 +53,6 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1200.dp -> maxWidth
-                maxWidth >= 1100.dp -> 1060.dp
                 maxWidth >= 840.dp -> 920.dp
                 maxWidth >= 680.dp -> 760.dp
                 else -> 520.dp

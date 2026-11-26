@@ -17,8 +17,8 @@ android {
         applicationId = "com.Nightjar.caliq5"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 51489
-        versionName = "5.14.89"
+        versionCode = 51490
+        versionName = "5.14.90"
     }
 
     buildFeatures {
@@ -43,18 +43,10 @@ android {
         FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
     }
 
-    val admobAppId = System.getenv("ADMOB_APP_ID")
-        ?: keystoreProperties.getProperty("ADMOB_APP_ID")
-        ?: (project.findProperty("ADMOB_APP_ID") as? String)
-        ?: "ca-app-pub-3940256099942544~3347511713"
-    val admobBannerId = System.getenv("ADMOB_BANNER_ID")
-        ?: keystoreProperties.getProperty("ADMOB_BANNER_ID")
-        ?: (project.findProperty("ADMOB_BANNER_ID") as? String)
-        ?: "ca-app-pub-3940256099942544/9214589741"
-    val admobInterstitialId = System.getenv("ADMOB_INTERSTITIAL_ID")
-        ?: keystoreProperties.getProperty("ADMOB_INTERSTITIAL_ID")
-        ?: (project.findProperty("ADMOB_INTERSTITIAL_ID") as? String)
-        ?: "ca-app-pub-3940256099942544/1033173712"
+    // Official Google AdMob Test Unit IDs (guaranteed 100% fill for verified testing)
+    val admobAppId = "ca-app-pub-3940256099942544~3347511713"
+    val admobBannerId = "ca-app-pub-3940256099942544/9214589741"
+    val admobInterstitialId = "ca-app-pub-3940256099942544/1033173712"
 
     defaultConfig {
         manifestPlaceholders["ADMOB_APP_ID"] = admobAppId

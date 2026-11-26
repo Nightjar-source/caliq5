@@ -52,9 +52,7 @@ fun Term2Screen(viewModel: AppViewModel) {
             }
 
             val containerMaxWidth = when {
-                maxWidth >= 1200.dp -> maxWidth
-                maxWidth >= 1100.dp -> 1040.dp
-                maxWidth >= 840.dp -> 900.dp
+                maxWidth >= 840.dp -> 960.dp
                 maxWidth >= 600.dp -> 740.dp
                 else -> 520.dp
             }

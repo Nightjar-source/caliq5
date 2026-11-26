@@ -37,10 +37,11 @@ fun Term2ResultContent(state: ResultDisplayState.Term2Result) {
         config = FlexBoxConfig {
             direction(FlexDirection.Row)
             wrap(FlexWrap.Wrap)
+            justifyContent(FlexJustifyContent.Center)
             gap(16.dp)
         }
     ) {
-        Box(modifier = Modifier.widthIn(min = 250.dp).flex { grow(1f); basis(250.dp) }) {
+        Box(modifier = Modifier.widthIn(min = 250.dp, max = 460.dp).flex { grow(1f); basis(280.dp) }) {
             Term2RequirementCard(
                 title = "لتحقيق معدل سعي سنوي 75% (الإعفاء العام)",
                 required = data.requiredFor75,
@@ -54,7 +55,7 @@ fun Term2ResultContent(state: ResultDisplayState.Term2Result) {
                 onExpandedChange = { state.is75Expanded = it }
             )
         }
-        Box(modifier = Modifier.widthIn(min = 250.dp).flex { grow(1f); basis(250.dp) }) {
+        Box(modifier = Modifier.widthIn(min = 250.dp, max = 460.dp).flex { grow(1f); basis(280.dp) }) {
             Term2RequirementCard(
                 title = "لتحقيق معدل سعي سنوي 90% (الإعفاء الفردي)",
                 required = data.requiredFor90,
