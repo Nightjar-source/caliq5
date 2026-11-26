@@ -24,7 +24,7 @@ compose.desktop {
             vendor = "Nightjar"
 
             windows {
-                menuGroup = "حاسبة الإعفاء والسعي لطلاب العراق"
+                menuGroup = "CaliQ5"
                 shortcut = true
                 perUserInstall = true
                 upgradeUuid = "7b8f9c2a-4d3e-4b1a-9f8e-1234567890ab"
