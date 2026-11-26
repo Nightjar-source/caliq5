@@ -198,10 +198,8 @@ fun CaliqAdaptiveBanner(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .then(
-                if (isAdLoaded) Modifier.wrapContentHeight().padding(vertical = 1.dp)
-                else Modifier.height(1.dp).graphicsLayer { alpha = 0f }
-            ),
+            .wrapContentHeight()
+            .padding(vertical = if (isAdLoaded) 1.dp else 0.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(

@@ -283,7 +283,7 @@ fun AppNavigation(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .zIndex(1f)
+                    .zIndex(10f)
                     .fillMaxWidth()
                     .windowInsetsPadding(
                         WindowInsets.navigationBars

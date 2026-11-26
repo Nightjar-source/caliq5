@@ -80,43 +80,30 @@ fun AppearanceScreen(viewModel: AppViewModel) {
 
             Column(
                 modifier = Modifier
-                    .widthIn(max = 780.dp)
+                    .widthIn(max = if (maxWidth >= 1200.dp) maxWidth else 960.dp)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (isWide) {
-                    // Wide screens & Tablets in landscape: Theme Mode & Advanced Themes side-by-side
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        ThemeModeCard(
-                            settings = settings,
-                            onThemeChange = { viewModel.updateSettings(settings.copy(theme = it)) },
-                            modifier = Modifier.weight(1f)
-                        )
-                        AdvancedThemesCard(
-                            settings = settings,
-                            onWhiteChange = { viewModel.updateSettings(settings.copy(pureWhiteMode = it)) },
-                            onBlackChange = { viewModel.updateSettings(settings.copy(pureBlackMode = it)) },
-                            modifier = Modifier.weight(1f)
-                        )
+                FlexBox(
+                    modifier = Modifier.fillMaxWidth(),
+                    config = FlexBoxConfig {
+                        direction(FlexDirection.Row)
+                        wrap(FlexWrap.Wrap)
+                        gap(16.dp)
                     }
-                } else {
-                    // Portrait Compact Phones: stacked vertically
+                ) {
                     ThemeModeCard(
                         settings = settings,
                         onThemeChange = { viewModel.updateSettings(settings.copy(theme = it)) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.widthIn(min = 260.dp).flex { grow(1f); basis(260.dp) }
                     )
                     AdvancedThemesCard(
                         settings = settings,
                         onWhiteChange = { viewModel.updateSettings(settings.copy(pureWhiteMode = it)) },
                         onBlackChange = { viewModel.updateSettings(settings.copy(pureBlackMode = it)) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.widthIn(min = 260.dp).flex { grow(1f); basis(260.dp) }
                     )
                 }
 

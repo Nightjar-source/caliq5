@@ -49,7 +49,7 @@ fun AnnualResultContent(state: ResultDisplayState.AnnualResult) {
                 gap(16.dp)
             }
         ) {
-            Box(modifier = Modifier.widthIn(min = 320.dp).flex { grow(1f) }) {
+            Box(modifier = Modifier.widthIn(min = 250.dp).flex { grow(1f); basis(250.dp) }) {
                 ResultCard(title = "النتيجة النهائية بعد الجبر") {
             val wasRounded = data.finalAverage > kotlin.math.floor(data.realAverage)
             val message = when {
@@ -160,7 +160,7 @@ fun AnnualResultContent(state: ResultDisplayState.AnnualResult) {
         }
 
             }
-            Box(modifier = Modifier.widthIn(min = 320.dp).flex { grow(1f) }) {
+            Box(modifier = Modifier.widthIn(min = 250.dp).flex { grow(1f); basis(250.dp) }) {
                 ResultCard(title = "تفاصيل الفصول والامتحانات") {
                     data.grades.forEach { grade ->
                         com.Nightjar.caliq5.ui.components.GradeDetailRow(

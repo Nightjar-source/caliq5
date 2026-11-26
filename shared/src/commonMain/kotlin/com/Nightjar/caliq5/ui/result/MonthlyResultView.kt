@@ -50,7 +50,7 @@ fun MonthlyResultContent(state: ResultDisplayState.MonthlyResult) {
                 gap(16.dp)
             }
         ) {
-            Box(modifier = Modifier.widthIn(min = 320.dp).flex { grow(1f) }) {
+            Box(modifier = Modifier.widthIn(min = 250.dp).flex { grow(1f); basis(250.dp) }) {
                 ResultCard(title = "النتيجة النهائية بعد الجبر") {
             val wasRounded = data.finalAverage > kotlin.math.floor(data.realAverage)
             val message = when {
@@ -159,7 +159,7 @@ fun MonthlyResultContent(state: ResultDisplayState.MonthlyResult) {
         }
 
             }
-            Box(modifier = Modifier.widthIn(min = 320.dp).flex { grow(1f) }) {
+            Box(modifier = Modifier.widthIn(min = 250.dp).flex { grow(1f); basis(250.dp) }) {
                 ResultCard(title = "تفاصيل الدرجات المدخلة") {
                     data.grades.forEach { grade ->
                         GradeDetailRow(
