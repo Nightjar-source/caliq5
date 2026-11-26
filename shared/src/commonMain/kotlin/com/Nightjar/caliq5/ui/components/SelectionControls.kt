@@ -1062,7 +1062,7 @@ fun CaliqOutlinedButton(
 
     elevation: ButtonElevation? = null,
 
-    border: BorderStroke? = ButtonDefaults.outlinedButtonBorder,
+    border: BorderStroke? = ButtonDefaults.outlinedButtonBorder(enabled = enabled),
 
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
 
@@ -1610,7 +1610,8 @@ fun CaliqConfirmationDialog(
             usePlatformDefaultWidth = false
         )
     ) {
-        BoxWithConstraints(
+        val maxWidth = rememberCaliqWindowMetrics().widthDp
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .clickable(

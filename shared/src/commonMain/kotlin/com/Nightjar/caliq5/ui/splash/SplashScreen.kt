@@ -36,7 +36,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontFamily
@@ -154,12 +154,13 @@ fun SplashScreen(
         label = "icon_scale"
     )
 
-    BoxWithConstraints(
+    val windowMetrics = com.Nightjar.caliq5.ui.components.rememberCaliqWindowMetrics()
+    Box(
         modifier = Modifier.fillMaxSize().alpha(animatedAlpha),
         contentAlignment = Alignment.Center
     ) {
-        val screenWidth = maxWidth
-        val screenHeight = maxHeight
+        val screenWidth = windowMetrics.widthDp
+        val screenHeight = windowMetrics.heightDp
 
         // Layer 1: Exact 135-degree linear gradient matching splash_background.xml (#1C5B7D -> #2A0845)
         Box(

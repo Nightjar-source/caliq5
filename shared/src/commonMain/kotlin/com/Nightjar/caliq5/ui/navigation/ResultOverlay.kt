@@ -52,7 +52,9 @@ fun ResultOverlay(
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        BoxWithConstraints(
+        val windowMetrics = rememberCaliqWindowMetrics()
+        val maxWidth = windowMetrics.widthDp
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .elasticOverscroll(oneUiReachabilityEnabled = false),

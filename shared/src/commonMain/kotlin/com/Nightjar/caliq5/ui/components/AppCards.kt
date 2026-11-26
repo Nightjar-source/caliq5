@@ -281,7 +281,8 @@ fun FeatureExplanationCard(
         )
     }
 
-        BoxWithConstraints(
+        val maxWidth = rememberCaliqWindowMetrics().widthDp
+        Box(
         modifier = modifier
             .fillMaxWidth()
             .zIndex(20f)

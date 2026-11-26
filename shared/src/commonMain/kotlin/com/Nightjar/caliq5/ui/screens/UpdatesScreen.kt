@@ -29,7 +29,10 @@ fun UpdatesScreen(viewModel: AppViewModel) {
         .calculateBottomPadding()
 
     CaliqScreen(title = "التحديثات", onBack = { viewModel.goBack() }, scrollable = false) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        val windowMetrics = rememberCaliqWindowMetrics()
+        val maxWidth = windowMetrics.widthDp
+        val maxHeight = windowMetrics.heightDp
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
             val isPhoneLandscape = isLandscape && (maxHeight < 540.dp || maxWidth < 840.dp)
             val gridColumns = when {

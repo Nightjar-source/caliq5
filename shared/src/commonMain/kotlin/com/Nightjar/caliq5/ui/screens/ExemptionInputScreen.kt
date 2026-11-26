@@ -89,7 +89,10 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
             }
         }
 
-        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        val windowMetrics = rememberCaliqWindowMetrics()
+        val maxWidth = windowMetrics.widthDp
+        val maxHeight = windowMetrics.heightDp
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val density = androidx.compose.ui.platform.LocalDensity.current
             val isImeVisible = WindowInsets.ime.getBottom(density) > 0
             val isWide = maxWidth >= 600.dp

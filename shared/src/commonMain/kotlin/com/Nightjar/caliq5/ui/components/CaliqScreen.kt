@@ -35,7 +35,9 @@ fun CaliqScreen(
     ) {
         val outerModifier = Modifier.fillMaxSize().elasticOverscroll(oneUiReachabilityEnabled = oneUiReachabilityEnabled)
 
-        BoxWithConstraints(modifier = outerModifier) {
+        val windowMetrics = rememberCaliqWindowMetrics()
+        val maxWidth = windowMetrics.widthDp
+        Box(modifier = outerModifier) {
             val isWide = maxWidth >= 600.dp
             val isWideOrLandscape = maxWidth >= 600.dp
             val topBarHeight = if (isWideOrLandscape) 42.dp else 48.dp

@@ -76,7 +76,9 @@ fun AppearanceScreen(viewModel: AppViewModel) {
         showBottomNav = false,
         scrollable = true
     ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val windowMetrics = rememberCaliqWindowMetrics()
+        val maxWidth = windowMetrics.widthDp
+        Box(modifier = Modifier.fillMaxWidth()) {
             val isWide = maxWidth >= 580.dp
 
             Column(

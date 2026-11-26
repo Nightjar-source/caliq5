@@ -234,7 +234,10 @@ fun MyGradesScreen(viewModel: AppViewModel) {
                 .calculateBottomPadding()
 
             CaliqScreen(title = "درجاتي (السجل الشامل)", onBack = { viewModel.goBack() }, scrollable = false, oneUiReachabilityEnabled = true) {
-                BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                val windowMetrics = rememberCaliqWindowMetrics()
+                val maxWidth = windowMetrics.widthDp
+                val maxHeight = windowMetrics.heightDp
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                     val isLandscape = maxWidth > maxHeight
                     val isCompactWindow = maxWidth < 520.dp
                     val isPhoneLandscape = isLandscape && (maxHeight < 500.dp && maxWidth >= 520.dp)
@@ -684,7 +687,10 @@ fun StudentEditView(
         .calculateBottomPadding()
 
     CaliqScreen(title = if (student == null) "إضافة سجل درجاتي (السجل الشامل)" else "تعديل سجل درجاتي (السجل الشامل)", onBack = { if (hasUnsavedChanges) showUnsavedDialog = true else onCancel() }, scrollable = false, oneUiReachabilityEnabled = true) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        val windowMetrics = rememberCaliqWindowMetrics()
+        val maxWidth = windowMetrics.widthDp
+        val maxHeight = windowMetrics.heightDp
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
             val isCompactWindow = maxWidth < 520.dp
             val isPhoneLandscape = isLandscape && (maxHeight < 500.dp && maxWidth >= 520.dp)

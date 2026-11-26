@@ -1,9 +1,8 @@
-const CACHE_NAME = 'caliq5-pwa-v1';
+const CACHE_NAME = 'caliq5-pwa-v3';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json',
-  './caliq5.js'
+  './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -23,15 +22,14 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request).then((response) => {
-        if (response && response.status === 200 && event.request.method === 'GET') {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => cached);
-    })
+    fetch(event.request).then((response) => {
+      if (response && response.status === 200) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+      }
+      return response;
+    }).catch(() => caches.match(event.request))
   );
 });

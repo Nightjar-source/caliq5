@@ -50,7 +50,8 @@ fun CaliqSideMenu(
     onClose: () -> Unit,
     onNavigate: (Screen) -> Unit,
 ) {
-    BoxWithConstraints(modifier = Modifier.fillMaxHeight()) {
+    val maxWidth = com.Nightjar.caliq5.ui.components.rememberCaliqWindowMetrics().widthDp
+    Box(modifier = Modifier.fillMaxHeight()) {
         // Material 3 Adaptive Drawer Width: proportional and sleek on phones, standard on tablets/foldables
         val drawerWidth = when {
             maxWidth < 360.dp -> (maxWidth - 52.dp).coerceAtLeast(260.dp)

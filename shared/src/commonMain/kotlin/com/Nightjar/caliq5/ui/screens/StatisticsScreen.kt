@@ -58,7 +58,10 @@ fun StatisticsScreen(viewModel: AppViewModel) {
             )
         }
         
-        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        val windowMetrics = rememberCaliqWindowMetrics()
+        val maxWidth = windowMetrics.widthDp
+        val maxHeight = windowMetrics.heightDp
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val isLandscape = maxWidth > maxHeight
             val isCompactWindow = maxWidth < 520.dp
             val isPhoneLandscape = isLandscape && (maxHeight < 500.dp && maxWidth >= 520.dp)
@@ -102,14 +105,13 @@ fun StatisticsScreen(viewModel: AppViewModel) {
             } else {
                 itemsIndexed(history, key = { _, item -> item.id }) { index, item ->
                     val isDeleting = deletingItemId == item.id
-                    val dismissState = rememberSwipeToDismissBoxState(
-                        confirmValueChange = {
-                            if (it == SwipeToDismissBoxValue.EndToStart) {
-                                itemToDelete = item.id
-                                false
-                            } else false
+                    val dismissState = rememberSwipeToDismissBoxState()
+                    LaunchedEffect(dismissState.currentValue) {
+                        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+                            itemToDelete = item.id
+                            dismissState.reset()
                         }
-                    )
+                    }
 
                     Box(
                         modifier = Modifier

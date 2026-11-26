@@ -27,6 +27,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.layout.WindowInsets
@@ -137,23 +138,22 @@ fun AppNavigation(
         viewModel.handleTopBarBack()
     }
 
-    // Official Material 3 Adaptive Window & Posture Calculation (Foldables & Flex Mode)
-    val adaptiveInfo = currentWindowAdaptiveInfo()
-    val adaptiveWindowSizeClass = adaptiveInfo.windowSizeClass
-    val isTabletop = adaptiveInfo.windowPosture.isTabletop
-    val horizontalHinge = adaptiveInfo.windowPosture.hingeList.firstOrNull { !it.isVertical }
-    val verticalHinge = adaptiveInfo.windowPosture.hingeList.firstOrNull { it.isVertical && it.isSeparating }
+    // Official Material 3 Adaptive Window & Posture Calculation (Foldables, Flex Mode, DeX, Desktop)
+    val windowMetrics = com.Nightjar.caliq5.ui.components.rememberCaliqWindowMetrics()
+    val adaptiveWindowSizeClass = windowMetrics.windowSizeClass
+    val isTabletop = windowMetrics.isTabletop
+    val horizontalHinge = windowMetrics.horizontalHinge
+    val verticalHinge = windowMetrics.verticalHinge
 
     val navTrigger by viewModel.navigationTrigger.collectAsState()
     CompositionLocalProvider(
         com.Nightjar.caliq5.ui.components.LocalScreenNavigationTrigger provides navTrigger
     ) {
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val windowInfo = LocalWindowInfo.current
+    Box(modifier = Modifier.fillMaxSize()) {
         val density = LocalDensity.current
-        val containerWidth = if (maxWidth > 0.dp) maxWidth else with(density) { windowInfo.containerSize.width.toDp() }.coerceAtLeast(1.dp)
-        val containerHeight = if (maxHeight > 0.dp) maxHeight else with(density) { windowInfo.containerSize.height.toDp() }.coerceAtLeast(1.dp)
-        val isWideScreen = containerWidth >= 600.dp || verticalHinge != null
+        val containerWidth = windowMetrics.widthDp
+        val containerHeight = windowMetrics.heightDp
+        val isWideScreen = windowMetrics.isWide
         val isLandscape = containerWidth > containerHeight && containerHeight < 500.dp
         val tabletopBottomReserve = if (isTabletop && horizontalHinge != null) {
             with(density) { (horizontalHinge.bounds.bottom - horizontalHinge.bounds.top).toDp() }.coerceAtLeast(16.dp)
@@ -549,7 +549,7 @@ private fun MainContent(
 ) {
     val canGoBack by viewModel.canGoBack.collectAsState()
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
         val isWideOrLandscape = isWideScreen
         val topBarHeight = if (isWideOrLandscape) 38.dp else 48.dp
 
@@ -624,7 +624,7 @@ private fun MainContent(
         val layoutDirection = LocalLayoutDirection.current
         val topBarStartPadding = if (isWideScreen) contentPadding.calculateStartPadding(layoutDirection) else 0.dp
         val topBarEndPadding = if (isWideScreen) contentPadding.calculateEndPadding(layoutDirection) else 0.dp
-        val containerWidth = maxWidth
+        val containerWidth = com.Nightjar.caliq5.ui.components.rememberCaliqWindowMetrics().widthDp
         val topSafeInset = WindowInsets.statusBars
             .union(WindowInsets.captionBar)
             .union(WindowInsets.displayCutout)
@@ -801,8 +801,8 @@ fun CaliqBottomNav(
     val isDark = com.Nightjar.caliq5.theme.isAppInDarkTheme()
     val themePrimary = MaterialTheme.colorScheme.primary
 
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        val navTotalWidth = maxWidth
+    val navTotalWidth = com.Nightjar.caliq5.ui.components.rememberCaliqWindowMetrics().widthDp
+    Box(modifier = modifier.fillMaxWidth()) {
         val isUltraCompact = navTotalWidth < 280.dp
         val isCompact = navTotalWidth < 360.dp
         val barHeight = if (isUltraCompact) 38.dp else if (isCompact) 44.dp else 48.dp
@@ -824,13 +824,16 @@ fun CaliqBottomNav(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 1. الكبسولة العضوية الحبيبية الرئيسية الشفافة (Original 25% frosted glass from backup)
-            BoxWithConstraints(
+            var pillContainerWidthPx by remember { mutableIntStateOf(0) }
+            val density = LocalDensity.current
+            Box(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .onSizeChanged { pillContainerWidthPx = it.width },
                 contentAlignment = Alignment.Center
             ) {
-                val totalWidth = maxWidth
+                val totalWidth = with(density) { pillContainerWidthPx.toDp() }.coerceAtLeast(120.dp)
                 val tabWidth = totalWidth / 4f
                 val tabWidthPx = with(LocalDensity.current) { tabWidth.toPx() }
                 val safeTabWidthPx = tabWidthPx.coerceAtLeast(1f)
@@ -1095,8 +1098,8 @@ fun CaliqNavigationRail(
     modifier: Modifier = Modifier,
     railWidth: Dp = 72.dp,
 ) {
-    BoxWithConstraints(modifier = modifier) {
-        val availableHeight = maxHeight
+    val availableHeight = com.Nightjar.caliq5.ui.components.rememberCaliqWindowMetrics().heightDp
+    Box(modifier = modifier) {
         // Dynamic adaptive items based on vertical space (الشاشات الكبيرة والمطويات والتابلت)
         // >= 680.dp: All 7 items (الإعفاء، السعي، الفصلي، فصل 2، درجاتي، السجل، الأخبار)
         // >= 560.dp: 6 items (إضافة درجاتي والسجل)
@@ -1148,13 +1151,16 @@ fun CaliqNavigationRail(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // 1. الكبسولة العضوية الحبيبية العمودية الرئيسية مع التبويبات المتكيفة ديناميكياً
-            BoxWithConstraints(
+            var railPillHeightPx by remember { mutableIntStateOf(0) }
+            val railDensity = LocalDensity.current
+            Box(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .onSizeChanged { railPillHeightPx = it.height },
                 contentAlignment = Alignment.Center
             ) {
-                val totalHeight = maxHeight
+                val totalHeight = with(railDensity) { railPillHeightPx.toDp() }.coerceAtLeast(160.dp)
                 val tabHeight = totalHeight / itemCount.toFloat()
                 val tabHeightPx = with(LocalDensity.current) { tabHeight.toPx() }
                 val safeTabHeightPx = tabHeightPx.coerceAtLeast(1f)

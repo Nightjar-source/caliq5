@@ -36,7 +36,10 @@ fun ExemptionSelectScreen(viewModel: AppViewModel) {
             .asPaddingValues()
             .calculateTopPadding()
 
-        BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        val windowMetrics = rememberCaliqWindowMetrics()
+        val maxWidth = windowMetrics.widthDp
+        val maxHeight = windowMetrics.heightDp
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             val screenWidth = maxWidth
             val containerMaxWidth = when {
                 maxWidth >= 1200.dp -> maxWidth
