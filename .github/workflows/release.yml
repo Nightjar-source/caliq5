@@ -143,28 +143,34 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build Windows Standalone App (EXE & Distributable)
-        run: ./gradlew :desktopApp:createDistributable --no-daemon --stacktrace
+      - name: Install WiX Toolset for Direct Windows EXE
+        run: choco install wixtoolset -y
 
-      - name: Package Portable Windows ZIP
+      - name: Build Direct Windows Installer (EXE)
+        run: ./gradlew :desktopApp:packageExe --no-daemon --stacktrace
+
+      - name: Locate Windows EXE
+        id: find_exe
         shell: pwsh
         run: |
-          $distDir = "desktopApp/build/compose/binaries/main/app"
-          if (Test-Path $distDir) {
-            Compress-Archive -Path "$distDir/*" -DestinationPath "caliq5-windows-portable.zip" -Force
+          $exe = Get-ChildItem -Path "desktopApp/build/compose/binaries/main/exe" -Filter "*.exe" | Select-Object -First 1
+          if ($exe) {
+            $dest = "Caliq5-${{ github.ref_name }}-windows-setup.exe"
+            Copy-Item $exe.FullName $dest -Force
+            echo "exe_path=$dest" >> $env:GITHUB_OUTPUT
           }
 
-      - name: Upload Windows Artifacts
+      - name: Upload Windows EXE Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: caliq5-windows-desktop
-          path: caliq5-windows-portable.zip
+          name: caliq5-windows-exe
+          path: ${{ steps.find_exe.outputs.exe_path }}
 
-      - name: Attach Windows Build to Release
+      - name: Attach Windows EXE to Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: caliq5-windows-portable.zip
+          files: ${{ steps.find_exe.outputs.exe_path }}
 
   build-pwa:
     name: Build PWA Web App (WasmJs)

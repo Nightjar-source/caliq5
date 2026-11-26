@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
@@ -355,16 +356,20 @@ private fun ThemeModeCard(
                 )
             )
 
-            BoxWithConstraints(
+            var containerWidthPx by remember { mutableStateOf(0) }
+            val density = androidx.compose.ui.platform.LocalDensity.current
+            val containerWidthDp = with(density) { containerWidthPx.toDp() }
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
+                    .onSizeChanged { containerWidthPx = it.width }
             ) {
                 val options = listOf("light", "dark", "system")
                 val selectedIndex = options.indexOf(settings.theme).takeIf { it >= 0 } ?: 2
-                
-                val tabWidth = maxWidth / 3
+
+                val tabWidth = (containerWidthDp / 3).coerceAtLeast(0.dp)
                 val indicatorOffset by androidx.compose.animation.core.animateDpAsState(
                     targetValue = tabWidth * selectedIndex,
                     animationSpec = androidx.compose.animation.core.spring(
@@ -374,14 +379,16 @@ private fun ThemeModeCard(
                 )
 
                 // Sliding Indicator
-                Box(
-                    modifier = Modifier
-                        .offset(x = indicatorOffset)
-                        .width(tabWidth)
-                        .fillMaxHeight()
-                        .padding(4.dp)
-                        .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp))
-                )
+                if (tabWidth > 0.dp) {
+                    Box(
+                        modifier = Modifier
+                            .offset(x = indicatorOffset)
+                            .width(tabWidth)
+                            .fillMaxHeight()
+                            .padding(4.dp)
+                            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp))
+                    )
+                }
 
                 Row(modifier = Modifier.fillMaxSize()) {
                     ThemeOptionButton(

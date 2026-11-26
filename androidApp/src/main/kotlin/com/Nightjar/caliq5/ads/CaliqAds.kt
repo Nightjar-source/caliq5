@@ -46,6 +46,10 @@ object CaliqAdsManager {
     private var cachedAdView: AdView? = null
     var isBannerLoaded = false
         private set
+    var bannerWidthDp: Int = 320
+        private set
+    var bannerHeightDp: Int = 50
+        private set
 
     // Official Google Mobile Ads Test Unit IDs fallback
     private const val FALLBACK_TEST_INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712"
@@ -81,8 +85,10 @@ object CaliqAdsManager {
         } else if (rawWidth >= 600) {
             AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, rawWidth.coerceAtMost(640))
         } else {
-            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, rawWidth)
+            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, rawWidth.coerceAtLeast(320))
         }
+        bannerWidthDp = adSize.width.coerceAtLeast(320)
+        bannerHeightDp = adSize.height.coerceAtLeast(50)
         adView.setAdSize(adSize)
 
         adView.adListener = object : AdListener() {
@@ -216,12 +222,13 @@ fun CaliqAdaptiveBanner(
         ) {
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 4.dp, vertical = 2.dp)
-                    .wrapContentSize(),
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
                 contentAlignment = Alignment.Center
             ) {
                 AndroidView(
-                    modifier = Modifier.wrapContentSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(CaliqAdsManager.bannerHeightDp.dp),
                     factory = { context ->
                         CaliqAdsManager.getOrCreateBannerAdView(context) { loaded ->
                             isAdLoaded = loaded
