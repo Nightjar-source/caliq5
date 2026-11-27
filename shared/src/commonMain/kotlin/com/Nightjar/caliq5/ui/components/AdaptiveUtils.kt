@@ -2,7 +2,7 @@ package com.Nightjar.caliq5.ui.components
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.HingeInfo
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.platform.LocalDensity
@@ -37,7 +37,7 @@ data class CaliqWindowMetrics(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun rememberCaliqWindowMetrics(): CaliqWindowMetrics {
-    val adaptiveInfo = currentWindowAdaptiveInfo(supportLargeAndXLargeWidth = true)
+    val adaptiveInfo = currentWindowAdaptiveInfoV2()
     val density = LocalDensity.current
     val containerSize = LocalWindowInfo.current.containerSize
     val widthDp = with(density) { containerSize.width.toDp() }.coerceAtLeast(1.dp)
