@@ -184,11 +184,10 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                                     stiffness = Spring.StiffnessMediumLow
                                 )
                             )
-                            .fillMaxWidth()
-                            .popInOnInitialLoad(index + 1),
-                        contentAlignment = Alignment.Center
+                            .popInOnInitialLoad(index + 1)
                     ) {
-                        SubjectInputRow(
+                        Box(modifier = if (isOrphan) Modifier.widthIn(max = 460.dp).fillMaxWidth() else Modifier.fillMaxWidth()) {
+                            SubjectInputRow(
                             subjectName = subject.name,
                             isOptional = subject.optional,
                             entry = entry,
@@ -200,6 +199,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                             onSkipToggle = { viewModel.toggleSkipSubject(subject.name) },
                             modifier = Modifier.fillMaxWidth()
                         )
+                        }
                     }
                 }
 
@@ -231,17 +231,19 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                             .popInOnInitialLoad(predefinedSubjects.size + index + 1),
                         contentAlignment = Alignment.Center
                     ) {
-                        val isLone = (predefinedSubjects.size + customSubjects.size) % 2 == 1 && index == customSubjects.lastIndex
-                        CustomSubjectRow(
-                            index = index,
-                            entry = subject,
-                            isDetailedMode = selectedTab == 1,
-                            onNameChange = { viewModel.updateCustomSubjectName(index, it) },
-                            onGradeChange = { viewModel.updateCustomSubjectGrade(index, it) },
-                            onDetailChange = { t1, mid, t2 -> viewModel.updateCustomSubjectDetailGrades(index, t1, mid, t2) },
-                            onRemove = { viewModel.removeCustomSubject(index) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        val isLone = index == customSubjects.lastIndex
+                        Box(modifier = if (isLone) Modifier.widthIn(max = 460.dp).fillMaxWidth() else Modifier.fillMaxWidth()) {
+                            CustomSubjectRow(
+                                index = index,
+                                entry = subject,
+                                isDetailedMode = selectedTab == 1,
+                                onNameChange = { viewModel.updateCustomSubjectName(index, it) },
+                                onGradeChange = { viewModel.updateCustomSubjectGrade(index, it) },
+                                onDetailChange = { t1, mid, t2 -> viewModel.updateCustomSubjectDetailGrades(index, t1, mid, t2) },
+                                onRemove = { viewModel.removeCustomSubject(index) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
 

@@ -209,7 +209,7 @@ private fun MonthRowItem(
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = if (isTrailingOdd) Modifier.widthIn(max = 460.dp).fillMaxWidth() else Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {

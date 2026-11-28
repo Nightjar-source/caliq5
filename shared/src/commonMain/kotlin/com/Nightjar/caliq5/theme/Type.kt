@@ -9,6 +9,8 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import caliq5.shared.generated.resources.Res
+import caliq5.shared.generated.resources.notosansarabic_bold
+import caliq5.shared.generated.resources.notosansarabic_regular
 import caliq5.shared.generated.resources.reemkufi_regular
 import caliq5.shared.generated.resources.reemkufi_bold
 
@@ -133,3 +135,32 @@ val ReemKufiFontFamily: FontFamily
         org.jetbrains.compose.resources.Font(Res.font.reemkufi_regular, FontWeight.Normal),
         org.jetbrains.compose.resources.Font(Res.font.reemkufi_bold, FontWeight.Bold)
     )
+
+val NotoSansArabicFontFamily: FontFamily
+    @Composable
+    get() = FontFamily(
+        org.jetbrains.compose.resources.Font(Res.font.notosansarabic_regular, FontWeight.Normal),
+        org.jetbrains.compose.resources.Font(Res.font.notosansarabic_bold, FontWeight.Bold)
+    )
+
+@Composable
+fun rememberCaliqTypography(): Typography {
+    val bodyFont = rememberDefaultBodyFontFamily()
+    return CaliqTypography.copy(
+        displayLarge = CaliqTypography.displayLarge.copy(fontFamily = bodyFont),
+        displayMedium = CaliqTypography.displayMedium.copy(fontFamily = bodyFont),
+        displaySmall = CaliqTypography.displaySmall.copy(fontFamily = bodyFont),
+        headlineLarge = CaliqTypography.headlineLarge.copy(fontFamily = bodyFont),
+        headlineMedium = CaliqTypography.headlineMedium.copy(fontFamily = bodyFont),
+        headlineSmall = CaliqTypography.headlineSmall.copy(fontFamily = bodyFont),
+        titleLarge = CaliqTypography.titleLarge.copy(fontFamily = bodyFont),
+        titleMedium = CaliqTypography.titleMedium.copy(fontFamily = bodyFont),
+        titleSmall = CaliqTypography.titleSmall.copy(fontFamily = bodyFont),
+        bodyLarge = CaliqTypography.bodyLarge.copy(fontFamily = bodyFont),
+        bodyMedium = CaliqTypography.bodyMedium.copy(fontFamily = bodyFont),
+        bodySmall = CaliqTypography.bodySmall.copy(fontFamily = bodyFont),
+        labelLarge = CaliqTypography.labelLarge.copy(fontFamily = bodyFont),
+        labelMedium = CaliqTypography.labelMedium.copy(fontFamily = bodyFont),
+        labelSmall = CaliqTypography.labelSmall.copy(fontFamily = bodyFont),
+    )
+}

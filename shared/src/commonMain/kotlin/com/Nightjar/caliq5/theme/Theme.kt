@@ -382,7 +382,7 @@ fun CaliqTheme(
     ) {
         MaterialTheme(
             colorScheme = animatedColorScheme,
-            typography = CaliqTypography,
+            typography = rememberCaliqTypography(),
             shapes = CaliqShapes,
             content = {
                 SystemAppearance(isDark = darkTheme)

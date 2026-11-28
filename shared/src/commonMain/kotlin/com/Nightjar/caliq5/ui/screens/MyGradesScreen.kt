@@ -1061,7 +1061,6 @@ Box(modifier = Modifier.fillMaxWidth()) {
                     val isSkipped = isOptional && entry.record.t1Val == "SKIPPED"
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxWidth()
                         modifier = Modifier
                             .fillMaxWidth()
                             .popInOnInitialLoad(index + 1)
@@ -1074,8 +1073,8 @@ Box(modifier = Modifier.fillMaxWidth()) {
                                 )
                             )
                     ) {
-
-                        SubjectGradeEditCard(
+                        Box(modifier = if (isOrphan) Modifier.widthIn(max = 460.dp).fillMaxWidth() else Modifier.fillMaxWidth()) {
+                            SubjectGradeEditCard(
                             name = entry.name,
                             record = entry.record,
                             isGenerallyExempt = isGenerallyExempt,
@@ -1108,6 +1107,7 @@ Box(modifier = Modifier.fillMaxWidth()) {
                                 }
                             }
                         )
+                        }
                     }
                 }
                 

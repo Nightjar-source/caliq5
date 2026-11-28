@@ -749,7 +749,6 @@ fun GoldenSpiritualCard(modifier: Modifier = Modifier) {
                     text = "بِاسْمِ الْعَلِيِّ الْعَظِيمِ، وَقُلْ هُوَ اللَّهُ أَحَدٌ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ",
                     style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.Bold,
-                        fontFamily = com.Nightjar.caliq5.theme.ReemKufiFontFamily,
                         fontSize = 14.5.sp,
                         lineHeight = 22.sp,
                         brush = goldenShimmerBrush
