@@ -1047,13 +1047,21 @@ Box(modifier = Modifier.fillMaxWidth()) {
                 itemsIndexed(
                     items = sortedEntries,
                     key = { _, it -> it.id },
-                    span = { _, _ -> androidx.compose.foundation.lazy.grid.GridItemSpan(1) }
+                    span = { index, _ ->
+                        if (maxLineSpan > 1 && sortedEntries.size % maxLineSpan == 1 && index == sortedEntries.lastIndex) {
+                            androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan)
+                        } else {
+                            androidx.compose.foundation.lazy.grid.GridItemSpan(1)
+                        }
+                    }
                 ) { index, entry ->
+                    val isOrphan = sortedEntries.size > 1 && index == sortedEntries.lastIndex
                     val isSubjectCustom = isCustomClass || !predefinedSubjects.contains(entry.name)
                     val isOptional = !isCustomClass && (com.Nightjar.caliq5.data.ClassData.getSubjects(selectedClassName).find { it.name == entry.name }?.optional == true)
                     val isSkipped = isOptional && entry.record.t1Val == "SKIPPED"
                     Box(
                         contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxWidth()
                         modifier = Modifier
                             .fillMaxWidth()
                             .popInOnInitialLoad(index + 1)

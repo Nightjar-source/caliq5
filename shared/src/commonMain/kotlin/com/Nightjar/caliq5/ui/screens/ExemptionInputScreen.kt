@@ -157,13 +157,25 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 itemsIndexed(
                     items = predefinedSubjects,
                     key = { _, it -> "pre_" + it.name },
-                    span = { _, _ -> GridItemSpan(1) }
+                    span = { index, _ ->
+                        val totalCount = predefinedSubjects.size + customSubjects.size
+                        val isLastItem = customSubjects.isEmpty() && index == predefinedSubjects.lastIndex
+                        if (maxLineSpan > 1 && totalCount % maxLineSpan == 1 && isLastItem) {
+                            GridItemSpan(maxLineSpan)
+                        } else {
+                            GridItemSpan(1)
+                        }
+                    }
                 ) { index, subject ->
+                    val totalCount = predefinedSubjects.size + customSubjects.size
+                    val isOrphan = customSubjects.isEmpty() && index == predefinedSubjects.lastIndex && totalCount > 1
                     val entry = exemptionGrades[subject.name] ?: SubjectGradeEntry(
                         name = subject.name, grade = null, isSkipped = false
                     )
                     Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
+                            .fillMaxWidth()
                             .animateItem(
                                 fadeInSpec = androidx.compose.animation.core.tween(250),
                                 fadeOutSpec = androidx.compose.animation.core.tween(200),
