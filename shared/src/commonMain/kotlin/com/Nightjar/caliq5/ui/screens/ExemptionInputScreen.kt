@@ -157,15 +157,7 @@ fun ExemptionInputScreen(viewModel: AppViewModel) {
                 itemsIndexed(
                     items = predefinedSubjects,
                     key = { _, it -> "pre_" + it.name },
-                    span = { index, _ ->
-                        val totalCount = predefinedSubjects.size + customSubjects.size
-                        val isLastItem = customSubjects.isEmpty() && index == predefinedSubjects.lastIndex
-                        if (maxLineSpan > 1 && totalCount % maxLineSpan == 1 && isLastItem) {
-                            GridItemSpan(maxLineSpan)
-                        } else {
-                            GridItemSpan(1)
-                        }
-                    }
+                    span = { _, _ -> GridItemSpan(1) }
                 ) { index, subject ->
                     val entry = exemptionGrades[subject.name] ?: SubjectGradeEntry(
                         name = subject.name, grade = null, isSkipped = false

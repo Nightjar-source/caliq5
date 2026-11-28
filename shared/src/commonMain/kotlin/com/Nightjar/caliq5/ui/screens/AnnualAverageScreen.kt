@@ -119,7 +119,7 @@ fun AnnualAverageScreen(viewModel: AppViewModel) {
                         label = "الفصل الثاني:",
                         value = term2,
                         onValueChange = { viewModel.updateAnnualField("term2", it) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.widthIn(max = 420.dp).fillMaxWidth()
                     )
                 }
             }
